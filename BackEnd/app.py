@@ -132,5 +132,76 @@ def sair ():
     session.clear()
     return redirect ("/Pages/login.html")
 
+
+@app.route("/Pages/editarPerfil.html", methods=["GET", "POST"] )
+def editar_perfil():
+    usuario_id = session.get("usuario_id")
+
+    if not usuario_id:
+        return redirect("/Pages/login.html")
+
+    if request.method == "POST":
+        token_enviado = request.form.get("csrf_token", "")
+        token_esperado = request.form.get("csrf_token", "")
+
+        if not token_esperado or not secrets.compare_digest(
+            token_enviado, token_esperado
+        ):
+            abort(400)
+
+    conexao = sqlite3.connect(caminho_banco)
+    conexao.row_factory = sqlite3.Row
+    erro = None
+
+    try:
+        usuario = conexao.execute(
+            "SELECT nome, telefone FROM usuarios WHERE id = ?",
+            (usuario_id,)
+        ).fetchone
+
+        if usuario is None:
+            session.clear()
+            return redirect("/Pages/login.html")
+
+        if request.method == "POST":
+            nome = request.form.get("nome", "").strip()
+            telefone = request.form.get("telefone", "").strip()
+
+            usuario = {"nome": nome, "telefone": telefone}
+
+            if not 3 <= len(nome) <=120:
+                erro = "O nome deve  ter entre 3 e 120 caracteres."
+            elif not telefone or len(telefone) > 20:
+                erro = "Informe um telefone com até 20 caracteres."
+            else:
+                conexao.execute(
+                    """
+                    UPDATE usuarios
+                    SET nome = ?, telefone = ?
+                    WHERE id = ?
+                    """,
+                    (nome, telefone, usuario_id)
+                )    
+                conexao.commit()
+
+                return redirect("/Pages/Perfil.html")
+    finally:
+        conexao.close()
+
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_urlsafe(32)
+
+    resposta = app.make_response(
+        render_template(
+            "editarPerfil.html",
+            usuario=usuario,
+            erro=erro,
+            csrf_token=session["csrf_token"]
+        )
+    )
+    resposta.headers["Cache-Control"] = "no-store"
+
+    return resposta
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
