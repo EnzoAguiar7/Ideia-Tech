@@ -48,18 +48,7 @@ body {
     color: var(--texto);
     background: var(--fundo-pagina);
 }
-<<<<<<< HEAD
-=======
 
-button,
-input {
-    font: inherit;
-}
-
-a {
-    color: inherit;
-}
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
 
 button,
 input {
@@ -89,7 +78,7 @@ a {
     background:#98e7de2d ;
 }
 
-.auth-aside::after {
+.auth-aside:after {
     position: absolute;
     z-index: -1;
     right: -125px;
@@ -118,19 +107,16 @@ a {
     transition: color var(--transicao);
 }
 
-<<<<<<< HEAD
 .auth-brand:hover {
     color: var(--cor-primaria);
 }
 
 .auth-brand svg,
 .auth-brand i {
-=======
-.auth-brand svg {
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
     width: 30px;
     height: 30px;
     stroke-width: 1.8;
+
 }
 
 .auth-aside-copy {
@@ -177,16 +163,13 @@ a {
     margin: auto;
 }
 
-<<<<<<< HEAD
+
 /* ---------- Heading ---------- */
 .auth-heading {
     margin-bottom: 28px;
    display: flex;
    flex-direction: column;
-=======
-.auth-heading {
-    margin-bottom: 28px;
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
 }
 
 .auth-heading h2 {
@@ -203,10 +186,9 @@ a {
     font-size: 0.94rem;
 }
 
-<<<<<<< HEAD
+
 /* ---------- Form ---------- */
-=======
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
 .auth-form {
     display: flex;
     flex-direction: column;
@@ -223,10 +205,9 @@ a {
 .form-field label {
     font-size: 0.85rem;
     font-weight: 650;
-<<<<<<< HEAD
+
     color: var(--texto);
-=======
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
 }
 
 .form-field input {
@@ -246,15 +227,12 @@ a {
 }
 
 .form-field input:focus {
-<<<<<<< HEAD
+
     border-color: var(--cor-primaria);
     background: var(--branco);
     box-shadow: 0 0 0 4px rgba(17, 197, 173, 0.16);
-=======
-    border-color: var(--azul-claro);
-    background: var(--branco);
-    box-shadow: 0 0 0 4px rgba(115, 177, 184, 0.16);
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
+
 }
 
 .form-field input:focus-visible {
@@ -286,42 +264,31 @@ a {
     height: 16px;
     flex: 0 0 auto;
     margin-top: 3px;
-<<<<<<< HEAD
     accent-color: var(--cor-primaria-escura);
-=======
-    accent-color: var(--azul-escuro);
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
 }
 
 .form-check a,
 .auth-inline-link,
 .auth-bottom a {
-<<<<<<< HEAD
+
     color: var(--cor-primaria-escura);
     font-weight: 700;
     text-decoration: none;
     transition: color var(--transicao);
-=======
-    color: var(--azul-escuro);
-    font-weight: 700;
-    text-decoration: none;
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
 }
 
 .form-check a:hover,
 .auth-inline-link:hover,
 .auth-bottom a:hover {
-<<<<<<< HEAD
+
     color: var(--cor-primaria);
     text-decoration: underline;
 }
 
 /* ---------- Botão principal ---------- */
-=======
-    text-decoration: underline;
-}
 
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
 .auth-submit {
     width: 100%;
     min-height: 52px;
@@ -339,8 +306,8 @@ a {
     cursor: pointer;
     transition: transform var(--transicao), background var(--transicao), box-shadow var(--transicao);
 }
-<<<<<<< HEAD
-=======
+
+
 
 .auth-submit:hover {
     transform: translateY(-1px);
@@ -392,7 +359,7 @@ a {
     color: var(--texto-secundario);
     font-size: 0.82rem;
 }
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
 
 .auth-submit:hover {
     transform: translateY(-1px);
@@ -480,14 +447,13 @@ a {
         font-size: 1.2rem;
     }
 
-<<<<<<< HEAD
+
     .auth-brand svg,
     .auth-brand i {
-=======
-    .auth-brand svg {
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
         width: 26px;
         height: 26px;
+        
     }
 
     .auth-aside-copy {
@@ -532,10 +498,7 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-<<<<<<< HEAD
-=======
 
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
     *,
     *::before,
     *::after {
@@ -544,8 +507,8 @@ a {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
     }
-<<<<<<< HEAD
+
 }
-=======
-}
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
+
+

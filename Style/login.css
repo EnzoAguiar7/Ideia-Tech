@@ -64,11 +64,7 @@ a {
     flex-direction: column;
     justify-content: center;
     overflow: hidden;
-<<<<<<< HEAD
     background: #98e7de2d;
-=======
-    background: linear-gradient(145deg, #e3edeb 0%, #dce8e5 55%, #d4e3df 100%);
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
 }
 
 .slogan>img:first-child {
@@ -184,13 +180,10 @@ a {
     transition: color var(--transicao);
 }
 
-<<<<<<< HEAD
+
 .login-form form > span:hover {
 color: #2c87b1;
-=======
-.login-form form>span:hover {
-    color: var(--azul);
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
 }
 
 .login-form button {
@@ -284,13 +277,10 @@ color: #2c87b1;
     font-size: 0.8125rem;
 }
 
-<<<<<<< HEAD
+
 .login-form > p:last-child a {
     color: black;
-=======
-.login-form>p:last-child a {
-    color: var(--azul-escuro);
->>>>>>> 50e5f31c02f8f697fc6f715efec9af2ae417fc5b
+
     font-weight: 700;
     text-decoration: none;
 }
