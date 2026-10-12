@@ -2,12 +2,13 @@
 <html lang="pt-br">
 
 <head>
-
+    <base href="/Pages/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>login</title>
     <link rel="stylesheet" href="/Style/login.css">
     <link rel="stylesheet" href="/Style/Style.css">
+    <link rel="stylesheet" href="/Style/mensagens.css">
 
     <script src="https://unpkg.com/lucide@latest" async onload="window.lucide?.createIcons()"></script>
 
@@ -34,6 +35,8 @@
 
     <section class="login-form">
         <h2>Login</h2>
+        {% include "_mensagens.html" %}
+
         <form action="/login" method="POST">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>

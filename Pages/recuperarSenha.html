@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <link rel="stylesheet" href="../Style/Style.css">
     <meta charset="UTF-8">
@@ -7,15 +8,15 @@
     <meta name="description" content="Recupere o acesso à sua conta IdeiaTech.">
     <title>Recuperar senha | IdeiaTech</title>
 
+    <base href="/Pages/">
+    <link rel="stylesheet" href="/Style/mensagens.css">
     <link rel="stylesheet" href="/Style/auth-pages.css">
     <link rel="stylesheet" href="/Style/recuperarSenha.css">
-     <script 
-        src="https://unpkg.com/lucide@latest" 
-        async 
-        onload="window.lucide?.createIcons()">
+    <script src="https://unpkg.com/lucide@latest" async onload="window.lucide?.createIcons()">
     </script>
 
 </head>
+
 <body>
     <main class="auth-layout">
         <aside class="auth-aside">
@@ -24,32 +25,40 @@
             </a>
             <div class="auth-aside-copy">
                 <h1>Vamos ajudar você a voltar.</h1>
-                <p>Informe o e-mail associado à sua conta. Se ele estiver cadastrado, o sistema poderá enviar instruções para redefinir sua senha.</p>
+                <p>Informe o e-mail associado à sua conta. Se ele estiver cadastrado, o sistema poderá enviar instruções
+                    para redefinir sua senha.</p>
             </div>
             <p class="auth-aside-foot">IdeiaTech · Seu acesso protegido.</p>
         </aside>
 
         <section class="auth-main" aria-labelledby="titulo-recuperacao">
             <div class="auth-panel auth-panel--recuperacao">
-                <a class="auth-back" href="login.html"><i data-lucide="arrow-left" aria-hidden="true"></i> Voltar para o login</a>
+                <a class="auth-back" href="login.html"><i data-lucide="arrow-left" aria-hidden="true"></i> Voltar para o
+                    login</a>
                 <header class="auth-heading">
                     <h2 id="titulo-recuperacao">Esqueceu sua senha?</h2>
                     <p>Sem problema. Vamos orientar você na recuperação do acesso.</p>
                 </header>
 
+                {% include "_mensagens.html" %}
+
                 <form class="auth-form" action="/recuperar-senha" method="POST" id="formRecuperarSenha">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <div class="form-field">
                         <label for="emailRecuperacao">E-mail cadastrado</label>
-                        <input type="email" id="emailRecuperacao" name="email" autocomplete="email" maxlength="254" required>
+                        <input type="email" id="emailRecuperacao" name="email" autocomplete="email" maxlength="254"
+                            required>
                     </div>
                     <p class="auth-notice">Confira também a pasta de spam ao procurar as instruções de recuperação.</p>
-                    <button class="auth-submit" type="submit">Enviar instruções <i data-lucide="mail" aria-hidden="true"></i></button>
+                    <button class="auth-submit" type="submit">Enviar instruções <i data-lucide="mail"
+                            aria-hidden="true"></i></button>
                 </form>
 
                 <p class="auth-bottom">Lembrou sua senha? <a href="login.html">Entrar</a></p>
             </div>
         </section>
     </main>
-    
+
 </body>
+
 </html>

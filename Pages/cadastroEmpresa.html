@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <base href="/Pages/">
     <link rel="stylesheet" href="../Style/Style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,8 @@
     <title>Cadastro de empresa | IdeiaTech</title>
     <link rel="stylesheet" href="/Style/auth-pages.css">
     <link rel="stylesheet" href="/Style/cadastroEmpresa.css">
+    <link rel="stylesheet" href="/Style/mensagens.css">
+
     <script 
         src="https://unpkg.com/lucide@latest" 
         async 
@@ -35,7 +38,10 @@
                     <p>Informe os dados do negócio e da pessoa responsável.</p>
                 </header>
 
+                {% include "_mensagens.html" %}
+
                 <form class="auth-form" action="/register/empresa" method="POST" id="formCadastroEmpresa">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <div class="form-field">
                         <label for="nomeEmpresa">Nome da empresa</label>
                         <input type="text" id="nomeEmpresa" name="nomeEmpresa" autocomplete="organization" minlength="2" maxlength="150" required>

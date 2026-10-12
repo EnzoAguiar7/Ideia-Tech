@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 
 <head>
+    <base href="/Pages/">
     <link rel="stylesheet" href="../Style/Style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,8 @@
 
     <link rel="stylesheet" href="/Style/auth-pages.css">
     <link rel="stylesheet" href="/Style/cadastroCliente.css">
+    <link rel="stylesheet" href="/Style/mensagens.css">
+
   <script 
         src="https://unpkg.com/lucide@latest" 
         async 
@@ -39,6 +42,8 @@
                     <h2 id="titulo-cadastro">Crie sua conta de cliente</h2>
                     <p>Preencha seus dados para começar.</p>
                 </header>
+
+                {% include "_mensagens.html" %}
 
                 <form class="auth-form" action="/register/cliente" method="POST" id="formCadastroCliente">
                     <div class="form-field">
