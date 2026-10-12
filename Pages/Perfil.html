@@ -393,10 +393,12 @@
                     Alterar senha
                 </a>
 
-                <button type="button" class="botao-sair" id="botao-sair">
-                    <i data-lucide="log-out"></i>
-                    Sair da conta
-                </button>
+                <form action="/logout" method="POST">
+                    <button type="submit" class="botao-sair" id="botao-sair">
+                        <i data-lucide="log-out"></i>
+                        Sair da conta
+                    </button>
+                </form>
 
             </div>
 

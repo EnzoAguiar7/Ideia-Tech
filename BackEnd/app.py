@@ -127,5 +127,10 @@ def perfil():
     return resposta
 
 
+@app.post("/logout")
+def sair ():
+    session.clear()
+    return redirect ("/Pages/login.html")
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
