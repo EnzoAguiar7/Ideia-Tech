@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Recupere o acesso à sua conta IdeiaTech.">
     <title>Recuperar senha | IdeiaTech</title>
-    <link rel="stylesheet" href="/Style/auth-pages.css">
-    <link rel="stylesheet" href="/Style/recuperarSenha.css">
-    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <link rel="stylesheet" href="../Style/auth-pages.css">
+    <link rel="stylesheet" href="../Style/recuperarSenha.css">
+    <script src="https://unpkg.com/lucide@latest" defer onload="window.lucide?.createIcons()"></script>
 </head>
 <body>
     <main class="auth-layout">
         <aside class="auth-aside">
-            <a class="auth-brand" href="/Pages/index.html" aria-label="IdeiaTech - página inicial">
+            <a class="auth-brand" href="index.html" aria-label="IdeiaTech - página inicial">
                 <i data-lucide="cpu" aria-hidden="true"></i><span>IdeiaTech</span>
             </a>
             <div class="auth-aside-copy">
@@ -25,7 +25,7 @@
 
         <section class="auth-main" aria-labelledby="titulo-recuperacao">
             <div class="auth-panel auth-panel--recuperacao">
-                <a class="auth-back" href="/Pages/login.html"><i data-lucide="arrow-left" aria-hidden="true"></i> Voltar para o login</a>
+                <a class="auth-back" href="login.html"><i data-lucide="arrow-left" aria-hidden="true"></i> Voltar para o login</a>
                 <header class="auth-heading">
                     <h2 id="titulo-recuperacao">Esqueceu sua senha?</h2>
                     <p>Sem problema. Vamos orientar você na recuperação do acesso.</p>
@@ -36,11 +36,11 @@
                         <label for="emailRecuperacao">E-mail cadastrado</label>
                         <input type="email" id="emailRecuperacao" name="email" autocomplete="email" maxlength="254" required>
                     </div>
-                    <p class="auth-notice">Por segurança, a resposta do sistema não deve revelar se um e-mail está ou não cadastrado.</p>
+                    <p class="auth-notice">Confira também a pasta de spam ao procurar as instruções de recuperação.</p>
                     <button class="auth-submit" type="submit">Enviar instruções <i data-lucide="mail" aria-hidden="true"></i></button>
                 </form>
 
-                <p class="auth-bottom">Lembrou sua senha? <a href="/Pages/login.html">Entrar</a></p>
+                <p class="auth-bottom">Lembrou sua senha? <a href="login.html">Entrar</a></p>
             </div>
         </section>
     </main>
