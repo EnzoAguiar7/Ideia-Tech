@@ -1,0 +1,8 @@
+#Banco LocalStorage
+BackEnd/dados/*.db
+BackEnd/dados/*.db-*
+
+#Arquivos Pyhthon
+__pycache__/
+*.pyc
+.venv/
