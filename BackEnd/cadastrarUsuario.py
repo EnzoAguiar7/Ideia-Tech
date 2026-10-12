@@ -13,8 +13,8 @@ confirmacao = getpass("Confirme a senha: ")
 
 if not nome or not email or not telefone:
     print("Preencha todos os campos.")
-elif len(senha) < 6:
-    print("Use pelo menos 6 caracteres na sua senha.")
+elif len(senha) < 8:
+    print("Use pelo menos 8 caracteres na sua senha.")
 elif senha != confirmacao:
     print("As senhas não são iguais.")
 else:
