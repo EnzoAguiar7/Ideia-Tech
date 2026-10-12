@@ -1,28 +1,30 @@
 import secrets
 import sqlite3
 from pathlib import Path
-from flask import Flask, abort, redirect, send_from_directory, request, session
+from flask import Flask, abort, redirect, send_from_directory, request, session, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__, static_folder=None)
+app = Flask(
+    __name__,
+    static_folder=None,
+    template_folder="../Pages"
+)
 app.secret_key = secrets.token_hex(32)
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 raiz = Path(__file__).resolve().parent.parent
+caminho_banco = raiz / "Backend" / "dados" / "ideia_tech.db"
 
 
 @app.get("/")
 def inicio():
     return redirect("/Pages/index.html")
 
+
 @app.get("/<pasta>/<path:arquivo>")
 def arquivos_publicos(pasta, arquivo):
     if pasta not in {"Pages", "Style", "Script", "Assets"}:
         abort(404)
 
-    if pasta == "Pages" and arquivo == "Perfil.html":
-        if "usuario_id" not in session:
-            return redirect("/Pages/login.html")
-        
     return send_from_directory(raiz / pasta, arquivo)
 
 
@@ -41,7 +43,7 @@ def cadastrar_cliente():
     if "@" not in email or len(email) > 254:
         return "Informe um e-mail válido.", 400
 
-    if len (senha) < 8:
+    if len(senha) < 8:
         return "A senha precisa ter pelo menos 8 caracteres.", 400
 
     if senha != confirmacao:
@@ -51,8 +53,7 @@ def cadastrar_cliente():
         return "Você precisa aceitar os termos.", 400
 
     senha_hash = generate_password_hash(senha)
-    caminho = raiz / "Backend" / "dados" / "ideia_tech.db"
-    conexao = sqlite3.connect(caminho)
+    conexao = sqlite3.connect(caminho_banco)
 
     try:
         conexao.execute(
@@ -64,19 +65,19 @@ def cadastrar_cliente():
         )
         conexao.commit()
     except sqlite3.IntegrityError:
-        return "Não foi possivel cadastrar. O e-mail pode já estar em uso.", 409
+        return "Não foi possível cadastrar. O e-mail pode já estar em uso.", 409
     finally:
         conexao.close()
 
     return redirect("/Pages/login.html")
+
 
 @app.post("/login")
 def entrar():
     email = request.form.get("email", "").strip().lower()
     senha = request.form.get("password", "")
 
-    caminho = raiz / "Backend" / "dados" / "ideia_tech.db"
-    conexao = sqlite3.connect(caminho)
+    conexao = sqlite3.connect(caminho_banco)
     conexao.row_factory = sqlite3.Row
 
     try:
@@ -91,9 +92,40 @@ def entrar():
         return "E-mail ou senha incorretos.", 401
 
     session.clear()
-    session["usuario_id"] = usuario ["id"]
-    
+    session["usuario_id"] = usuario["id"]
+
     return redirect("/Pages/Perfil.html")
 
+
+@app.get("/Pages/Perfil.html")
+def perfil():
+    usuario_id = session.get("usuario_id")
+
+    if not usuario_id:
+        return redirect("/Pages/login.html")
+
+    conexao = sqlite3.connect(caminho_banco)
+    conexao.row_factory = sqlite3.Row
+
+    try:
+        usuario = conexao.execute(
+            "SELECT nome, email, telefone FROM usuarios WHERE id = ?",
+            (usuario_id,)
+        ).fetchone()
+    finally:
+        conexao.close()
+
+    if usuario is None:
+        session.clear()
+        return redirect("/Pages/login.html")
+
+    resposta = app.make_response(
+        render_template("Perfil.html", usuario=usuario)
+    )
+    resposta.headers["Cache-Control"] = "no-store"
+
+    return resposta
+
+
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000) 
+    app.run(host="127.0.0.1", port=5000)

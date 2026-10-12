@@ -10,12 +10,9 @@
     <title>Perfil | Ideia Tech</title>
 
     <link rel="stylesheet" href="../Style/Style.css">
-    <link rel="stylesheet" href="../Style/perfil.css">
+    <link rel="stylesheet" href="../Style/Perfil.css">
 
-    <script
-        src="https://unpkg.com/lucide@latest"
-        async
-        onload="window.lucide?.createIcons()">
+    <script src="https://unpkg.com/lucide@latest" async onload="window.lucide?.createIcons()">
     </script>
 </head>
 
@@ -53,11 +50,7 @@
                 </li>
             </ul>
 
-            <a
-                href="Perfil.html"
-                class="perfil-menu"
-                aria-current="page"
-            >
+            <a href="Perfil.html" class="perfil-menu" aria-current="page">
                 <i data-lucide="user"></i>
                 Perfil
             </a>
@@ -85,9 +78,7 @@
 
                     <h1>
                         Olá,
-                        <span id="nome-usuario">
-                            Cliente
-                        </span>
+                        <span id="nome-usuario">{{ usuario["nome"] }}</span>
                     </h1>
 
                     <p>
@@ -98,11 +89,7 @@
 
             </div>
 
-            <button
-                type="button"
-                class="botao-editar"
-                id="botao-editar-perfil"
-            >
+            <button type="button" class="botao-editar" id="botao-editar-perfil">
                 <i data-lucide="pencil"></i>
                 Editar perfil
             </button>
@@ -114,10 +101,7 @@
 
         <section class="perfil-atalhos">
 
-            <a
-                href="Acompanhar.html"
-                class="card-atalho"
-            >
+            <a href="Acompanhar.html" class="card-atalho">
                 <div class="atalho-icone">
                     <i data-lucide="wrench"></i>
                 </div>
@@ -131,17 +115,11 @@
                     </p>
                 </div>
 
-                <i
-                    data-lucide="arrow-up-right"
-                    class="atalho-seta"
-                ></i>
+                <i data-lucide="arrow-up-right" class="atalho-seta"></i>
             </a>
 
 
-            <a
-                href="Carrinho.html"
-                class="card-atalho"
-            >
+            <a href="Carrinho.html" class="card-atalho">
                 <div class="atalho-icone">
                     <i data-lucide="shopping-bag"></i>
                 </div>
@@ -154,17 +132,11 @@
                     </p>
                 </div>
 
-                <i
-                    data-lucide="arrow-up-right"
-                    class="atalho-seta"
-                ></i>
+                <i data-lucide="arrow-up-right" class="atalho-seta"></i>
             </a>
 
 
-            <a
-                href="Orçamento.html"
-                class="card-atalho"
-            >
+            <a href="Orçamento.html" class="card-atalho">
                 <div class="atalho-icone">
                     <i data-lucide="file-text"></i>
                 </div>
@@ -178,10 +150,7 @@
                     </p>
                 </div>
 
-                <i
-                    data-lucide="arrow-up-right"
-                    class="atalho-seta"
-                ></i>
+                <i data-lucide="arrow-up-right" class="atalho-seta"></i>
             </a>
 
         </section>
@@ -218,9 +187,7 @@
                             Nome
                         </span>
 
-                        <strong id="perfil-nome">
-                            Nome do cliente
-                        </strong>
+                        <strong id="perfil-nome">{{ usuario["nome"] }}</strong>
 
                     </div>
 
@@ -231,9 +198,7 @@
                             E-mail
                         </span>
 
-                        <strong id="perfil-email">
-                            email@exemplo.com
-                        </strong>
+                        <strong id="perfil-email">{{ usuario["email"] }}</strong>
 
                     </div>
 
@@ -244,9 +209,7 @@
                             Telefone
                         </span>
 
-                        <strong id="perfil-telefone">
-                            (00) 00000-0000
-                        </strong>
+                        <strong id="perfil-telefone">{{ usuario["telefone"] }}</strong>
 
                     </div>
 
@@ -304,11 +267,7 @@
                 </div>
 
 
-                <button
-                    type="button"
-                    class="botao-secundario"
-                    id="botao-editar-endereco"
-                >
+                <button type="button" class="botao-secundario" id="botao-editar-endereco">
                     <i data-lucide="pencil"></i>
                     Alterar endereço
                 </button>
@@ -429,19 +388,12 @@
 
             <div class="acoes-botoes">
 
-                <a
-                    href="recuperarSenha.html"
-                    class="botao-secundario"
-                >
+                <a href="recuperarSenha.html" class="botao-secundario">
                     <i data-lucide="key-round"></i>
                     Alterar senha
                 </a>
 
-                <button
-                    type="button"
-                    class="botao-sair"
-                    id="botao-sair"
-                >
+                <button type="button" class="botao-sair" id="botao-sair">
                     <i data-lucide="log-out"></i>
                     Sair da conta
                 </button>
