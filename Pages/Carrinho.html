@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,26 +12,35 @@
     <script src="../Script/carrinho.js" defer></script>
     <link rel="stylesheet" href="../Style/acessoCarrinho.css">
 </head>
+
 <body class="pagina-carrinho">
+
     <header>
         <nav aria-label="Navegação principal">
             <ul>
+
                 <li><a href="index.html">Início</a></li>
                 <li><a href="vitrine.html">Vitrine</a></li>
                 <li><a href="Servicos.html">Serviços</a></li>
                 <li><a href="Orçamento.html">Orçamento</a></li>
                 <li><a href="Acompanhar.html">Acompanhar</a></li>
-                <li><a href="Carrinho.html" aria-current="page">Carrinho (<span data-contador-carrinho>0</span>)</a></li>
+                <li><a href="Carrinho.html" aria-current="page">Carrinho (<span data-contador-carrinho>0</span>)</a>
+                </li>
+
             </ul>
+
             <a href="login.html">Entrar</a>
         </nav>
     </header>
+
     <main class="carrinho-conteudo">
+        
         <div class="carrinho-titulo">
             <span class="texto-destaque">SUA COMPRA</span>
             <h1>Meu carrinho</h1>
             <p>Confira seus produtos e escolha a quantidade de cada um.</p>
         </div>
+
         <div class="carrinho-layout">
             <section aria-label="Produtos do carrinho">
                 <div data-carrinho-vazio class="carrinho-vazio">
@@ -38,20 +48,37 @@
                     <p>Encontre peças e acessórios para o seu celular.</p>
                     <a href="vitrine.html" class="carrinho-botao">Explorar a vitrine</a>
                 </div>
+                <div class="carrinho-acoes-gerais">
+                    <button type="button" class="remover-todos" data-limpar-carrinho disabled>Remover todos os
+                        produtos</button>
+                </div>
                 <div data-itens-carrinho></div>
                 <a class="continuar-comprando" href="vitrine.html">← Continuar comprando</a>
             </section>
+
             <aside class="resumo-carrinho" aria-label="Resumo da compra">
+
                 <h2>Resumo da compra</h2>
+
                 <p data-quantidade-resumo>0 produtos</p>
-                <div class="resumo-total"><span>Total dos produtos</span><strong data-total-carrinho>R$ 0,00</strong></div>
+                <div class="resumo-total"><span>Total dos produtos</span><strong data-total-carrinho>R$ 0,00</strong>
+                </div>
+
                 <p>Frete não incluído.</p>
                 <button type="button" class="carrinho-botao" data-pagar disabled>Continuar para pagamento</button>
                 <p>Para pagar, entre na sua conta ou crie uma. Seu carrinho será mantido.</p>
             </aside>
+
         </div>
         <p data-aviso-carrinho role="status" class="mensagem-carrinho"></p>
     </main>
-    <footer><p>Ideia Tech · Projeto desenvolvido no Senac DF · 2026</p></footer>
+
+    <footer>
+
+        <p>Ideia Tech · Projeto desenvolvido no Senac DF · 2026</p>
+        
+    </footer>
+
 </body>
+
 </html>

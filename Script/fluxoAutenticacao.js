@@ -1,6 +1,4 @@
-/* Integração futura: configure verificarSessao e iniciarPagamento com chamadas ao servidor.
-   Após autenticar de verdade, chame FluxoAutenticacao.concluirLogin().
-   Nenhuma senha ou indicação de usuário autenticado é guardada no localStorage. */
+
 (() => {
     const chave = 'ideiaTech.retornoLogin';
     let verificarSessao = async () => false;

@@ -36,6 +36,37 @@
     align-items: start;
 }
 
+.carrinho-acoes-gerais {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+.remover-todos {
+    color: #a52d2d;
+    background: white;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.remover-todos:hover:not(:disabled) {
+    background: #fff0f0;
+}
+
+.remover-todos:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+}
+
+.remover-todos:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
 .item-carrinho {
     display: grid;
     grid-template-columns: 110px minmax(0, 1fr) auto;

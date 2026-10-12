@@ -3,22 +3,10 @@
    Usar junto de cadastroCliente.css, cadastroEmpresa.css ou recuperarSenha.css.
    Tokens alinhados com Style.css (paleta teal oficial).
 ===================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* Fontes e cores principais herdadas de Style.css. */
 
 :root {
-    /* Tokens oficiais do site */
-    --fundo-pagina: #F2F2F0;
-    --fundo-pagina-secundario: #E8E8E5;
-    --cor-primaria: #11c5ad;
-    --cor-primaria-escura: #008b7c;
-    --cor-primaria-hover: #0cb19d;
-    --cor-texto: #061922;
-    --cor-texto-secundario: #647277;
-    --cor-borda: #d2dddd;
-    --cor-branca: #ffffff;
-    --cor-botao-texto: #002d29;
-
-    /* Aliases usados pelas páginas de auth */
+    /* Aliases dos tokens compartilhados de Style.css. */
     --fundo: var(--fundo-pagina);
     --branco: var(--cor-branca);
     --texto: var(--cor-texto);
@@ -43,12 +31,11 @@ html {
 
 body {
     min-height: 100vh;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: "Sora", sans-serif;
     line-height: 1.5;
     color: var(--texto);
     background: var(--fundo-pagina);
 }
-
 
 button,
 input {
@@ -75,10 +62,13 @@ a {
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
+
     background:
         radial-gradient(ellipse at 15% 8%, rgba(255, 255, 255, 0.88), transparent 34%),
         radial-gradient(ellipse at 92% 78%, rgba(17, 197, 173, 0.2), transparent 40%),
         linear-gradient(145deg, #e5f7f4 0%, #d8f0ec 48%, #eaf5f2 100%);
+
+
 }
 
 .auth-aside::before {
@@ -181,6 +171,14 @@ a {
 
 /* ---------- Heading ---------- */
 .auth-heading {
+    position: static;
+    z-index: auto;
+    width: auto;
+    height: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    align-items: flex-start;
     margin-bottom: 28px;
    display: flex;
    flex-direction: column;
@@ -188,6 +186,7 @@ a {
 }
 
 .auth-heading h2 {
+    font-family: "Manrope", sans-serif;
     margin-bottom: 9px;
     font-size: clamp(1.8rem, 2.6vw, 2.35rem);
     line-height: 1.15;
@@ -201,8 +200,6 @@ a {
     font-size: 0.94rem;
 }
 
-
-/* ---------- Form ---------- */
 
 .auth-form {
     display: flex;
@@ -221,7 +218,9 @@ a {
     font-size: 0.85rem;
     font-weight: 650;
 
+
     color: var(--texto);
+
 
 }
 
@@ -230,9 +229,9 @@ a {
     min-height: 49px;
     padding: 11px 14px;
     border: 1px solid var(--borda);
-    border-radius: var(--raio-campo);
+    border-radius: 7px;
     outline: none;
-    background: #FAFCFC;
+    background: var(--cor-fundo);
     color: var(--texto);
     transition: border-color var(--transicao), box-shadow var(--transicao), background var(--transicao);
 }
@@ -243,9 +242,11 @@ a {
 
 .form-field input:focus {
 
+
     border-color: var(--cor-primaria);
     background: var(--branco);
     box-shadow: 0 0 0 4px rgba(17, 197, 173, 0.16);
+
 
 
 }
@@ -313,9 +314,9 @@ a {
     justify-content: center;
     gap: 10px;
     border: 0;
-    border-radius: var(--raio-campo);
+    border-radius: 7px;
     background: var(--cor-primaria);
-    color: var(--cor-botao-texto);
+    color: #002d29;
     font-size: 0.93rem;
     font-weight: 700;
     cursor: pointer;
@@ -379,6 +380,7 @@ a {
 .auth-submit:hover {
     transform: translateY(-1px);
     background: var(--cor-primaria-hover);
+
     box-shadow: 0 8px 20px rgba(17, 197, 173, 0.22);
 }
 
@@ -415,6 +417,14 @@ a {
 .auth-back:hover {
     color: var(--cor-primaria);
     text-decoration: underline;
+}
+
+.auth-brand:focus-visible,
+.auth-back:focus-visible,
+.auth-bottom a:focus-visible,
+.auth-submit:focus-visible {
+    outline: 3px solid var(--cor-primaria-escura);
+    outline-offset: 4px;
 }
 
 .auth-back svg,
@@ -463,8 +473,10 @@ a {
     }
 
 
+
     .auth-brand svg,
     .auth-brand i {
+
 
         width: 26px;
         height: 26px;
@@ -524,6 +536,3 @@ a {
     }
 
 }
-
-
-

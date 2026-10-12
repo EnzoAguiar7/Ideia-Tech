@@ -35,6 +35,8 @@
         const itens = ler();
         const quantidade = itens.reduce((soma, item) => soma + item.quantidade, 0);
         document.querySelectorAll('[data-contador-carrinho]').forEach(el => el.textContent = quantidade);
+        const limpar = document.querySelector('[data-limpar-carrinho]');
+        if (limpar) limpar.disabled = itens.length === 0;
         const lista = document.querySelector('[data-itens-carrinho]');
         if (!lista) return;
         lista.replaceChildren();
@@ -46,7 +48,7 @@
             const card = elemento('article', undefined, 'item-carrinho');
             const foto = elemento('div', undefined, 'foto-carrinho');
             if (produto.imagem) {
-                const img = elemento('img'); img.src = '../Assets/img/' + produto.imagem; img.alt = produto.nome;
+                const img = elemento('img'); img.src = produto.imagem; img.alt = produto.nome;
                 foto.append(img);
             } else foto.textContent = 'Foto em breve';
             const detalhes = elemento('div', undefined, 'detalhes-carrinho');
@@ -85,6 +87,10 @@
             else itens.push({ id: botao.dataset.produtoId, quantidade: 1 });
             if (salvar(itens)) avisar(produto.nome + ' adicionado ao carrinho.');
         });
+    });
+    document.querySelector('[data-limpar-carrinho]')?.addEventListener('click', () => {
+        if (!ler().length) return;
+        if (salvar([])) avisar('Todos os produtos foram removidos do carrinho.');
     });
     document.querySelector('[data-pagar]')?.addEventListener('click', async event => {
         const botao = event.currentTarget;
