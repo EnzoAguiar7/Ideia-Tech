@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
     <link rel="stylesheet" href="../Style/Style.css">
     <link rel="stylesheet" href="../Style/auth-pages.css">
     <link rel="stylesheet" href="../Style/cadastroCliente.css">
+    <script src="../Script/protecaoCsrf.js" defer></script>
 </head>
+
 <body>
     <main class="auth-layout">
         <aside class="auth-aside">
@@ -29,42 +32,28 @@
                 </header>
 
                 {% if erro %}
-                    <p class="auth-notice" role="alert">{{ erro }}</p>
+                <p class="auth-notice" role="alert">{{ erro }}</p>
                 {% endif %}
 
                 <!-- Essa tag acima é uma mensagem para aprecer somente quando der erro -->
 
-                <form action="/Pages/editarPerfil.html"
-                      method="POST"
-                      class="auth-form">
+                <form action="/Pages/editarPerfil.html" method="POST" class="auth-form">
 
-                    <input type="hidden"
-                           name="csrf_token"
-                           value="{{ csrf_token }}">
-                           <!-- Esse value ajuda a proteger o formulario -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <!-- Esse value ajuda a proteger o formulario -->
 
                     <div class="form-field">
                         <label for="nome">Nome completo</label>
-                        <input id="nome"
-                               name="nome"
-                               value="{{ usuario['nome'] }}"
-                               minlength="3"
-                               maxlength="120"
-                               autocomplete="name"
-                               required>
+                        <input id="nome" name="nome" value="{{ usuario['nome'] }}" minlength="3" maxlength="120"
+                            autocomplete="name" required>
                     </div>
 
                     <!-- Value preenche o campo com o dado  -->
 
                     <div class="form-field">
                         <label for="telefone">Telefone / WhatsApp</label>
-                        <input type="tel"
-                               id="telefone"
-                               name="telefone"
-                               value="{{ usuario['telefone'] }}"
-                               maxlength="20"
-                               autocomplete="tel"
-                               required>
+                        <input type="tel" id="telefone" name="telefone" value="{{ usuario['telefone'] }}" maxlength="20"
+                            autocomplete="tel" required>
                     </div>
 
                     <button type="submit" class="auth-submit">
@@ -75,4 +64,5 @@
         </section>
     </main>
 </body>
+
 </html>

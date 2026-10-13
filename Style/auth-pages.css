@@ -376,6 +376,32 @@ a {
     font-size: 0.82rem;
 }
 
+.auth-form-feedback {
+    padding: 12px 14px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio-campo);
+    background: #F7FBFA;
+    color: var(--texto-secundario);
+    font-size: 0.85rem;
+}
+
+.auth-form-feedback[role="alert"] {
+    border-color: #d98b8b;
+    background: #fff5f5;
+    color: #8d2525;
+}
+
+.auth-form-feedback[hidden] {
+    display: none;
+}
+
+.auth-submit:disabled,
+.auth-form button:disabled {
+    cursor: wait;
+    opacity: 0.68;
+    transform: none;
+}
+
 
 .auth-submit:hover {
     transform: translateY(-1px);
