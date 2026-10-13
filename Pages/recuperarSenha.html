@@ -8,10 +8,9 @@
     <meta name="description" content="Recupere o acesso à sua conta IdeiaTech.">
     <title>Recuperar senha | IdeiaTech</title>
 
-    <base href="/Pages/">
-    <link rel="stylesheet" href="/Style/mensagens.css">
     <link rel="stylesheet" href="/Style/auth-pages.css">
     <link rel="stylesheet" href="/Style/recuperarSenha.css">
+    <script src="../Script/protecaoCsrf.js" defer></script>
     <script src="https://unpkg.com/lucide@latest" async onload="window.lucide?.createIcons()">
     </script>
 
@@ -40,10 +39,8 @@
                     <p>Sem problema. Vamos orientar você na recuperação do acesso.</p>
                 </header>
 
-                {% include "_mensagens.html" %}
-
-                <form class="auth-form" action="/recuperar-senha" method="POST" id="formRecuperarSenha">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <form class="auth-form" action="/recuperar-senha" method="POST" id="formRecuperarSenha"
+                    data-auth-ajax="true">
                     <div class="form-field">
                         <label for="emailRecuperacao">E-mail cadastrado</label>
                         <input type="email" id="emailRecuperacao" name="email" autocomplete="email" maxlength="254"
@@ -52,6 +49,23 @@
                     <p class="auth-notice">Confira também a pasta de spam ao procurar as instruções de recuperação.</p>
                     <button class="auth-submit" type="submit">Enviar instruções <i data-lucide="mail"
                             aria-hidden="true"></i></button>
+                    <p id="mensagemRecuperacao" class="auth-form-feedback" data-form-message
+                        role="status" aria-live="polite" hidden></p>
+                </form>
+
+                <form class="auth-form" id="formRedefinirSenha" action="/redefinir-senha" method="POST"
+                    data-auth-ajax="true" hidden>
+                    <input type="hidden" id="tokenRedefinicao" name="token">
+
+                    <label for="novaSenha">Nova senha</label>
+                    <input type="password" id="novaSenha" name="senha" minlength="8" maxlength="128"
+                        autocomplete="new-password" required>
+
+                    <label for="confirmarNovaSenha">Confirme a nova senha</label>
+                    <input type="password" id="confirmarNovaSenha" name="confirmarSenha" minlength="8"
+                        maxlength="128" autocomplete="new-password" required>
+
+                    <button type="submit">Redefinir senha</button>
                 </form>
 
                 <p class="auth-bottom">Lembrou sua senha? <a href="login.html">Entrar</a></p>
@@ -59,6 +73,8 @@
         </section>
     </main>
 
+    <script src="../Script/autenticacao.js" defer></script>
+    <script src="../Script/recuperarSenha.js" defer></script>
 </body>
 
 </html>

@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 
 <head>
-    <base href="/Pages/">
     <link rel="stylesheet" href="../Style/Style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,12 +10,9 @@
 
     <link rel="stylesheet" href="/Style/auth-pages.css">
     <link rel="stylesheet" href="/Style/cadastroCliente.css">
-    <link rel="stylesheet" href="/Style/mensagens.css">
-
-  <script 
-        src="https://unpkg.com/lucide@latest" 
-        async 
-        onload="window.lucide?.createIcons()">
+    <script src="../Script/protecaoCsrf.js" defer></script>
+    <script src="../Script/autenticacao.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest" async onload="window.lucide?.createIcons()">
     </script>
 
 </head>
@@ -36,45 +32,44 @@
 
         <section class="auth-main" aria-labelledby="titulo-cadastro">
             <div class="auth-panel auth-panel--cliente">
-                <a class="auth-back" href="tiposCadastro.html"><i data-lucide="arrow-left"
-                        aria-hidden="true"></i> Voltar às opções</a>
+                <a class="auth-back" href="tiposCadastro.html"><i data-lucide="arrow-left" aria-hidden="true"></i>
+                    Voltar às opções</a>
                 <header class="auth-heading">
                     <h2 id="titulo-cadastro">Crie sua conta de cliente</h2>
                     <p>Preencha seus dados para começar.</p>
                 </header>
 
-                {% include "_mensagens.html" %}
-
-                <form class="auth-form" action="/register/cliente" method="POST" id="formCadastroCliente">
+                <form class="auth-form" action="/register/cliente" method="POST" id="formCadastroCliente"
+                    data-auth-ajax="true">
                     <div class="form-field">
                         <label for="nomeCliente">Nome completo</label>
-                        <input type="text" id="nomeCliente" name="nome" autocomplete="name"
-                             minlength="3" maxlength="120" required>
+                        <input type="text" id="nomeCliente" name="nome" autocomplete="name" minlength="3"
+                            maxlength="120" required>
                     </div>
 
                     <div class="form-field">
                         <label for="emailCliente">E-mail</label>
-                        <input type="email" id="emailCliente" name="email" autocomplete="email"
-                           maxlength="254" required>
+                        <input type="email" id="emailCliente" name="email" autocomplete="email" maxlength="254"
+                            required>
                     </div>
 
                     <div class="form-field">
                         <label for="telefoneCliente">Telefone / WhatsApp</label>
-                        <input type="tel" id="telefoneCliente" name="telefone" autocomplete="tel"
-                             maxlength="20" required>
+                        <input type="tel" id="telefoneCliente" name="telefone" autocomplete="tel" maxlength="20"
+                            required>
                     </div>
 
                     <div class="form-row">
                         <div class="form-field">
                             <label for="senhaCliente">Senha</label>
                             <input type="password" id="senhaCliente" name="senha" autocomplete="new-password"
-                                minlength="8" required>
+                                minlength="8" maxlength="128" required>
                             <small>Use pelo menos 8 caracteres.</small>
                         </div>
                         <div class="form-field">
                             <label for="confirmarSenhaCliente">Confirmar senha</label>
                             <input type="password" id="confirmarSenhaCliente" name="confirmarSenha"
-                                autocomplete="new-password" minlength="8" required>
+                                autocomplete="new-password" minlength="8" maxlength="128" required>
                         </div>
                     </div>
 

@@ -199,6 +199,30 @@ a {
     flex-direction: column;
 }
 
+.auth-form-feedback {
+    padding: 12px 14px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio-campo);
+    background: #F7FBFA;
+    color: var(--texto-secundario);
+    font-size: 0.85rem;
+}
+
+.auth-form-feedback[role="alert"] {
+    border-color: #d98b8b;
+    background: #fff5f5;
+    color: #8d2525;
+}
+
+.auth-form-feedback[hidden] {
+    display: none;
+}
+
+.login-form button:disabled {
+    cursor: wait;
+    opacity: 0.68;
+}
+
 .login-form label {
     margin-bottom: 8px;
     font-size: 0.875rem;
