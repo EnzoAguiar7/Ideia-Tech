@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../Style/Style.css">
     <link rel="stylesheet" href="../Style/auth-pages.css">
     <link rel="stylesheet" href="../Style/cadastroCliente.css">
+    <link rel="stylesheet" href="../Style/mensagens.css">
     <script src="../Script/protecaoCsrf.js" defer></script>
 </head>
 
@@ -30,6 +31,8 @@
                     <h2>Editar perfil</h2>
                     <p>Atualize seu nome e telefone.</p>
                 </header>
+
+                {% include "_mensagens.html" %}
 
                 {% if erro %}
                 <p class="auth-notice" role="alert">{{ erro }}</p>

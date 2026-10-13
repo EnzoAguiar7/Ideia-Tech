@@ -1,0 +1,21 @@
+.mensagem {
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    border-radius: 7px;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.mensagem--sucesso {
+    background: #dff8f3;
+    border-color: #008b7c;
+    color: #07312e;
+}
+
+.mensagem--erro {
+    background: #fff3dc;
+    border-color: #956000;
+    color: #624000;
+}

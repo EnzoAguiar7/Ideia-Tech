@@ -10,7 +10,7 @@ from datetime import timedelta
 from email.message import EmailMessage
 from pathlib import Path
 from urllib.parse import quote, unquote, urlsplit, urlunsplit
-from flask import Flask, abort, redirect, send_from_directory, request, session, render_template, jsonify
+from flask import Flask, abort, flash, redirect, send_from_directory, request, session, render_template, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -32,6 +32,11 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = os.environ.get("APP_ENV") == "production"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=12)
 app.config["SESSION_REFRESH_EACH_REQUEST"] = False
+app.config["RECUPERACAO_LOCAL"] = os.environ.get("RECUPERACAO_LOCAL") == "1"
+
+if app.config["RECUPERACAO_LOCAL"] and os.environ.get("APP_ENV") == "production":
+    raise RuntimeError("RECUPERACAO_LOCAL não pode ser habilitado em produção.")
+
 LIMITE_LOGIN_EMAIL = 5
 LIMITE_LOGIN_IP = 20
 JANELA_LOGIN_SEGUNDOS = 15 * 60
@@ -68,6 +73,10 @@ def obter_token_csrf():
 
 
 def enviar_email_recuperacao(destinatario, link_redefinicao):
+    if app.config["RECUPERACAO_LOCAL"]:
+        app.logger.warning("Link local de redefinição de senha: %s", link_redefinicao)
+        return
+
     servidor_smtp = os.environ.get("SMTP_HOST")
     porta_smtp = int(os.environ.get("SMTP_PORT", "587"))
     usuario_smtp = os.environ.get("SMTP_USERNAME")
@@ -377,6 +386,13 @@ def arquivos_publicos(pasta, arquivo):
     return resposta
 
 
+@app.get("/Pages/login.html")
+def pagina_login():
+    resposta = app.make_response(render_template("login.html"))
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
+
+
 @app.post("/register/cliente")
 def cadastrar_cliente():
     nome = request.form.get("nome", "").strip()
@@ -418,6 +434,7 @@ def cadastrar_cliente():
     finally:
         conexao.close()
 
+    flash("Conta cadastrada com sucesso. Entre com seu e-mail e senha.", "sucesso")
     return redirect("/Pages/login.html")
 
 @app.post("/register/empresa")
@@ -482,6 +499,7 @@ def cadastrar_empresa():
     finally:
         conexao.close()
 
+    flash("Empresa cadastrada com sucesso. Entre com seu e-mail e senha.", "sucesso")
     return redirect("/Pages/login.html")
 
 def destino_local_seguro(valor):
@@ -652,6 +670,7 @@ def perfil():
 @app.post("/logout")
 def sair ():
     session.clear()
+    flash("Você saiu da conta.", "sucesso")
     return redirect ("/Pages/login.html")
 
 
@@ -708,6 +727,7 @@ def editar_perfil():
                 )    
                 conexao.commit()
 
+                flash("Perfil atualizado com sucesso.", "sucesso")
                 return redirect("/Pages/Perfil.html")
     finally:
         conexao.close()
