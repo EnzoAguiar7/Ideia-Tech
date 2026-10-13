@@ -2,7 +2,9 @@ import sqlite3
 from pathlib import Path
 
 pasta = Path(__file__).parent 
-caminho = pasta / "dados" / "ideia_tech.db"
+pasta_dados = pasta / "dados"
+pasta_dados.mkdir(parents=True, exist_ok=True)
+caminho = pasta_dados /"ideia_tech.db"
 
 conexao = sqlite3.connect(caminho)
 
