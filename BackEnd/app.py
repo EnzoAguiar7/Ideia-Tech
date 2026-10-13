@@ -12,7 +12,7 @@ from pathlib import Path
 from urllib.parse import quote, unquote, urlsplit, urlunsplit
 from flask import Flask, abort, flash, redirect, send_from_directory, request, session, render_template, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from urllib.parse import urlsplit
 
 app = Flask(
     __name__,
@@ -101,7 +101,7 @@ def enviar_email_recuperacao(destinatario, link_redefinicao):
     mensagem["To"] = destinatario
     mensagem.set_content(
         "Recebemos uma solicitação para redefinir sua senha.\n\n"
-        f"Use este link em até 1 hora: {link_redefinicao}\n\n"
+        f"Use este link em até 30 minutos: {link_redefinicao}\n\n"
         "Se você não solicitou a redefinição, ignore este e-mail."
     )
 
@@ -209,7 +209,7 @@ def solicitar_recuperacao_senha():
                 (usuario_id, token_hash, expira_em)
             VALUES (?, ?, ?)
             """,
-            (usuario["id"], token_hash, agora + 3600)
+            (usuario["id"], token_hash, agora + 30 * 60)
         )
         conexao.commit()
     finally:
