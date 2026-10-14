@@ -234,7 +234,6 @@ main {
 }
 
 
-
 .hero-botoes button:nth-of-type(2) a {
     color: var(--cor-texto);
 }
@@ -616,8 +615,6 @@ main {
 }
 
 
-
-
 .etapas-processo {
     display: flex;
     flex-direction: column;
@@ -770,138 +767,5 @@ button:focus-visible {
     outline-offset: 4px;
 }
 
-@media (max-width: 900px) {
-    nav ul {
-        gap: 16px;
-    }
-
-    .hero {
-        gap: 30px;
-    }
-
-    .hero-botoes {
-        flex-wrap: wrap;
-    }
-
-    .diagrama-iphone {
-        padding: 20px;
-    }
-
-    .processo {
-        gap: 40px;
-    }
-}
-
-@media (max-width: 700px) {
-    header {
-        height: auto;
-    }
-
-    nav {
-        flex-wrap: wrap;
-        gap: 12px;
-        padding: 14px 0;
-    }
-
-    nav ul {
-        flex-wrap: wrap;
-        gap: 12px 18px;
-    }
-
-    nav ul li a::after {
-        display: none;
-    }
-
-    nav>a {
-        padding: 6px 12px;
-    }
-
-    .hero {
-        grid-template-columns: 1fr;
-        margin: 40px auto;
-    }
-
-    .apresentação h1 {
-        letter-spacing: -1.5px;
-    }
-
-    .diagrama-iphone {
-        max-width: 460px;
-        width: 100%;
-        justify-self: center;
-    }
-
-    .nota-atendimento {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-        margin-bottom: 48px;
-    }
-
-    .cards-acoes {
-        grid-template-columns: 1fr;
-    }
-
-    .card-acao {
-        min-height: 210px;
-        gap: 24px;
-    }
-
-    .cabecalho-secao h2,
-    .processo-apresentacao h2 {
-        font-size: 34px;
-        line-height: 1.15;
-        letter-spacing: -1px;
-    }
-
-    .proximo-passo {
-        padding-bottom: 48px;
-    }
-
-    .processo {
-        grid-template-columns: 1fr;
-        padding-top: 48px;
-        padding-bottom: 48px;
-    }
-}
 
 /* Mantém feedback suave de cor sem deslocamentos no modo de movimento reduzido. */
-@media (prefers-reduced-motion: reduce) {
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-        transition-property: color, background-color, border-color, box-shadow, opacity !important;
-        transition-duration: 180ms !important;
-        transition-timing-function: ease !important;
-    }
-
-    .hero-botoes a:hover,
-    .card-acao:hover,
-    .card-produto:hover,
-    .card-produto:hover::before,
-    .card-produto:hover .produto-foto img,
-    .card-produto:hover .produto-info h3,
-    .card-produto:hover .botao-carrinho,
-    .botao-carrinho:hover,
-    .chamada-orcamento button a:hover,
-    .botao-principal:hover,
-    .botao-secundario:hover,
-    .card-servico:hover,
-    .card-servico:hover::before,
-    .card-servico:hover>a svg,
-    .lista-diferenciais>div:hover,
-    .chamada-servico>a:hover,
-    .botao-analisar:hover,
-    .botao-continuar:hover,
-    .etapas-orcamento article:hover {
-        transform: none !important;
-    }
-
-    .card-produto:hover .produto-foto img {
-        filter: none;
-    }
-}

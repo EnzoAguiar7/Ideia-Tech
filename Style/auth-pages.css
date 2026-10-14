@@ -201,8 +201,8 @@ a {
 }
 
 
-.auth-form {
-    display: flex;
+.auth-form[hidden] {
+    display: none;
     flex-direction: column;
     gap: 17px;
 }
@@ -246,7 +246,6 @@ a {
     border-color: var(--cor-primaria);
     background: var(--branco);
     box-shadow: 0 0 0 4px rgba(17, 197, 173, 0.16);
-
 
 
 }
@@ -322,7 +321,6 @@ a {
     cursor: pointer;
     transition: transform var(--transicao), background var(--transicao), box-shadow var(--transicao);
 }
-
 
 
 .auth-submit:hover {
@@ -469,96 +467,3 @@ a {
 }
 
 /* ---------- Responsivo ---------- */
-@media (max-width: 900px) {
-    .auth-layout {
-        grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
-    }
-
-    .auth-aside {
-        padding: 34px 28px;
-    }
-
-    .auth-main {
-        padding: 38px 28px;
-    }
-}
-
-@media (max-width: 700px) {
-    .auth-layout {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .auth-aside {
-        min-height: auto;
-        padding: 24px 24px 28px;
-    }
-
-    .auth-brand {
-        font-size: 1.2rem;
-    }
-
-
-
-    .auth-brand svg,
-    .auth-brand i {
-
-
-        width: 26px;
-        height: 26px;
-        
-    }
-
-    .auth-aside-copy {
-        margin: 32px 0 0;
-    }
-
-    .auth-aside-copy h1 {
-        max-width: 560px;
-        font-size: clamp(1.75rem, 7vw, 2.5rem);
-    }
-
-    .auth-aside-copy p {
-        font-size: 0.9rem;
-    }
-
-    .auth-aside-foot {
-        margin-top: 22px;
-    }
-
-    .auth-main {
-        padding: 34px 22px 42px;
-    }
-
-    .auth-panel {
-        max-width: 560px;
-    }
-}
-
-@media (max-width: 460px) {
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 17px;
-    }
-
-    .auth-main {
-        padding-inline: 18px;
-    }
-
-    .auth-form {
-        gap: 15px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-    }
-
-}

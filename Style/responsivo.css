@@ -1,0 +1,1071 @@
+@media (min-width: 1500px) {
+:where(html[data-responsive~="Empresa/painelEmpresa"]) main {
+        padding: 0 60px;
+    }
+}
+
+@media (max-width: 1150px) {
+:where(html[data-responsive~="Empresa/painelEmpresa"]) body {
+        grid-template-columns: 215px minmax(0, 1fr);
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .menu {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) main {
+        padding: 0 26px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .banner-illustration {
+        flex-basis: 145px;
+        margin-right: 0;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .welcome-banner {
+        padding: 26px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .workflow ol {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .workflow li {
+        padding-bottom: 0;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .workflow li::after {
+        display: none;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .metric {
+        padding: 18px 15px 13px;
+    }
+}
+
+@media (max-width: 800px) {
+:where(html[data-responsive~="Empresa/painelEmpresa"]) body {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .menu {
+        position: static;
+        height: auto;
+        padding: 20px 24px 14px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .marca-sub {
+        display: inline;
+        font-size: 8px;
+        margin-left: 10px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .workspace,
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .nav-label,
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .nav-future,
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .sidebar-note,
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .site-link {
+        display: none;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) nav {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) nav a {
+        padding: 9px 12px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .topbar {
+        min-height: 64px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .page-heading {
+        margin-top: 26px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) h1 {
+        font-size: 27px;
+    }
+}
+
+@media (max-width: 560px) {
+:where(html[data-responsive~="Empresa/painelEmpresa"]) main {
+        padding: 0 18px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .menu {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .topbar {
+        align-items: flex-start;
+        justify-content: center;
+        flex-direction: column;
+        gap: 6px;
+        padding: 13px 0;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .welcome-banner {
+        padding: 24px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .welcome-banner h2 {
+        font-size: 21px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .banner-illustration {
+        display: none;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .metrics {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .metric {
+        padding: 20px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .metric-value {
+        font-size: 32px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .metric-foot {
+        font-size: 10px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .workflow ol {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .service-panel .section-heading {
+        padding: 20px;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .section-heading {
+        flex-wrap: wrap;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) footer {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+html:where([data-responsive~="Empresa/painelEmpresa"]) {
+        scroll-behavior: auto;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) * {
+        transition: none !important;
+    }
+}
+
+
+/* ===== Style/login.css ===== */
+
+@media (max-width: 900px) {
+:where(html[data-responsive~="login"]) body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+
+:where(html[data-responsive~="login"]) .slogan,
+:where(html[data-responsive~="login"]) .login-form {
+        width: 100%;
+    }
+
+:where(html[data-responsive~="login"]) .slogan {
+        min-height: 390px;
+        padding: 130px 8% 65px;
+    }
+
+:where(html[data-responsive~="login"]) .slogan>img:first-child {
+        top: 30px;
+        left: 8%;
+        width: 165px;
+    }
+
+:where(html[data-responsive~="login"]) .slogan h1 {
+        max-width: 650px;
+        font-size: clamp(2.25rem, 6vw, 3.25rem);
+    }
+
+:where(html[data-responsive~="login"]) .slogan p {
+        font-size: 1rem;
+    }
+
+:where(html[data-responsive~="login"]) .slogan>img:last-child {
+        width: 300px;
+        right: -70px;
+        bottom: -85px;
+    }
+
+:where(html[data-responsive~="login"]) .login-form {
+        min-height: auto;
+        padding: 55px 8% 65px;
+        align-items: center;
+    }
+}
+
+@media (max-width: 550px) {
+:where(html[data-responsive~="login"]) .slogan {
+        min-height: 350px;
+        padding: 112px 25px 48px;
+    }
+
+:where(html[data-responsive~="login"]) .slogan>img:first-child {
+        top: 24px;
+        left: 25px;
+        width: 140px;
+        max-height: 55px;
+    }
+
+:where(html[data-responsive~="login"]) .slogan h1 {
+        margin-bottom: 15px;
+        font-size: clamp(2rem, 9vw, 2.5rem);
+        letter-spacing: -0.035em;
+    }
+
+:where(html[data-responsive~="login"]) .slogan p {
+        font-size: 0.9375rem;
+        line-height: 1.6;
+    }
+
+:where(html[data-responsive~="login"]) .slogan>img:last-child {
+        width: 220px;
+        right: -65px;
+        bottom: -70px;
+    }
+
+:where(html[data-responsive~="login"]) .login-form {
+        padding: 42px 25px 48px;
+    }
+
+:where(html[data-responsive~="login"]) .login-form h2 {
+        margin-bottom: 24px;
+        font-size: 2rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+:where(html[data-responsive~="login"]) *,
+:where(html[data-responsive~="login"]) *::before,
+:where(html[data-responsive~="login"]) *::after {
+        transition-property: color, background-color, border-color, box-shadow !important;
+        transition-duration: 180ms !important;
+    }
+
+:where(html[data-responsive~="login"]) .login-form button:hover,
+:where(html[data-responsive~="login"]) .social-login a:hover {
+        transform: none;
+    }
+}
+
+
+/* ===== Style/Empresa/ordensServico.css ===== */
+
+@media (max-width: 1100px) {
+:where(html[data-responsive~="Empresa/ordensServico"]) .order-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+:where(html[data-responsive~="Empresa/ordensServico"]) .order-aside {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+:where(html[data-responsive~="Empresa/ordensServico"]) .order-card,
+:where(html[data-responsive~="Empresa/ordensServico"]) .lista-ordens {
+        padding: 22px;
+    }
+
+:where(html[data-responsive~="Empresa/ordensServico"]) .order-aside {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Empresa/ordensServico"]) .form-bottom p {
+        align-items: flex-start;
+    }
+}
+
+
+/* ===== Style/Style.css ===== */
+
+@media (max-width: 900px) {
+:where(html[data-responsive~="Style"]) nav ul {
+        gap: 16px;
+    }
+
+:where(html[data-responsive~="Style"]) .hero {
+        gap: 30px;
+    }
+
+:where(html[data-responsive~="Style"]) .hero-botoes {
+        flex-wrap: wrap;
+    }
+
+:where(html[data-responsive~="Style"]) .diagrama-iphone {
+        padding: 20px;
+    }
+
+:where(html[data-responsive~="Style"]) .processo {
+        gap: 40px;
+    }
+}
+
+@media (max-width: 700px) {
+:where(html[data-responsive~="Style"]) header {
+        height: auto;
+    }
+
+:where(html[data-responsive~="Style"]) nav {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 14px 0;
+    }
+
+:where(html[data-responsive~="Style"]) nav ul {
+        flex-wrap: wrap;
+        gap: 12px 18px;
+    }
+
+:where(html[data-responsive~="Style"]) nav ul li a::after {
+        display: none;
+    }
+
+:where(html[data-responsive~="Style"]) nav>a {
+        padding: 6px 12px;
+    }
+
+:where(html[data-responsive~="Style"]) .hero {
+        grid-template-columns: 1fr;
+        margin: 40px auto;
+    }
+
+:where(html[data-responsive~="Style"]) .apresentação h1 {
+        letter-spacing: -1.5px;
+    }
+
+:where(html[data-responsive~="Style"]) .diagrama-iphone {
+        max-width: 460px;
+        width: 100%;
+        justify-self: center;
+    }
+
+:where(html[data-responsive~="Style"]) .nota-atendimento {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 48px;
+    }
+
+:where(html[data-responsive~="Style"]) .cards-acoes {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Style"]) .card-acao {
+        min-height: 210px;
+        gap: 24px;
+    }
+
+:where(html[data-responsive~="Style"]) .cabecalho-secao h2,
+:where(html[data-responsive~="Style"]) .processo-apresentacao h2 {
+        font-size: 34px;
+        line-height: 1.15;
+        letter-spacing: -1px;
+    }
+
+:where(html[data-responsive~="Style"]) .proximo-passo {
+        padding-bottom: 48px;
+    }
+
+:where(html[data-responsive~="Style"]) .processo {
+        grid-template-columns: 1fr;
+        padding-top: 48px;
+        padding-bottom: 48px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+html:where([data-responsive~="Style"]) {
+        scroll-behavior: auto;
+    }
+
+:where(html[data-responsive~="Style"]) *,
+:where(html[data-responsive~="Style"]) *::before,
+:where(html[data-responsive~="Style"]) *::after {
+        transition-property: color, background-color, border-color, box-shadow, opacity !important;
+        transition-duration: 180ms !important;
+        transition-timing-function: ease !important;
+    }
+
+:where(html[data-responsive~="Style"]) .hero-botoes a:hover,
+:where(html[data-responsive~="Style"]) .card-acao:hover,
+:where(html[data-responsive~="Style"]) .card-produto:hover,
+:where(html[data-responsive~="Style"]) .card-produto:hover::before,
+:where(html[data-responsive~="Style"]) .card-produto:hover .produto-foto img,
+:where(html[data-responsive~="Style"]) .card-produto:hover .produto-info h3,
+:where(html[data-responsive~="Style"]) .card-produto:hover .botao-carrinho,
+:where(html[data-responsive~="Style"]) .botao-carrinho:hover,
+:where(html[data-responsive~="Style"]) .chamada-orcamento button a:hover,
+:where(html[data-responsive~="Style"]) .botao-principal:hover,
+:where(html[data-responsive~="Style"]) .botao-secundario:hover,
+:where(html[data-responsive~="Style"]) .card-servico:hover,
+:where(html[data-responsive~="Style"]) .card-servico:hover::before,
+:where(html[data-responsive~="Style"]) .card-servico:hover>a svg,
+:where(html[data-responsive~="Style"]) .lista-diferenciais>div:hover,
+:where(html[data-responsive~="Style"]) .chamada-servico>a:hover,
+:where(html[data-responsive~="Style"]) .botao-analisar:hover,
+:where(html[data-responsive~="Style"]) .botao-continuar:hover,
+:where(html[data-responsive~="Style"]) .etapas-orcamento article:hover {
+        transform: none !important;
+    }
+
+:where(html[data-responsive~="Style"]) .card-produto:hover .produto-foto img {
+        filter: none;
+    }
+}
+
+
+/* ===== Style/Acompanhar.css ===== */
+
+@media (max-width: 1000px) {
+:where(html[data-responsive~="Acompanhar"]) .acompanhar-topo {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .detalhes-acompanhamento {
+        grid-template-columns: 1fr 1fr;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .ordem-servico,
+:where(html[data-responsive~="Acompanhar"]) .historico-ordem {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 700px) {
+:where(html[data-responsive~="Acompanhar"]) nav a[aria-current="page"]::after {
+        display: none;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .pagina-acompanhar {
+        margin: 40px auto 48px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .acompanhar-topo h1 {
+        letter-spacing: -1.5px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .acompanhar-topo p {
+        font-size: 16px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .ordem-cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .resumo-ordem {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .etapas-reparo {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .etapas-reparo li {
+        display: grid;
+        grid-template-columns: 40px 1fr;
+        gap: 0 14px;
+        text-align: left;
+        padding: 0 0 20px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .marcador-etapa {
+        grid-row: span 2;
+        margin: 0;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .etapas-reparo li:not(:last-child)::after {
+        top: 44px;
+        left: 19px;
+        width: 2px;
+        height: 12px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .etapas-reparo li:last-child {
+        padding-bottom: 0;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .situacao-reparo {
+        padding: 18px;
+        gap: 12px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .detalhes-acompanhamento {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .chamada-acompanhar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 400px) {
+:where(html[data-responsive~="Acompanhar"]) .ordem-servico,
+:where(html[data-responsive~="Acompanhar"]) .historico-ordem,
+:where(html[data-responsive~="Acompanhar"]) .duvidas-ordem,
+:where(html[data-responsive~="Acompanhar"]) .recado-tecnico {
+        padding: 20px;
+    }
+
+:where(html[data-responsive~="Acompanhar"]) .situacao-reparo {
+        flex-direction: column;
+    }
+}
+
+
+/* ===== Style/Orçamento.css ===== */
+
+@media(max-width:950px) {
+:where(html[data-responsive~="Orçamento"]) .orcamento-topo {
+        grid-template-columns: 1fr .75fr;
+        gap: 40px;
+    }
+
+:where(html[data-responsive~="Orçamento"]) .area-orcamento {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Orçamento"]) .painel-resultado {
+        position: static;
+        min-height: auto;
+    }
+
+:where(html[data-responsive~="Orçamento"]) .etapas-orcamento {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width:750px) {
+:where(html[data-responsive~="Orçamento"]) .orcamento-topo {
+        margin-top: 55px;
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Orçamento"]) .cartao-ia {
+        min-height: 380px;
+    }
+}
+
+@media(max-width:550px) {
+:where(html[data-responsive~="Orçamento"]) .orcamento-apresentacao h1 {
+        font-size: 39px;
+        letter-spacing: -2px;
+    }
+
+:where(html[data-responsive~="Orçamento"]) .grupo-campos {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+:where(html[data-responsive~="Orçamento"]) .formulario-container,
+:where(html[data-responsive~="Orçamento"]) .painel-resultado {
+        padding: 20px;
+    }
+
+:where(html[data-responsive~="Orçamento"]) .campo-titulo {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0;
+    }
+
+:where(html[data-responsive~="Orçamento"]) .etapas-orcamento {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ===== Style/Perfil.css ===== */
+
+@media (max-width: 900px) {
+:where(html[data-responsive~="Perfil"]) .perfil-atalhos {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Perfil"]) .perfil-conteudo {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Perfil"]) .perfil-acoes {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 650px) {
+:where(html[data-responsive~="Perfil"]) .perfil-pagina {
+        padding-top: 45px;
+    }
+
+:where(html[data-responsive~="Perfil"]) .perfil-cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+:where(html[data-responsive~="Perfil"]) .perfil-identidade {
+        align-items: flex-start;
+    }
+
+:where(html[data-responsive~="Perfil"]) .perfil-avatar {
+        width: 68px;
+        height: 68px;
+    }
+
+:where(html[data-responsive~="Perfil"]) .perfil-avatar svg {
+        width: 32px;
+        height: 32px;
+    }
+
+:where(html[data-responsive~="Perfil"]) .botao-editar {
+        width: 100%;
+    }
+
+:where(html[data-responsive~="Perfil"]) .perfil-card {
+        padding: 22px;
+    }
+
+:where(html[data-responsive~="Perfil"]) .dado-item {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 6px;
+    }
+
+:where(html[data-responsive~="Perfil"]) .dado-item strong {
+        text-align: left;
+    }
+
+:where(html[data-responsive~="Perfil"]) .historico-item {
+        grid-template-columns: auto 1fr;
+    }
+
+:where(html[data-responsive~="Perfil"]) .historico-status {
+        grid-column: 2;
+
+        align-items: flex-start;
+    }
+
+:where(html[data-responsive~="Perfil"]) .acoes-botoes {
+        width: 100%;
+
+        flex-direction: column;
+    }
+
+:where(html[data-responsive~="Perfil"]) .acoes-botoes a,
+:where(html[data-responsive~="Perfil"]) .acoes-botoes button {
+        width: 100%;
+    }
+}
+
+
+/* ===== Style/Servicos.css ===== */
+
+@media(max-width:1000px) {
+:where(html[data-responsive~="Servicos"]) .servicos-apresentacao {
+        grid-template-columns: 1fr .6fr;
+        gap: 40px;
+    }
+
+:where(html[data-responsive~="Servicos"]) .grade-servicos {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+:where(html[data-responsive~="Servicos"]) .etapas-servico {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 45px 30px;
+    }
+
+:where(html[data-responsive~="Servicos"]) .diferenciais {
+        gap: 50px;
+    }
+}
+
+@media(max-width:750px) {
+:where(html[data-responsive~="Servicos"]) .servicos-apresentacao {
+        margin-top: 55px;
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Servicos"]) .servicos-destaque {
+        min-height: 260px;
+    }
+
+:where(html[data-responsive~="Servicos"]) .processo-servico {
+        padding: 35px 25px;
+    }
+
+:where(html[data-responsive~="Servicos"]) .diferenciais {
+        grid-template-columns: 1fr;
+        gap: 35px;
+    }
+
+:where(html[data-responsive~="Servicos"]) .chamada-servico {
+        padding: 35px 25px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media(max-width:560px) {
+:where(html[data-responsive~="Servicos"]) .servicos-introducao h1 {
+        font-size: 40px;
+        letter-spacing: -2px;
+    }
+
+:where(html[data-responsive~="Servicos"]) .servicos-acoes {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+:where(html[data-responsive~="Servicos"]) .grade-servicos {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Servicos"]) .card-servico {
+        min-height: 310px;
+    }
+
+:where(html[data-responsive~="Servicos"]) .etapas-servico {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Servicos"]) .lista-diferenciais {
+        grid-template-columns: 1fr;
+    }
+
+:where(html[data-responsive~="Servicos"]) .chamada-servico>a {
+        width: 100%;
+    }
+}
+
+
+/* ===== Style/auth-pages.css ===== */
+
+@media (max-width: 900px) {
+:where(html[data-responsive~="auth-pages"]) .auth-layout {
+        grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-aside {
+        padding: 34px 28px;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-main {
+        padding: 38px 28px;
+    }
+}
+
+@media (max-width: 700px) {
+:where(html[data-responsive~="auth-pages"]) .auth-layout {
+        display: flex;
+        flex-direction: column;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-aside {
+        min-height: auto;
+        padding: 24px 24px 28px;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-brand {
+        font-size: 1.2rem;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-brand svg,
+:where(html[data-responsive~="auth-pages"]) .auth-brand i {
+
+
+        width: 26px;
+        height: 26px;
+        
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-aside-copy {
+        margin: 32px 0 0;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-aside-copy h1 {
+        max-width: 560px;
+        font-size: clamp(1.75rem, 7vw, 2.5rem);
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-aside-copy p {
+        font-size: 0.9rem;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-aside-foot {
+        margin-top: 22px;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-main {
+        padding: 34px 22px 42px;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-panel {
+        max-width: 560px;
+    }
+}
+
+@media (max-width: 460px) {
+:where(html[data-responsive~="auth-pages"]) .form-row {
+        grid-template-columns: 1fr;
+        gap: 17px;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-main {
+        padding-inline: 18px;
+    }
+
+:where(html[data-responsive~="auth-pages"]) .auth-form {
+        gap: 15px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+:where(html[data-responsive~="auth-pages"]) *,
+:where(html[data-responsive~="auth-pages"]) *::before,
+:where(html[data-responsive~="auth-pages"]) *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+
+/* ===== Style/carrinho.css ===== */
+
+@media (max-width: 850px) {
+:where(html[data-responsive~="carrinho"]) .carrinho-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+:where(html[data-responsive~="carrinho"]) .carrinho-conteudo {
+        margin-top: 32px;
+    }
+
+:where(html[data-responsive~="carrinho"]) .item-carrinho {
+        grid-template-columns: 74px minmax(0, 1fr);
+        padding: 16px;
+        gap: 14px;
+    }
+
+:where(html[data-responsive~="carrinho"]) .foto-carrinho {
+        height: 74px;
+    }
+
+:where(html[data-responsive~="carrinho"]) .foto-carrinho img {
+        max-height: 74px;
+    }
+
+:where(html[data-responsive~="carrinho"]) .acoes-carrinho {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+
+/* ===== Style/tiposCadastro.css ===== */
+
+@media (max-width: 700px) {
+:where(html[data-responsive~="tiposCadastro"]) .cadastro-tipo {
+        padding: 130px 6% 42px;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .cadastro-tipo .logo {
+        height: auto;
+        display: block;
+        border-bottom: 0;
+        background: transparent;
+        top: 28px;
+        left: 6%;
+        width: 160px;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .cabecalho {
+        margin-bottom: 28px;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .cards {
+        gap: 18px;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .card {
+        min-height: 260px;
+        padding: 28px 24px;
+    }
+}
+
+@media (max-width: 560px) {
+:where(html[data-responsive~="tiposCadastro"]) .cadastro-tipo {
+        padding: 112px 22px 35px;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .cadastro-tipo .logo {
+        height: auto;
+        display: block;
+        border-bottom: 0;
+        background: transparent;
+        top: 22px;
+        left: 22px;
+        width: 140px;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .cabecalho {
+        margin-bottom: 25px;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .cabecalho h1 {
+        font-size: 2rem;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .cabecalho p {
+        font-size: 0.9375rem;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .cards {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        max-width: 390px;
+        margin: 0 auto;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .card {
+        min-height: 245px;
+        padding: 26px 22px;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .login-link {
+        margin-top: 23px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+:where(html[data-responsive~="tiposCadastro"]) *,
+:where(html[data-responsive~="tiposCadastro"]) *::before,
+:where(html[data-responsive~="tiposCadastro"]) *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+
+:where(html[data-responsive~="tiposCadastro"]) .card:hover,
+:where(html[data-responsive~="tiposCadastro"]) .card:hover .seta {
+        transform: none;
+    }
+}
+
+
+/* ===== Style/vitrine.css ===== */
+
+@media (hover: hover) and (pointer: fine) {
+:where(html[data-responsive~="vitrine"]) .card-produto:hover {
+        box-shadow: 0 8px 20px rgba(6, 25, 34, .12);
+    }
+}
+
+@media (max-width: 1050px) {
+:where(html[data-responsive~="vitrine"]) .grade-produtos {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 800px) {
+:where(html[data-responsive~="vitrine"]) .vitrine {
+        margin-top: 40px;
+    }
+
+:where(html[data-responsive~="vitrine"]) .grade-produtos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+:where(html[data-responsive~="vitrine"]) .vitrine-topo {
+        gap: 24px;
+    }
+
+:where(html[data-responsive~="vitrine"]) .imagemPrincipal {
+        width: 200px;
+        height: 190px;
+        object-fit: contain;
+    }
+
+:where(html[data-responsive~="vitrine"]) .chamada-orcamento {
+        padding: 28px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 520px) {
+:where(html[data-responsive~="vitrine"]) .vitrine-topo {
+        display: block;
+    }
+
+:where(html[data-responsive~="vitrine"]) .vitrine-topo>div:last-child {
+        display: none;
+    }
+
+:where(html[data-responsive~="vitrine"]) .grade-produtos {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+:where(html[data-responsive~="vitrine"]) .produto-foto {
+        max-height: 380px;
+    }
+
+:where(html[data-responsive~="vitrine"]) .produto-info h3 {
+        font-size: 20px;
+    }
+
+:where(html[data-responsive~="vitrine"]) .botao-carrinho {
+        font-size: 14px;
+    }
+
+:where(html[data-responsive~="vitrine"]) .secao-produtos {
+        margin-bottom: 40px;
+    }
+}
