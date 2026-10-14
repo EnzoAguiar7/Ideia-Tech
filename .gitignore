@@ -6,3 +6,9 @@ BackEnd/dados/*.db-*
 __pycache__/
 *.pyc
 .venv/
+
+# Configuração e credenciais de cada computador
+BackEnd/config.local.json
+.env
+.env.*
+!.env.example

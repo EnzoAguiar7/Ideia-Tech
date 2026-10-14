@@ -232,35 +232,3 @@
     min-height: 44px;
     padding: 12px 20px;
 }
-
-@media (max-width: 850px) {
-    .carrinho-layout {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 520px) {
-    .carrinho-conteudo {
-        margin-top: 32px;
-    }
-
-    .item-carrinho {
-        grid-template-columns: 74px minmax(0, 1fr);
-        padding: 16px;
-        gap: 14px;
-    }
-
-    .foto-carrinho {
-        height: 74px;
-    }
-
-    .foto-carrinho img {
-        max-height: 74px;
-    }
-
-    .acoes-carrinho {
-        grid-column: 1 / -1;
-        flex-direction: row;
-        align-items: center;
-    }
-}

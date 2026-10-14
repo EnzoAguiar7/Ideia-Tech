@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html data-responsive="Empresa/painelEmpresa Empresa/ordensServico Empresa/listasEmpresa" lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pedidos | IdeiaTech</title>
+
+    <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
+    <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
+    <link rel="stylesheet" href="/Style/Empresa/listasEmpresa.css">
+    <link rel="stylesheet" href="/Style/responsivo.css">
+
+    <script defer src="/Script/vendor/lucide.min.js"></script>
+    <script defer src="/Script/icones.js"></script>
+</head>
+
+<body>
+    <aside class="menu">
+        <a class="marca" href="/Pages/index.html">
+            <i data-lucide="cpu" aria-hidden="true"></i>
+            <span>IdeiaTech</span>
+        </a>
+
+        <div class="workspace">
+            <span class="workspace-avatar">IT</span>
+            <div>
+                <strong>Sua assistência</strong>
+                <span>Espaço de trabalho</span>
+            </div>
+        </div>
+
+        <p class="nav-label">GERENCIAMENTO</p>
+
+        <nav aria-label="Menu empresarial">
+            <a href="/Pages/Empresa/painelEmpresa.html">
+                <i data-lucide="layout-dashboard" aria-hidden="true"></i>
+                Visão geral
+            </a>
+
+            <a href="/Pages/Empresa/ordensServico.html">
+                <i data-lucide="clipboard-list" aria-hidden="true"></i>
+                Ordens de serviço
+            </a>
+
+            <a href="/Pages/Empresa/dadosEmpresa.html">
+                <i data-lucide="building-2" aria-hidden="true"></i>
+                Dados da empresa
+            </a>
+
+            <a href="/Pages/Empresa/aparelhosCadastrados.html">
+                <i data-lucide="smartphone" aria-hidden="true"></i>
+                Aparelhos cadastrados
+            </a>
+
+            <a href="/Pages/Empresa/solicitacoes.html">
+                <i data-lucide="inbox" aria-hidden="true"></i>
+                Solicitações recebidas
+            </a>
+
+            <a href="/Pages/Empresa/orcamentos.html">
+                <i data-lucide="file-text" aria-hidden="true"></i>
+                Orçamentos
+            </a>
+
+            <a href="/Pages/Empresa/produtos.html">
+                <i data-lucide="package" aria-hidden="true"></i>
+                Produtos
+            </a>
+
+            <a href="/Pages/Empresa/pedidos.html" aria-current="page">
+                <i data-lucide="shopping-bag" aria-hidden="true"></i>
+                Pedidos
+            </a>
+
+        </nav>
+
+        <div class="sidebar-note">
+            <span class="note-dot"></span>
+            <strong>Mais clareza em cada etapa.</strong>
+            <p>Do primeiro atendimento à entrega do aparelho.</p>
+        </div>
+
+        <a class="site-link" href="/Pages/index.html">
+            <i data-lucide="arrow-left" aria-hidden="true"></i>
+            Visitar o site
+        </a>
+    </aside>
+
+    <main>
+        <div class="topbar">
+            <p>Área empresarial <span>/</span> <strong>Pedidos</strong></p>
+            <span class="demo-badge">
+                <span></span>Modo demonstração
+            </span>
+        </div>
+
+        <header class="page-heading">
+            <div>
+                <p class="eyebrow">VENDAS DA ASSISTÊNCIA</p>
+                <h1>Pedidos</h1>
+                <p>Acompanhe as compras de peças e acessórios dos clientes.</p>
+            </div>
+
+            <a class="button secondary" href="/Pages/Empresa/produtos.html">
+                <i data-lucide="package" aria-hidden="true"></i>
+                Ver produtos
+            </a>
+        </header>
+
+        <section class="empresa-lista" aria-labelledby="titulo-pedidos">
+            <div class="empresa-lista-topo">
+                <h2 id="titulo-pedidos">Pedidos dos clientes</h2>
+                <span class="demo-badge">2 exemplos fictícios</span>
+            </div>
+
+            <div class="empresa-tabela-wrap">
+                <table class="empresa-tabela">
+                    <thead>
+                        <tr>
+                            <th scope="col">Pedido</th>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Quantidade</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Situação</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>#EX-001</td>
+                            <td>Cliente exemplo A</td>
+                            <td>Carregador USB-C 20W</td>
+                            <td>1</td>
+                            <td>R$ 89,90</td>
+                            <td>
+                                <span class="empresa-situacao">
+                                    Aguardando pagamento
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>#EX-002</td>
+                            <td>Cliente exemplo B</td>
+                            <td>Película para Galaxy S23</td>
+                            <td>2</td>
+                            <td>R$ 59,80</td>
+                            <td>
+                                <span class="empresa-situacao">
+                                    Entregue
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <p class="demo-note">
+            Dados fictícios de demonstração. Nada é consultado ou salvo no banco.
+        </p>
+
+        <footer>
+            IdeiaTech
+            <span>Organização para quem cuida de tecnologia.</span>
+        </footer>
+    </main>
+</body>
+
+</html>

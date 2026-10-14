@@ -378,105 +378,10 @@ body>footer {
 }
 
 /* Tablet */
-@media (max-width: 900px) {
-    body {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
-    }
 
-    .slogan,
-    .login-form {
-        width: 100%;
-    }
-
-    .slogan {
-        min-height: 390px;
-        padding: 130px 8% 65px;
-    }
-
-    .slogan>img:first-child {
-        top: 30px;
-        left: 8%;
-        width: 165px;
-    }
-
-    .slogan h1 {
-        max-width: 650px;
-        font-size: clamp(2.25rem, 6vw, 3.25rem);
-    }
-
-    .slogan p {
-        font-size: 1rem;
-    }
-
-    .slogan>img:last-child {
-        width: 300px;
-        right: -70px;
-        bottom: -85px;
-    }
-
-    .login-form {
-        min-height: auto;
-        padding: 55px 8% 65px;
-        align-items: center;
-    }
-}
 
 /* Celular */
-@media (max-width: 550px) {
-    .slogan {
-        min-height: 350px;
-        padding: 112px 25px 48px;
-    }
 
-    .slogan>img:first-child {
-        top: 24px;
-        left: 25px;
-        width: 140px;
-        max-height: 55px;
-    }
-
-    .slogan h1 {
-        margin-bottom: 15px;
-        font-size: clamp(2rem, 9vw, 2.5rem);
-        letter-spacing: -0.035em;
-    }
-
-    .slogan p {
-        font-size: 0.9375rem;
-        line-height: 1.6;
-    }
-
-    .slogan>img:last-child {
-        width: 220px;
-        right: -65px;
-        bottom: -70px;
-    }
-
-    .login-form {
-        padding: 42px 25px 48px;
-    }
-
-    .login-form h2 {
-        margin-bottom: 24px;
-        font-size: 2rem;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        transition-property: color, background-color, border-color, box-shadow !important;
-        transition-duration: 180ms !important;
-    }
-
-    .login-form button:hover,
-    .social-login a:hover {
-        transform: none;
-    }
-}
 
 .aviso-retorno {
     max-width: 440px;

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html data-responsive="Empresa/painelEmpresa" lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Visão geral | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
+
+    <link rel="stylesheet" href="/Style/responsivo.css">
+    <script defer src="/Script/vendor/lucide.min.js"></script>
+    <script defer src="/Script/icones.js"></script>
+</head>
+
+<body>
+    <aside class="menu">
+        <a class="marca" href="/Pages/Empresa/painelEmpresa.html">
+            <i data-lucide="cpu" aria-hidden="true"></i>
+            <span>IdeiaTech</span>
+        </a>
+        <div class="workspace">
+            <span class="workspace-avatar">IT</span>
+            <div>
+                <strong>Sua assistência</strong>
+                <span>Espaço de trabalho</span>
+            </div>
+        </div>
+        <p class="nav-label">GERENCIAMENTO</p>
+        <nav aria-label="Menu empresarial">
+            <a href="/Pages/Empresa/painelEmpresa.html" aria-current="page">
+                <i data-lucide="layout-dashboard" aria-hidden="true"></i>Visão geral</a>
+            <a href="/Pages/Empresa/ordensServico.html">
+                <i data-lucide="clipboard-list" aria-hidden="true"></i>Ordens de serviço</a>
+            <a href="/Pages/Empresa/dadosEmpresa.html">
+                <i data-lucide="building-2" aria-hidden="true"></i>Dados da empresa</a>
+            <a href="/Pages/Empresa/aparelhosCadastrados.html">
+                <i data-lucide="smartphone" aria-hidden="true"></i>
+                Aparelhos cadastrados
+            </a>
+
+            <a href="/Pages/Empresa/solicitacoes.html">
+                <i data-lucide="inbox" aria-hidden="true"></i>
+                Solicitações recebidas
+            </a>
+
+            <a href="/Pages/Empresa/orcamentos.html">
+                <i data-lucide="file-text" aria-hidden="true"></i>
+                Orçamentos
+            </a>
+
+            <a href="/Pages/Empresa/produtos.html">
+                <i data-lucide="package" aria-hidden="true"></i>
+                Produtos
+            </a>
+
+            <a href="/Pages/Empresa/pedidos.html">
+                <i data-lucide="shopping-bag" aria-hidden="true"></i>
+                Pedidos
+            </a>
+        </nav>
+
+
+            <div class="sidebar-note">
+                <span class="note-dot">
+                </span>
+                <strong>Mais clareza em cada etapa.</strong>
+                <p>Do primeiro atendimento à entrega do aparelho.</p>
+            </div>
+            <a class="site-link" href="/Pages/index.html">
+                <i data-lucide="arrow-left" aria-hidden="true"></i>Visitar o site</a>
+    </aside>
+    <main>
+        <div class="topbar">
+            <p>Área empresarial <span>/</span> <strong>Visão geral</strong>
+            </p>
+            <span class="demo-badge">
+                <span>
+                </span>Modo demonstração</span>
+        </div>
+
+        <header class="page-heading">
+            <div>
+                <p class="eyebrow">VISÃO GERAL DA OPERAÇÃO</p>
+                <h1>Seu negócio, mais organizado.</h1>
+                <p>Tenha clareza sobre os atendimentos e o próximo passo de cada serviço.</p>
+            </div>
+            <a class="button primary" href="/Pages/Empresa/ordensServico.html#nova-ordem">
+                <i data-lucide="plus" aria-hidden="true"></i>Nova ordem</a>
+        </header>
+        <section class="welcome-banner">
+            <div>
+                <span class="banner-label">COMECE POR AQUI</span>
+                <h2>Um bom atendimento começa<br>com tudo no lugar.</h2>
+                <p>Registre o aparelho, descreva o problema e mantenha o cliente informado durante o conserto.</p>
+                <a href="/Pages/Empresa/ordensServico.html#nova-ordem">Preparar primeiro atendimento <i
+                        data-lucide="arrow-right" aria-hidden="true"></i>
+                </a>
+            </div>
+            <div class="banner-illustration" aria-hidden="true">
+                <span class="orbit orbit-one">
+                </span>
+                <span class="orbit orbit-two">
+                </span>
+                <div class="device">
+                    <i data-lucide="smartphone" aria-hidden="true"></i>
+                    <span class="device-check">
+                        <i data-lucide="circle-check" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <span class="illustration-tag">Cada etapa conta.</span>
+            </div>
+        </section>
+        <section id="resumo" class="metrics" aria-label="Resumo da empresa">
+            <article class="card metric">
+                <div class="metric-top">
+                    <h2>Serviços ativos</h2>
+                    <span class="metric-icon teal">
+                        <i data-lucide="smartphone" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <strong class="metric-value">0</strong>
+                <p>Aparelhos em atendimento</p>
+                <span class="metric-foot">Recebidos, em diagnóstico ou reparo</span>
+            </article>
+            <article class="card metric">
+                <div class="metric-top">
+                    <h2>Orçamentos pendentes</h2>
+                    <span class="metric-icon amber">
+                        <i data-lucide="clock-3" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <strong class="metric-value">0</strong>
+                <p>Aguardando aprovação do cliente</p>
+                <span class="metric-foot">Acompanhe antes de iniciar o serviço</span>
+            </article>
+            <article class="card metric">
+                <div class="metric-top">
+                    <h2>Prontos para retirada</h2>
+                    <span class="metric-icon blue">
+                        <i data-lucide="circle-check" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <strong class="metric-value">0</strong>
+                <p>Serviços finalizados</p>
+                <span class="metric-foot">Organize a entrega dos aparelhos</span>
+            </article>
+        </section>
+        <div class="dashboard-grid">
+            <section class="card service-panel" id="servicos">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">ATENDIMENTOS</p>
+                        <h2>Ordens de serviço</h2>
+                    </div>
+                    <a class="text-link" href="/Pages/Empresa/ordensServico.html">Ver ordens <i
+                            data-lucide="arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="empty-state">
+                    <span class="empty-icon">
+                        <i data-lucide="clipboard-list" aria-hidden="true"></i>
+                    </span>
+                    <h3>Seu próximo atendimento começa aqui.</h3>
+                    <p>Ainda não há ordens cadastradas. Quando forem conectadas ao sistema, os serviços e seus status
+                        aparecerão neste espaço.</p>
+                    <a class="button secondary" href="/Pages/Empresa/ordensServico.html#nova-ordem">Preparar uma ordem
+                        <i data-lucide="arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="panel-foot">Os números exibidos são demonstrativos.</div>
+            </section>
+            <aside class="card workflow">
+                <p class="eyebrow">ROTINA DA ASSISTÊNCIA</p>
+                <h2>Do recebimento à entrega</h2>
+                <p class="workflow-intro">Um processo claro para sua equipe e para o cliente.</p>
+                <ol>
+                    <li>
+                        <span>01</span>
+                        <div>
+                            <h3>Receba e registre</h3>
+                            <p>Identifique o cliente, o aparelho e o problema relatado.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span>02</span>
+                        <div>
+                            <h3>Avalie e orce</h3>
+                            <p>Apresente o diagnóstico e aguarde a aprovação.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span>03</span>
+                        <div>
+                            <h3>Repare e teste</h3>
+                            <p>Atualize o andamento e confira o funcionamento.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span>04</span>
+                        <div>
+                            <h3>Avise e entregue</h3>
+                            <p>Informe que o aparelho está pronto para retirada.</p>
+                        </div>
+                    </li>
+                </ol>
+            </aside>
+        </div>
+        <p class="demo-note">Interface em demonstração · Os atendimentos ainda não são salvos no banco.</p>
+
+        <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span>
+        </footer>
+    </main>
+</body>
+
+</html>

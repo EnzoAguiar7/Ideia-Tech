@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html data-responsive="Empresa/painelEmpresa Empresa/ordensServico" lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ordens de serviço | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
+    <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
+    <link rel="stylesheet" href="/Style/responsivo.css">
+    <script defer src="/Script/vendor/lucide.min.js"></script>
+    <script defer src="/Script/icones.js"></script>
+</head>
+
+<body>
+    <aside class="menu">
+        <a class="marca" href="/Pages/index.html">
+            <i data-lucide="cpu" aria-hidden="true"></i>
+            <span>IdeiaTech</span>
+
+        </a>
+        <div class="workspace">
+            <span class="workspace-avatar">IT</span>
+            <div>
+                <strong>Sua assistência</strong>
+                <span>Espaço de trabalho</span>
+            </div>
+        </div>
+        <p class="nav-label">GERENCIAMENTO</p>
+        <nav aria-label="Menu empresarial">
+            <a href="/Pages/Empresa/painelEmpresa.html">
+                <i data-lucide="layout-dashboard" aria-hidden="true"></i>Visão geral</a>
+            <a href="/Pages/Empresa/ordensServico.html" aria-current="page">
+                <i data-lucide="clipboard-list" aria-hidden="true"></i>Ordens de serviço</a>
+            <a href="/Pages/Empresa/dadosEmpresa.html">
+                <i data-lucide="building-2" aria-hidden="true"></i>Dados da empresa</a>
+            <a href="/Pages/Empresa/aparelhosCadastrados.html">
+                <i data-lucide="smartphone" aria-hidden="true"></i>
+                Aparelhos cadastrados
+            </a>
+
+            <a href="/Pages/Empresa/solicitacoes.html">
+                <i data-lucide="inbox" aria-hidden="true"></i>
+                Solicitações recebidas
+            </a>
+            <a href="/Pages/Empresa/orcamentos.html">
+                <i data-lucide="file-text" aria-hidden="true"></i>
+                Orçamentos
+            </a>
+
+            <a href="/Pages/Empresa/produtos.html">
+                <i data-lucide="package" aria-hidden="true"></i>
+                Produtos
+            </a>
+
+            <a href="/Pages/Empresa/pedidos.html">
+                <i data-lucide="shopping-bag" aria-hidden="true"></i>
+                Pedidos
+            </a>
+        </nav>
+
+
+        <div class="sidebar-note">
+            <span class="note-dot">
+            </span>
+            <strong>Mais clareza em cada etapa.</strong>
+            <p>Do primeiro atendimento à entrega do aparelho.</p>
+        </div>
+        <a class="site-link" href="/Pages/index.html">
+            <i data-lucide="arrow-left" aria-hidden="true"></i>Visitar o site</a>
+    </aside>
+    <main>
+        <div class="topbar">
+            <p>Área empresarial <span>/</span> <strong>Ordens de serviço</strong>
+            </p>
+            <span class="demo-badge">
+                <span>
+                </span>Modo demonstração</span>
+        </div>
+
+        <header class="page-heading">
+            <div>
+                <p class="eyebrow">GESTÃO DE ATENDIMENTOS</p>
+                <h1>Cada aparelho, uma história.</h1>
+                <p>Comece com as informações que sua equipe precisa para cuidar do serviço.</p>
+            </div>
+            <a class="button secondary" href="/Pages/Empresa/painelEmpresa.html">
+                <i data-lucide="arrow-left" aria-hidden="true"></i>Voltar ao painel</a>
+        </header>
+        <div class="order-layout">
+            <section class="card order-card" id="nova-ordem">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">NOVO ATENDIMENTO</p>
+                        <h2>Prepare a ordem de serviço</h2>
+                    </div>
+                    <span class="section-icon">
+                        <i data-lucide="clipboard-list" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <p class="form-intro">Preencha os dados do cliente e do aparelho. Os campos com * são obrigatórios.</p>
+                <form id="formOrdemServico">
+                    <fieldset>
+                        <legend>
+                            <span>01</span>Cliente e aparelho
+                        </legend>
+                        <div class="field">
+                            <label for="clienteEmail">E-mail do cliente *</label>
+                            <input id="clienteEmail" name="cliente_email" type="email" maxlength="254"
+                                autocomplete="email" placeholder="cliente@email.com" required>
+                            <small>Use o e-mail da conta do cliente para vincular o atendimento.</small>
+                        </div>
+                        <div class="field">
+                            <label for="aparelho">Aparelho e modelo *</label>
+                            <input id="aparelho" name="aparelho" maxlength="120" placeholder="Ex.: Samsung Galaxy S23"
+                                required>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>
+                            <span>02</span>Detalhes do atendimento
+                        </legend>
+                        <div class="field">
+                            <label for="problema">Problema relatado *</label>
+                            <textarea id="problema" name="problema" maxlength="1000" rows="5"
+                                placeholder="Descreva os sintomas, como o problema começou e o que o cliente observou."
+                                required>
+</textarea>
+                            <small>Inclua as informações que ajudam na avaliação técnica.</small>
+                        </div>
+                        <div class="field">
+                            <label for="previsao">Previsão de entrega <span class="optional">Opcional</span>
+                            </label>
+                            <input id="previsao" name="previsao" type="date">
+                            <small>A estimativa poderá ser ajustada após o diagnóstico.</small>
+                        </div>
+                    </fieldset>
+                    <div class="form-bottom">
+                        <p>
+                            <i data-lucide="clock-3" aria-hidden="true"></i>O cadastro será habilitado ao conectar as
+                            ordens ao banco.
+                        </p>
+                        <button class="button primary" type="button" disabled>
+                            <i data-lucide="plus" aria-hidden="true"></i>Salvar ordem</button>
+                    </div>
+                </form>
+            </section>
+            <aside class="order-aside">
+                <section class="card tip-card">
+                    <span class="tip-icon">
+                        <i data-lucide="user-round" aria-hidden="true"></i>
+                    </span>
+                    <h2>Informação que faz diferença.</h2>
+                    <p>Uma descrição cuidadosa evita dúvidas e ajuda o cliente a entender o atendimento.</p>
+                    <ul>
+                        <li>Confirme o modelo do aparelho.</li>
+                        <li>Anote danos e sintomas relatados.</li>
+                        <li>Combine a previsão com o cliente.</li>
+                    </ul>
+                </section>
+                <section class="status-guide">
+                    <p class="eyebrow">PRÓXIMAS ETAPAS</p>
+                    <h2>Um caminho fácil de acompanhar</h2>
+                    <div class="status-list">
+                        <span class="status active">Recebido</span>
+                        <span class="status">Diagnóstico</span>
+                        <span class="status">Aguardando aprovação</span>
+                        <span class="status">Em reparo</span>
+                        <span class="status">Pronto para retirada</span>
+                    </div>
+                    <p>Esses status vão orientar as atualizações do atendimento.</p>
+                </section>
+            </aside>
+        </div>
+        <section class="card lista-ordens">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">HISTÓRICO</p>
+                    <h2>Ordens cadastradas</h2>
+                </div>
+                <span class="count-badge">0 ordens</span>
+            </div>
+            <div class="compact-empty">
+                <i data-lucide="clipboard-list" aria-hidden="true"></i>
+                <div>
+                    <h3>Nenhuma ordem por enquanto.</h3>
+                    <p>Os atendimentos aparecerão aqui quando o cadastro estiver conectado.</p>
+                </div>
+            </div>
+        </section>
+        <p class="demo-note">Interface em demonstração · Nenhuma informação preenchida nesta tela é salva.</p>
+
+        <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span>
+        </footer>
+    </main>
+</body>
+
+</html>

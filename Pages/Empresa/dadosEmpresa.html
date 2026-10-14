@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html data-responsive="Empresa/painelEmpresa Empresa/ordensServico" lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dados da empresa | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
+    <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
+    <link rel="stylesheet" href="/Style/responsivo.css">
+    <script defer src="/Script/vendor/lucide.min.js"></script>
+    <script defer src="/Script/icones.js"></script>
+</head>
+
+<body>
+    <aside class="menu">
+        <a class="marca" href="/Pages/index.html">
+            <i data-lucide="cpu" aria-hidden="true"></i>
+            <span>IdeiaTech</span>
+        </a>
+        <div class="workspace">
+            <span class="workspace-avatar">IT</span>
+            <div>
+                <strong>Sua assistência</strong>
+                <span>Espaço de trabalho</span>
+            </div>
+        </div>
+        <p class="nav-label">GERENCIAMENTO</p>
+        <nav aria-label="Menu empresarial">
+            <a href="/Pages/Empresa/painelEmpresa.html">
+                <i data-lucide="layout-dashboard" aria-hidden="true"></i>Visão geral</a>
+            <a href="/Pages/Empresa/ordensServico.html">
+                <i data-lucide="clipboard-list" aria-hidden="true"></i>Ordens de serviço</a>
+            <a href="/Pages/Empresa/dadosEmpresa.html" aria-current="page">
+                <i data-lucide="building-2" aria-hidden="true"></i>Dados da empresa</a>
+            <a href="/Pages/Empresa/aparelhosCadastrados.html">
+                <i data-lucide="smartphone" aria-hidden="true"></i>
+                Aparelhos cadastrados
+            </a>
+
+            <a href="/Pages/Empresa/solicitacoes.html">
+                <i data-lucide="inbox" aria-hidden="true"></i>
+                Solicitações recebidas
+            </a>
+            <a href="/Pages/Empresa/orcamentos.html">
+                <i data-lucide="file-text" aria-hidden="true"></i>
+                Orçamentos
+            </a>
+
+            <a href="/Pages/Empresa/produtos.html">
+                <i data-lucide="package" aria-hidden="true"></i>
+                Produtos
+            </a>
+
+            <a href="/Pages/Empresa/pedidos.html">
+                <i data-lucide="shopping-bag" aria-hidden="true"></i>
+                Pedidos
+            </a>
+        </nav>
+
+
+        <div class="sidebar-note">
+            <span class="note-dot">
+            </span>
+            <strong>Mais clareza em cada etapa.</strong>
+            <p>Do primeiro atendimento à entrega do aparelho.</p>
+        </div>
+        <a class="site-link" href="/Pages/index.html">
+            <i data-lucide="arrow-left" aria-hidden="true"></i>Visitar o site</a>
+    </aside>
+    <main>
+        <div class="topbar">
+            <p>Área empresarial <span>/</span> <strong>Dados da empresa</strong></p>
+            <span class="demo-badge"><span></span>Modo demonstração</span>
+        </div>
+        <header class="page-heading">
+            <div>
+                <p class="eyebrow">IDENTIDADE DO NEGÓCIO</p>
+                <h1>Conheça seu espaço de trabalho.</h1>
+                <p>Informações da assistência e da pessoa responsável.</p>
+            </div>
+        </header>
+        <div class="order-layout">
+            <section class="card order-card" aria-labelledby="titulo-empresa">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">EMPRESA</p>
+                        <h2 id="titulo-empresa">Dados do negócio</h2>
+                    </div>
+                </div>
+                <p class="form-intro">Estas informações serão carregadas do cadastro da empresa.</p>
+                <div class="field">
+                    <label for="empresaNome">Nome da empresa</label>
+                    <input id="empresaNome" readonly placeholder="Ainda não conectado">
+                </div>
+                <div class="field">
+                    <label for="empresaCnpj">CNPJ</label>
+                    <input id="empresaCnpj" readonly placeholder="Ainda não conectado">
+                </div>
+                <div class="field">
+                    <label for="empresaTelefone">Telefone</label>
+                    <input id="empresaTelefone" readonly placeholder="Ainda não conectado">
+                </div>
+            </section>
+            <aside class="card order-card" aria-labelledby="titulo-responsavel">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">RESPONSÁVEL</p>
+                        <h2 id="titulo-responsavel">Quem administra a conta</h2>
+                    </div>
+                </div>
+                <p class="form-intro">Pessoa vinculada ao cadastro empresarial.</p>
+                <div class="field">
+                    <label for="responsavelNome">Nome completo</label>
+                    <input id="responsavelNome" readonly placeholder="Ainda não conectado">
+                </div>
+                <div class="field">
+                    <label for="responsavelEmail">E-mail de acesso</label>
+                    <input id="responsavelEmail" readonly placeholder="Ainda não conectado">
+                </div>
+            </aside>
+        </div>
+        <p class="demo-note">Demonstração: os dados reais serão exibidos após conectar esta página à conta empresarial.
+        </p>
+        <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span></footer>
+    </main>
+</body>
+
+</html>

@@ -13,6 +13,9 @@ from urllib.parse import quote, unquote, urlsplit, urlunsplit
 from flask import Flask, abort, flash, redirect, send_from_directory, request, session, render_template, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from urllib.parse import urlsplit
+from configuracao import carregar_configuracao
+
+carregar_configuracao()
 
 app = Flask(
     __name__,

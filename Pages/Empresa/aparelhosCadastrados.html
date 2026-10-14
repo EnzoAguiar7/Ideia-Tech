@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html data-responsive="Empresa/painelEmpresa Empresa/ordensServico Empresa/aparelhosCadastrados" lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Aparelhos cadastrados | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
+    <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
+    <link rel="stylesheet" href="/Style/Empresa/aparelhosCadastro.css">
+    <link rel="stylesheet" href="/Style/responsivo.css">
+
+    <script defer src="/Script/vendor/lucide.min.js"></script>
+    <script defer src="/Script/icones.js"></script>
+</head>
+
+<body class="pagina-aparelhos">
+    <aside class="menu">
+        <a class="marca" href="/Pages/index.html">
+            <i data-lucide="cpu" aria-hidden="true"></i>
+            <span>IdeiaTech</span>
+        </a>
+        <div class="workspace">
+            <span class="workspace-avatar">IT</span>
+            <div>
+                <strong>Sua assistência</strong>
+                <span>Espaço de trabalho</span>
+            </div>
+        </div>
+        <p class="nav-label">GERENCIAMENTO</p>
+        <nav aria-label="Menu empresarial">
+            <a href="/Pages/Empresa/painelEmpresa.html">
+                <i data-lucide="layout-dashboard" aria-hidden="true"></i>Visão geral</a>
+            <a href="/Pages/Empresa/ordensServico.html">
+                <i data-lucide="clipboard-list" aria-hidden="true"></i>Ordens de serviço</a>
+            <a href="/Pages/Empresa/dadosEmpresa.html">
+                <i data-lucide="building-2" aria-hidden="true"></i>Dados da empresa</a>
+            <a href="/Pages/Empresa/aparelhosCadastrados.html" aria-current="page">
+                <i data-lucide="smartphone" aria-hidden="true"></i>Aparelhos cadastrados</a>
+            <a href="/Pages/Empresa/solicitacoes.html">
+                <i data-lucide="inbox" aria-hidden="true"></i>
+                Solicitações recebidas
+            </a>
+            <a href="/Pages/Empresa/orcamentos.html">
+                <i data-lucide="file-text" aria-hidden="true"></i>
+                Orçamentos
+            </a>
+
+            <a href="/Pages/Empresa/produtos.html">
+                <i data-lucide="package" aria-hidden="true"></i>
+                Produtos
+            </a>
+
+            <a href="/Pages/Empresa/pedidos.html">
+                <i data-lucide="shopping-bag" aria-hidden="true"></i>
+                Pedidos
+            </a>
+        </nav>
+
+        <div class="sidebar-note">
+            <span class="note-dot"></span>
+            <strong>Mais clareza em cada etapa.</strong>
+            <p>Do primeiro atendimento à entrega do aparelho.</p>
+        </div>
+        <a class="site-link" href="/Pages/index.html">
+            <i data-lucide="arrow-left" aria-hidden="true"></i>Visitar o site</a>
+    </aside>
+
+    <main>
+        <div class="topbar">
+            <p>Área empresarial <span>/</span> <strong>Aparelhos cadastrados</strong></p>
+            <span class="demo-badge"><span></span>Modo demonstração</span>
+        </div>
+
+        <header class="page-heading">
+            <div>
+                <h1>Aparelhos cadastrados</h1>
+                <p>Consulte os aparelhos vinculados aos atendimentos da assistência.</p>
+            </div>
+            <a class="button secondary" href="/Pages/Empresa/ordensServico.html#nova-ordem">
+                Preparar atendimento
+            </a>
+        </header>
+
+        <section aria-labelledby="titulo-aparelhos">
+            <div class="lista-barra">
+                <h2 id="titulo-aparelhos">Aparelhos na assistência</h2>
+                <p>2 aparelhos</p>
+            </div>
+
+            <div class="tabela-wrap">
+                <table class="tabela-aparelhos">
+                    <thead>
+                        <tr>
+                            <th scope="col">Aparelho</th>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Problema relatado</th>
+                            <th scope="col">Previsão de entrega</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="Aparelho">
+                                <div class="aparelho-nome">
+                                    <i data-lucide="smartphone" aria-hidden="true"></i>
+                                    <div>
+                                        <strong>Samsung Galaxy S23</strong>
+                                        <small>Celular</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-label="Cliente">Cliente exemplo A</td>
+                            <td data-label="Problema">Tela não acende após queda.</td>
+                            <td data-label="Previsão">A definir após avaliação</td>
+                            <td data-label="Status">
+                                <span class="status status-diagnostico">Em diagnóstico</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Aparelho">
+                                <div class="aparelho-nome">
+                                    <i data-lucide="laptop" aria-hidden="true"></i>
+                                    <div>
+                                        <strong>Notebook Dell Inspiron</strong>
+                                        <small>Notebook</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-label="Cliente">Cliente exemplo B</td>
+                            <td data-label="Problema">Aparelho desligava durante o uso.</td>
+                            <td data-label="Previsão">Disponível para retirada</td>
+                            <td data-label="Status">
+                                <span class="status status-pronto">Pronto para retirada</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <p class="demo-note">
+            Dados fictícios de demonstração. Nada é consultado ou salvo no banco.
+        </p>
+
+        <footer>IdeiaTech</footer>
+    </main>
+</body>
+
+</html>

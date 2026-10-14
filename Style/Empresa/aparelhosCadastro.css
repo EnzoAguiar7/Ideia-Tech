@@ -1,0 +1,203 @@
+.pagina-aparelhos {
+    --ap-texto: #18231e;
+    --ap-muted: #5b675f;          /* contraste ~5.6:1 sobre branco */
+    --ap-linha: var(--borda, #dfe4dd);
+    --ap-superficie: #ffffff;
+    --ap-cabecalho: #f4f6f2;
+    --ap-acento: var(--verde, #0f6b52);
+    --ap-raio: 8px;
+}
+
+/* ---------- Sidebar mais enxuta ----------
+   Se quiser a mesma limpeza nas outras páginas, mova estas 3 regras
+   para o painelEmpresa.css. */
+.pagina-aparelhos .workspace,
+.pagina-aparelhos .sidebar-note,
+.pagina-aparelhos .nav-label {
+    display: none;
+}
+
+.pagina-aparelhos .menu nav a {
+    border-radius: 6px;
+}
+
+.pagina-aparelhos .nav-future small {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+/* ---------- Cabeçalho da página ---------- */
+.pagina-aparelhos .page-heading {
+    align-items: flex-end;
+    margin-bottom: 28px;
+}
+
+.pagina-aparelhos .page-heading h1 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--ap-texto);
+}
+
+.pagina-aparelhos .page-heading p {
+    margin-top: 8px;
+    max-width: 56ch;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ap-muted);
+}
+
+/* Ação principal da página: precisa parecer ação principal */
+.pagina-aparelhos .page-heading .button {
+    padding: 10px 18px;
+    border: 1px solid var(--ap-acento);
+    border-radius: 6px;
+    background: var(--ap-acento);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: none;
+    transition: background-color 0.15s ease;
+}
+
+.pagina-aparelhos .page-heading .button:hover {
+    background: #0b5642;
+}
+
+.pagina-aparelhos .page-heading .button:focus-visible {
+    outline: 2px solid var(--ap-acento);
+    outline-offset: 3px;
+}
+
+/* ---------- Barra da lista ---------- */
+.lista-barra {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.lista-barra h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ap-texto);
+}
+
+.lista-barra p {
+    font-size: 14px;
+    color: var(--ap-muted);
+}
+
+/* ---------- Tabela ---------- */
+.tabela-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--ap-linha);
+    border-radius: var(--ap-raio);
+    background: var(--ap-superficie);
+}
+
+.tabela-aparelhos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+}
+
+.tabela-aparelhos th {
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--ap-linha);
+    background: var(--ap-cabecalho);
+    text-align: left;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ap-muted);
+    white-space: nowrap;
+}
+
+.tabela-aparelhos td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--ap-linha);
+    vertical-align: top;
+    line-height: 1.45;
+    color: var(--ap-texto);
+}
+
+.tabela-aparelhos tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.tabela-aparelhos tbody tr:hover {
+    background: #fafbf8;
+}
+
+/* Coluna do aparelho: ícone simples + nome + categoria */
+.aparelho-nome {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.aparelho-nome svg {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+    color: var(--ap-acento);
+    stroke-width: 1.75;
+}
+
+.aparelho-nome strong {
+    display: block;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.aparelho-nome small {
+    display: block;
+    margin-top: 2px;
+    font-size: 13px;
+    color: var(--ap-muted);
+}
+
+/* ---------- Status: ponto + texto, sem pílula ---------- */
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.status::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ponto);
+}
+
+.status-diagnostico {
+    --ponto: #d9890b;
+}
+
+.status-pronto {
+    --ponto: #1f9d6b;
+}
+
+/* ---------- Nota e rodapé ---------- */
+.pagina-aparelhos .demo-note {
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ap-muted);
+}
+
+.pagina-aparelhos footer {
+    font-size: 13px;
+    color: var(--ap-muted);
+}

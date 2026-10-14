@@ -98,11 +98,6 @@ nav ul li:nth-child(2) a::after {
     box-shadow: 0 0 0 2px rgba(22, 68, 90, .22), 0 8px 20px rgba(6, 25, 34, .12);
 }
 
-@media (hover: hover) and (pointer: fine) {
-    .card-produto:hover {
-        box-shadow: 0 8px 20px rgba(6, 25, 34, .12);
-    }
-}
 
 .card-produto .icone-card {
     margin-bottom: 20px;
@@ -468,69 +463,6 @@ nav ul li:nth-child(2) a::after {
     font-size: 15px;
 }
 
-@media (max-width: 1050px) {
-    .grade-produtos {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 800px) {
-    .vitrine {
-        margin-top: 40px;
-    }
-
-    .grade-produtos {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .vitrine-topo {
-        gap: 24px;
-    }
-
-    .imagemPrincipal {
-        width: 200px;
-        height: 190px;
-        object-fit: contain;
-    }
-
-    .chamada-orcamento {
-        padding: 28px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-    }
-}
-
-@media (max-width: 520px) {
-    .vitrine-topo {
-        display: block;
-    }
-
-    .vitrine-topo>div:last-child {
-        display: none;
-    }
-
-    .grade-produtos {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .produto-foto {
-        max-height: 380px;
-    }
-
-    .produto-info h3 {
-        font-size: 20px;
-    }
-
-    .botao-carrinho {
-        font-size: 14px;
-    }
-
-    .secao-produtos {
-        margin-bottom: 40px;
-    }
-}
 
 .vitrine .cabecalho-secao h1 {
     font-family: "Manrope", sans-serif;
@@ -564,4 +496,3 @@ nav ul li:nth-child(2) a::after {
     opacity: .5;
     cursor: not-allowed;
 }
-
