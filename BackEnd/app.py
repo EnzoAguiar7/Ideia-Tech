@@ -534,6 +534,81 @@ def destino_local_seguro(valor):
 
     return urlunsplit(("", "", destino.path, destino.query, destino.fragment))
 
+def buscar_usuario_sessao():
+    usuario_id = session.get("usuario_id")
+
+    if not usuario_id:
+        return None
+
+    conexao = conectar_banco()
+
+    try:
+        usuario = conexao.execute(
+            """
+            SELECT id, nome, email, telefone, versao_sessao, tipo
+            FROM usuarios
+            WHERE id = ?
+            """,
+            (usuario_id,)
+        ).fetchone()
+    finally:
+        conexao.close()
+    
+    if (
+        usuario is None or usuario["versao_sessao"] != session.get("versao_sessao")
+    ):
+        session.clear()
+        return None
+
+    return usuario
+
+def pagina_inicial_usuario(tipo):
+    if tipo == "empresa":
+        return "/Pages/Empresa/painelEmpresa.html"
+    
+    return "/Pages/Perfil.html"
+
+def destino_permitido_para_usuario(destino, tipo):
+    if not destino:
+        return None
+
+    caminho = urlsplit(destino).path
+
+    if caminho.startswith ("/Pages/Empresa/") and tipo != "empresa":
+        return None
+    
+    paginas_cliente = {
+        "/Pages/Perfil.html",
+        "/Pages/editarPerfil.html",
+    }
+
+    if caminho in paginas_cliente and tipo != "cliente":
+        return None 
+    
+    return destino
+
+@app.before_request
+def proteger_area_empresarial():
+    if not request.path.startswith("/Pages/Empresa/"):
+        return
+
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        destino = quote(request.full_path.rstrip("?"), safe="/?=&")
+        return redirect (f"/Pages/login.html?next={destino}")
+
+    if usuario["tipo"] != "empresa":
+        abort(403)
+
+@app.after_request
+def impedir_cache_area_protegida(resposta):
+    if request.path.startswith("/Pages/Empresa/"):
+        resposta.headers["Cache-Control"] = "no-store"
+
+    return resposta
+
+
 
 def hash_identificador_login(escopo, valor):
     mensagem = f"{escopo}:{valor}".encode("utf-8")
@@ -608,7 +683,11 @@ def entrar():
             return "E-mail ou senha incorretos.", 401
 
         usuario = conexao.execute(
-            "SELECT id, senha_hash, versao_sessao FROM usuarios WHERE email = ?",
+            """
+            SELECT id, senha_hash, versao_sessao, tipo
+            FROM usuarios
+            WHERE email = ?
+            """,
             (email,)
         ).fetchone()
 
@@ -635,32 +714,22 @@ def entrar():
     session.permanent = True
 
     destino = destino_local_seguro(request.form.get("next", ""))
-    return redirect(destino or "/Pages/Perfil.html")
+    destino = destino_permitido_para_usuario(destino, usuario["tipo"])
+
+    return redirect(
+        destino or pagina_inicial_usuario(usuario["tipo"])
+    )
 
 
 @app.get("/Pages/Perfil.html")
 def perfil():
-    usuario_id = session.get("usuario_id")
+    usuario = buscar_usuario_sessao()
 
-    if not usuario_id:
+    if usuario is None:
         return redirect("/Pages/login.html")
 
-    conexao = conectar_banco()
-
-    try:
-        usuario = conexao.execute(
-            "SELECT nome, email, telefone, versao_sessao FROM usuarios WHERE id = ?",
-            (usuario_id,)
-        ).fetchone()
-    finally:
-        conexao.close()
-
-    if (
-        usuario is None
-        or usuario["versao_sessao"] != session.get("versao_sessao")
-    ):
-        session.clear()
-        return redirect("/Pages/login.html")
+    if usuario["tipo"] != "cliente":
+        return redirect(pagina_inicial_usuario(usuario["tipo"]))
 
     resposta = app.make_response(
         render_template("Perfil.html", usuario=usuario)
@@ -679,10 +748,15 @@ def sair ():
 
 @app.route("/Pages/editarPerfil.html", methods=["GET", "POST"] )
 def editar_perfil():
-    usuario_id = session.get("usuario_id")
+    usuario = buscar_usuario_sessao()
+    
+    if usuario is None:
+        return redirect ("/Pages/login.html")
 
-    if not usuario_id:
-        return redirect("/Pages/login.html")
+    if usuario["tipo"] != "cliente":
+        return redirect(pagina_inicial_usuario(usuario["tipo"]))
+
+    usuario_id = usuario["id"]    
 
     if request.method == "POST":
         token_enviado = request.form.get("csrf_token", "")
