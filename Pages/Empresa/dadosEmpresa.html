@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html data-responsive="Empresa/painelEmpresa Empresa/ordensServico" lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dados da empresa | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
+    <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
+    <link rel="stylesheet" href="/Style/responsivo.css">
+</head>
+
+<body>
+    <aside class="menu">
+        <a class="marca" href="/Pages/index.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <rect x="5" y="5" width="14" height="14" rx="3" />
+                <path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4M9 9h6v6H9z" />
+            </svg>
+            <span>IdeiaTech</span>
+        </a>
+        <div class="workspace">
+            <span class="workspace-avatar">IT</span>
+            <div>
+                <strong>Sua assistência</strong>
+                <span>Espaço de trabalho</span>
+            </div>
+        </div>
+        <p class="nav-label">GERENCIAMENTO</p>
+        <nav aria-label="Menu empresarial">
+            <a href="/Pages/Empresa/painelEmpresa.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                </svg>Visão geral</a>
+            <a href="/Pages/Empresa/ordensServico.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <rect x="5" y="4" width="14" height="17" rx="2" />
+                    <path d="M9 4V2h6v2M9 10h6M9 14h6M9 18h3" />
+                </svg>Ordens de serviço</a>
+            <a href="/Pages/Empresa/dadosEmpresa.html" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 21V5l8-3v19M12 8h8v13M2 21h20M7 7h2M7 11h2M7 15h2M15 12h2M15 16h2" />
+                </svg>Dados da empresa</a>
+        </nav>
+        <div class="nav-future">
+            <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v5l3 2" />
+                </svg>Orçamentos <small>Em breve</small>
+            </span>
+            <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <path d="m12 3 9 5v9l-9 5-9-5V8l9-5ZM3 8l9 5 9-5M12 13v9M7.5 5.5l9 5" />
+                </svg>Produtos <small>Em breve</small>
+            </span>
+        </div>
+        <div class="sidebar-note">
+            <span class="note-dot">
+            </span>
+            <strong>Mais clareza em cada etapa.</strong>
+            <p>Do primeiro atendimento à entrega do aparelho.</p>
+        </div>
+        <a class="site-link" href="/Pages/index.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5m6-6-6 6 6 6" />
+            </svg>Visitar o site</a>
+    </aside>
+    <main>
+        <div class="topbar">
+            <p>Área empresarial <span>/</span> <strong>Dados da empresa</strong></p>
+            <span class="demo-badge"><span></span>Modo demonstração</span>
+        </div>
+        <header class="page-heading">
+            <div>
+                <p class="eyebrow">IDENTIDADE DO NEGÓCIO</p>
+                <h1>Conheça seu espaço de trabalho.</h1>
+                <p>Informações da assistência e da pessoa responsável.</p>
+            </div>
+        </header>
+        <div class="order-layout">
+            <section class="card order-card" aria-labelledby="titulo-empresa">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">EMPRESA</p>
+                        <h2 id="titulo-empresa">Dados do negócio</h2>
+                    </div>
+                </div>
+                <p class="form-intro">Estas informações serão carregadas do cadastro da empresa.</p>
+                <div class="field">
+                    <label for="empresaNome">Nome da empresa</label>
+                    <input id="empresaNome" readonly placeholder="Ainda não conectado">
+                </div>
+                <div class="field">
+                    <label for="empresaCnpj">CNPJ</label>
+                    <input id="empresaCnpj" readonly placeholder="Ainda não conectado">
+                </div>
+                <div class="field">
+                    <label for="empresaTelefone">Telefone</label>
+                    <input id="empresaTelefone" readonly placeholder="Ainda não conectado">
+                </div>
+            </section>
+            <aside class="card order-card" aria-labelledby="titulo-responsavel">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">RESPONSÁVEL</p>
+                        <h2 id="titulo-responsavel">Quem administra a conta</h2>
+                    </div>
+                </div>
+                <p class="form-intro">Pessoa vinculada ao cadastro empresarial.</p>
+                <div class="field">
+                    <label for="responsavelNome">Nome completo</label>
+                    <input id="responsavelNome" readonly placeholder="Ainda não conectado">
+                </div>
+                <div class="field">
+                    <label for="responsavelEmail">E-mail de acesso</label>
+                    <input id="responsavelEmail" readonly placeholder="Ainda não conectado">
+                </div>
+            </aside>
+        </div>
+        <p class="demo-note">Demonstração: os dados reais serão exibidos após conectar esta página à conta empresarial.</p>
+        <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span></footer>
+    </main>
+</body>
+
+</html>
