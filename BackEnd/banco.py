@@ -22,6 +22,41 @@ if "versao_sessao" not in colunas_usuarios:
         "ALTER TABLE usuarios ADD COLUMN versao_sessao INTEGER NOT NULL DEFAULT 0"
     )
 
+if "tipo" not in colunas_usuarios:
+    conexao.execute(
+        """
+        ALTER TABLE usuarios
+        ADD COLUMN tipo TEXT NOT NULL DEFAULT 'cliente'
+        CHECK (tipo IN('cliente', 'empresa'))
+        """
+    )
+
+colunas_empresas = {
+    linha [1]
+    for linha in conexao.execute("PRAGMA table_info(empresas)")
+}
+
+if "usuario_id" not in colunas_empresas:
+    conexao.execute(
+        """
+        ALTER TABLE empresas
+        ADD COLUMN usuario_id INTEGER REFERENCES usuarios(id)
+        """
+    )
+
+conexao.execute(
+    """
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_empresas_usuario
+    ON empresas(usuario_id)
+    """
+)
+
+conexao.execute(
+    """
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_email
+    ON usuarios(email)
+    """
+)
+ 
 conexao.commit()
 conexao.close()
-
