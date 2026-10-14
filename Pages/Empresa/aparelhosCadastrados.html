@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html data-responsive="Empresa/painelEmpresa Empresa/ordensServico Empresa/aparelhosCadastrados" 
-lang="pt-BR">
+<html data-responsive="Empresa/painelEmpresa Empresa/ordensServico Empresa/aparelhosCadastrados" lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
@@ -15,7 +14,7 @@ lang="pt-BR">
     <script defer src="/Script/icones.js"></script>
 </head>
 
-<body>
+<body class="pagina-aparelhos">
     <aside class="menu">
         <a class="marca" href="/Pages/index.html">
             <i data-lucide="cpu" aria-hidden="true"></i>
@@ -30,7 +29,6 @@ lang="pt-BR">
         </div>
         <p class="nav-label">GERENCIAMENTO</p>
         <nav aria-label="Menu empresarial">
-
             <a href="/Pages/Empresa/painelEmpresa.html">
                 <i data-lucide="layout-dashboard" aria-hidden="true"></i>Visão geral</a>
             <a href="/Pages/Empresa/ordensServico.html">
@@ -38,36 +36,44 @@ lang="pt-BR">
             <a href="/Pages/Empresa/dadosEmpresa.html">
                 <i data-lucide="building-2" aria-hidden="true"></i>Dados da empresa</a>
             <a href="/Pages/Empresa/aparelhosCadastrados.html" aria-current="page">
-                <i data-lucide="smartphone" aria-hidden="true"></i>Aparelhos cadastrados
+                <i data-lucide="smartphone" aria-hidden="true"></i>Aparelhos cadastrados</a>
+            <a href="/Pages/Empresa/solicitacoes.html">
+                <i data-lucide="inbox" aria-hidden="true"></i>
+                Solicitações recebidas
+            </a>
+            <a href="/Pages/Empresa/orcamentos.html">
+                <i data-lucide="file-text" aria-hidden="true"></i>
+                Orçamentos
             </a>
 
+            <a href="/Pages/Empresa/produtos.html">
+                <i data-lucide="package" aria-hidden="true"></i>
+                Produtos
+            </a>
 
+            <a href="/Pages/Empresa/pedidos.html">
+                <i data-lucide="shopping-bag" aria-hidden="true"></i>
+                Pedidos
+            </a>
         </nav>
-        <div class="nav-future">
-            <span>
-                <i data-lucide="clock-3" aria-hidden="true"></i>Orçamentos <small>Em breve</small>
-            </span>
-            <span>
-                <i data-lucide="package" aria-hidden="true"></i>Produtos <small>Em breve</small>
-            </span>
-        </div>
+
         <div class="sidebar-note">
-            <span class="note-dot">
-            </span>
+            <span class="note-dot"></span>
             <strong>Mais clareza em cada etapa.</strong>
             <p>Do primeiro atendimento à entrega do aparelho.</p>
         </div>
         <a class="site-link" href="/Pages/index.html">
             <i data-lucide="arrow-left" aria-hidden="true"></i>Visitar o site</a>
     </aside>
+
     <main>
         <div class="topbar">
             <p>Área empresarial <span>/</span> <strong>Aparelhos cadastrados</strong></p>
             <span class="demo-badge"><span></span>Modo demonstração</span>
         </div>
+
         <header class="page-heading">
             <div>
-                <p class="eyebrow">ORGANIZAÇÃO DOS APARELHOS</p>
                 <h1>Aparelhos cadastrados</h1>
                 <p>Consulte os aparelhos vinculados aos atendimentos da assistência.</p>
             </div>
@@ -76,82 +82,68 @@ lang="pt-BR">
             </a>
         </header>
 
-        <section class="card order-card" aria-labelledby="titulo-aparelhos">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">APARELHOS</p>
-                    <h2 id="titulo-aparelhos">Aparelhos da assistência</h2>
-                </div>
-                <span class="count-badge">Demonstração</span>
+        <section aria-labelledby="titulo-aparelhos">
+            <div class="lista-barra">
+                <h2 id="titulo-aparelhos">Aparelhos na assistência</h2>
+                <p>2 aparelhos</p>
             </div>
 
-            <div class="aparelhos-grid">
-                <article class="aparelho-card">
-                    <div class="aparelho-topo">
-                        <span class="aparelho-icone">
-                            <i data-lucide="smartphone" aria-hidden="true"></i>
-                        </span>
-                        <span class="aparelho-status status-diagnostico">
-                            Em diagnóstico
-                        </span>
-                    </div>
-
-                    <h3>Samsung Galaxy S23</h3>
-                    <p class="aparelho-categoria">Celular · Exemplo fictício</p>
-
-                    <dl class="aparelho-dados">
-                        <div>
-                            <dt>Cliente</dt>
-                            <dd>Cliente exemplo A</dd>
-                        </div>
-                        <div>
-                            <dt>Problema relatado</dt>
-                            <dd>Tela não acende após queda.</dd>
-                        </div>
-                        <div>
-                            <dt>Previsão de entrega</dt>
-                            <dd>A definir após avaliação</dd>
-                        </div>
-                    </dl>
-                </article>
-
-                <article class="aparelho-card">
-                    <div class="aparelho-topo">
-                        <span class="aparelho-icone">
-                            <i data-lucide="laptop" aria-hidden="true"></i>
-                        </span>
-                        <span class="aparelho-status status-pronto">
-                            Pronto para retirada
-                        </span>
-                    </div>
-
-                    <h3>Notebook Dell Inspiron</h3>
-                    <p class="aparelho-categoria">Notebook · Exemplo fictício</p>
-
-                    <dl class="aparelho-dados">
-                        <div>
-                            <dt>Cliente</dt>
-                            <dd>Cliente exemplo B</dd>
-                        </div>
-                        <div>
-                            <dt>Problema relatado</dt>
-                            <dd>Aparelho desligava durante o uso.</dd>
-                        </div>
-                        <div>
-                            <dt>Previsão de entrega</dt>
-                            <dd>Disponível para retirada</dd>
-                        </div>
-                    </dl>
-                </article>
+            <div class="tabela-wrap">
+                <table class="tabela-aparelhos">
+                    <thead>
+                        <tr>
+                            <th scope="col">Aparelho</th>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Problema relatado</th>
+                            <th scope="col">Previsão de entrega</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="Aparelho">
+                                <div class="aparelho-nome">
+                                    <i data-lucide="smartphone" aria-hidden="true"></i>
+                                    <div>
+                                        <strong>Samsung Galaxy S23</strong>
+                                        <small>Celular</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-label="Cliente">Cliente exemplo A</td>
+                            <td data-label="Problema">Tela não acende após queda.</td>
+                            <td data-label="Previsão">A definir após avaliação</td>
+                            <td data-label="Status">
+                                <span class="status status-diagnostico">Em diagnóstico</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Aparelho">
+                                <div class="aparelho-nome">
+                                    <i data-lucide="laptop" aria-hidden="true"></i>
+                                    <div>
+                                        <strong>Notebook Dell Inspiron</strong>
+                                        <small>Notebook</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-label="Cliente">Cliente exemplo B</td>
+                            <td data-label="Problema">Aparelho desligava durante o uso.</td>
+                            <td data-label="Previsão">Disponível para retirada</td>
+                            <td data-label="Status">
+                                <span class="status status-pronto">Pronto para retirada</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </section>
 
         <p class="demo-note">
-            Interface em demonstração · Os aparelhos e clientes são fictícios.
-            Nenhum dado é consultado ou salvo no banco.
+            Dados fictícios de demonstração. Nada é consultado ou salvo no banco.
         </p>
 
-        <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span></footer>
+        <footer>IdeiaTech</footer>
     </main>
 </body>
 

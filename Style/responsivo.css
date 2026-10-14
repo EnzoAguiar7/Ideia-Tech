@@ -1083,3 +1083,75 @@ html:where([data-responsive~="Style"]) {
         padding: 18px;
     }
 }
+
+/* ---------- Mobile: cada linha vira um bloco com rótulos ---------- */
+@media (max-width: 760px) {
+    .pagina-aparelhos .lista-barra {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
+    .pagina-aparelhos .tabela-wrap {
+        overflow: visible;
+        border: 0;
+        background: none;
+    }
+
+    .pagina-aparelhos .tabela-aparelhos,
+    .pagina-aparelhos .tabela-aparelhos tbody,
+    .pagina-aparelhos .tabela-aparelhos tr,
+    .pagina-aparelhos .tabela-aparelhos td {
+        display: block;
+    }
+
+    .pagina-aparelhos .tabela-aparelhos thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    .pagina-aparelhos .tabela-aparelhos tbody tr {
+        margin-bottom: 12px;
+        border: 1px solid var(--ap-linha);
+        border-radius: var(--ap-raio);
+        background: var(--ap-superficie);
+    }
+
+    .pagina-aparelhos .tabela-aparelhos td {
+        display: grid;
+        grid-template-columns: 110px minmax(0, 1fr);
+        gap: 12px;
+        padding: 12px 16px;
+    }
+
+    .pagina-aparelhos .tabela-aparelhos tbody tr td:last-child {
+        border-bottom: 0;
+    }
+
+    .pagina-aparelhos .tabela-aparelhos td::before {
+        content: attr(data-label);
+        font-size: 13px;
+        color: var(--ap-muted);
+    }
+
+    /* o nome do aparelho ocupa a largura toda, como título do bloco */
+    .pagina-aparelhos .tabela-aparelhos td:first-child {
+        display: block;
+        background: var(--ap-cabecalho);
+        border-radius: var(--ap-raio) var(--ap-raio) 0 0;
+    }
+
+    .pagina-aparelhos .tabela-aparelhos td:first-child::before {
+        display: none;
+    }
+}
+
+
+@media (max-width: 760px) {
+    :where(html[data-responsive~="Empresa/listasEmpresa"]) .empresa-tabela {
+        min-width: 650px;
+    }
+}

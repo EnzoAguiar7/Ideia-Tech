@@ -1,0 +1,57 @@
+.empresa-lista {
+    min-width: 0;
+}
+
+.empresa-lista-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.empresa-lista-topo h2 {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.empresa-tabela-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: white;
+}
+
+.empresa-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.empresa-tabela th,
+.empresa-tabela td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--borda);
+    vertical-align: top;
+}
+
+.empresa-tabela th {
+    background: #f4f6f2;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.empresa-tabela tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.empresa-situacao {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #edf5ef;
+    color: #356442;
+    font-size: 11px;
+}
