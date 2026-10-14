@@ -8,18 +8,15 @@
     <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
 
     <link rel="stylesheet" href="/Style/responsivo.css">
+    <script defer src="/Script/vendor/lucide.min.js"></script>
+    <script defer src="/Script/icones.js"></script>
 </head>
 
 <body>
     <aside class="menu">
         <a class="marca" href="/Pages/Empresa/painelEmpresa.html">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                stroke-linejoin="round" aria-hidden="true">
-                <rect x="5" y="5" width="14" height="14" rx="3" />
-                <path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4M9 9h6v6H9z" />
-            </svg>
+            <i data-lucide="cpu" aria-hidden="true"></i>
             <span>IdeiaTech</span>
-            </span>
         </a>
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
@@ -31,38 +28,23 @@
         <p class="nav-label">GERENCIAMENTO</p>
         <nav aria-label="Menu empresarial">
             <a href="/Pages/Empresa/painelEmpresa.html" aria-current="page">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                    <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                    <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                    <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                </svg>Visão geral</a>
+                <i data-lucide="layout-dashboard" aria-hidden="true"></i>Visão geral</a>
             <a href="/Pages/Empresa/ordensServico.html">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-                    <rect x="5" y="4" width="14" height="17" rx="2" />
-                    <path d="M9 4V2h6v2M9 10h6M9 14h6M9 18h3" />
-                </svg>Ordens de serviço</a>
+                <i data-lucide="clipboard-list" aria-hidden="true"></i>Ordens de serviço</a>
             <a href="/Pages/Empresa/dadosEmpresa.html">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 21V5l8-3v19M12 8h8v13M2 21h20M7 7h2M7 11h2M7 15h2M15 12h2M15 16h2" />
-                </svg>Dados da empresa</a>
+                <i data-lucide="building-2" aria-hidden="true"></i>Dados da empresa</a>
+            <a href="/Pages/Empresa/aparelhosCadastrados.html">
+                <i data-lucide="smartphone" aria-hidden="true"></i>
+                Aparelhos cadastrados
+            </a>
+
         </nav>
         <div class="nav-future">
             <span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 7v5l3 2" />
-                </svg>Orçamentos <small>Em breve</small>
+                <i data-lucide="clock-3" aria-hidden="true"></i>Orçamentos <small>Em breve</small>
             </span>
             <span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-                    <path d="m12 3 9 5v9l-9 5-9-5V8l9-5ZM3 8l9 5 9-5M12 13v9M7.5 5.5l9 5" />
-                </svg>Produtos <small>Em breve</small>
+                <i data-lucide="package" aria-hidden="true"></i>Produtos <small>Em breve</small>
             </span>
         </div>
         <div class="sidebar-note">
@@ -72,10 +54,7 @@
             <p>Do primeiro atendimento à entrega do aparelho.</p>
         </div>
         <a class="site-link" href="/Pages/index.html">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                stroke-linejoin="round" aria-hidden="true">
-                <path d="M19 12H5m6-6-6 6 6 6" />
-            </svg>Visitar o site</a>
+            <i data-lucide="arrow-left" aria-hidden="true"></i>Visitar o site</a>
     </aside>
     <main>
         <div class="topbar">
@@ -93,21 +72,15 @@
                 <p>Tenha clareza sobre os atendimentos e o próximo passo de cada serviço.</p>
             </div>
             <a class="button primary" href="/Pages/Empresa/ordensServico.html#nova-ordem">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 5v14M5 12h14" />
-                </svg>Nova ordem</a>
+                <i data-lucide="plus" aria-hidden="true"></i>Nova ordem</a>
         </header>
         <section class="welcome-banner">
             <div>
                 <span class="banner-label">COMECE POR AQUI</span>
                 <h2>Um bom atendimento começa<br>com tudo no lugar.</h2>
                 <p>Registre o aparelho, descreva o problema e mantenha o cliente informado durante o conserto.</p>
-                <a href="/Pages/Empresa/ordensServico.html#nova-ordem">Preparar primeiro atendimento <svg
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                        stroke-linejoin="round" aria-hidden="true">
-                        <path d="M5 12h14m-6-6 6 6-6 6" />
-                    </svg>
+                <a href="/Pages/Empresa/ordensServico.html#nova-ordem">Preparar primeiro atendimento <i
+                        data-lucide="arrow-right" aria-hidden="true"></i>
                 </a>
             </div>
             <div class="banner-illustration" aria-hidden="true">
@@ -116,17 +89,9 @@
                 <span class="orbit orbit-two">
                 </span>
                 <div class="device">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                        stroke-linejoin="round" aria-hidden="true">
-                        <rect x="6" y="2" width="12" height="20" rx="3" />
-                        <path d="M10 5h4M11 19h2" />
-                    </svg>
+                    <i data-lucide="smartphone" aria-hidden="true"></i>
                     <span class="device-check">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9" />
-                            <path d="m8 12 3 3 5-6" />
-                        </svg>
+                        <i data-lucide="circle-check" aria-hidden="true"></i>
                     </span>
                 </div>
                 <span class="illustration-tag">Cada etapa conta.</span>
@@ -137,11 +102,7 @@
                 <div class="metric-top">
                     <h2>Serviços ativos</h2>
                     <span class="metric-icon teal">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect x="6" y="2" width="12" height="20" rx="3" />
-                            <path d="M10 5h4M11 19h2" />
-                        </svg>
+                        <i data-lucide="smartphone" aria-hidden="true"></i>
                     </span>
                 </div>
                 <strong class="metric-value">0</strong>
@@ -152,11 +113,7 @@
                 <div class="metric-top">
                     <h2>Orçamentos pendentes</h2>
                     <span class="metric-icon amber">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9" />
-                            <path d="M12 7v5l3 2" />
-                        </svg>
+                        <i data-lucide="clock-3" aria-hidden="true"></i>
                     </span>
                 </div>
                 <strong class="metric-value">0</strong>
@@ -167,11 +124,7 @@
                 <div class="metric-top">
                     <h2>Prontos para retirada</h2>
                     <span class="metric-icon blue">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9" />
-                            <path d="m8 12 3 3 5-6" />
-                        </svg>
+                        <i data-lucide="circle-check" aria-hidden="true"></i>
                     </span>
                 </div>
                 <strong class="metric-value">0</strong>
@@ -186,29 +139,19 @@
                         <p class="eyebrow">ATENDIMENTOS</p>
                         <h2>Ordens de serviço</h2>
                     </div>
-                    <a class="text-link" href="/Pages/Empresa/ordensServico.html">Ver ordens <svg viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
-                            stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14m-6-6 6 6-6 6" />
-                        </svg>
+                    <a class="text-link" href="/Pages/Empresa/ordensServico.html">Ver ordens <i
+                            data-lucide="arrow-right" aria-hidden="true"></i>
                     </a>
                 </div>
                 <div class="empty-state">
                     <span class="empty-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect x="5" y="4" width="14" height="17" rx="2" />
-                            <path d="M9 4V2h6v2M9 10h6M9 14h6M9 18h3" />
-                        </svg>
+                        <i data-lucide="clipboard-list" aria-hidden="true"></i>
                     </span>
                     <h3>Seu próximo atendimento começa aqui.</h3>
                     <p>Ainda não há ordens cadastradas. Quando forem conectadas ao sistema, os serviços e seus status
                         aparecerão neste espaço.</p>
                     <a class="button secondary" href="/Pages/Empresa/ordensServico.html#nova-ordem">Preparar uma ordem
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14m-6-6 6 6-6 6" />
-                        </svg>
+                        <i data-lucide="arrow-right" aria-hidden="true"></i>
                     </a>
                 </div>
                 <div class="panel-foot">Os números exibidos são demonstrativos.</div>

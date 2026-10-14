@@ -1070,3 +1070,16 @@ html:where([data-responsive~="Style"]) {
         margin-bottom: 40px;
     }
 }
+
+
+@media (max-width: 1100px) {
+    :where(html[data-responsive~="Empresa/aparelhosCadastrados"]) .aparelhos-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    :where(html[data-responsive~="Empresa/aparelhosCadastrados"]) .aparelho-card {
+        padding: 18px;
+    }
+}

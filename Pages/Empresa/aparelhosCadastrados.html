@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html data-responsive="Empresa/painelEmpresa Empresa/ordensServico Empresa/aparelhosCadastrados" 
+lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Aparelhos cadastrados | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
+    <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
+    <link rel="stylesheet" href="/Style/Empresa/aparelhosCadastro.css">
+    <link rel="stylesheet" href="/Style/responsivo.css">
+
+    <script defer src="/Script/vendor/lucide.min.js"></script>
+    <script defer src="/Script/icones.js"></script>
+</head>
+
+<body>
+    <aside class="menu">
+        <a class="marca" href="/Pages/index.html">
+            <i data-lucide="cpu" aria-hidden="true"></i>
+            <span>IdeiaTech</span>
+        </a>
+        <div class="workspace">
+            <span class="workspace-avatar">IT</span>
+            <div>
+                <strong>Sua assistência</strong>
+                <span>Espaço de trabalho</span>
+            </div>
+        </div>
+        <p class="nav-label">GERENCIAMENTO</p>
+        <nav aria-label="Menu empresarial">
+
+            <a href="/Pages/Empresa/painelEmpresa.html">
+                <i data-lucide="layout-dashboard" aria-hidden="true"></i>Visão geral</a>
+            <a href="/Pages/Empresa/ordensServico.html">
+                <i data-lucide="clipboard-list" aria-hidden="true"></i>Ordens de serviço</a>
+            <a href="/Pages/Empresa/dadosEmpresa.html">
+                <i data-lucide="building-2" aria-hidden="true"></i>Dados da empresa</a>
+            <a href="/Pages/Empresa/aparelhosCadastrados.html" aria-current="page">
+                <i data-lucide="smartphone" aria-hidden="true"></i>Aparelhos cadastrados
+            </a>
+
+
+        </nav>
+        <div class="nav-future">
+            <span>
+                <i data-lucide="clock-3" aria-hidden="true"></i>Orçamentos <small>Em breve</small>
+            </span>
+            <span>
+                <i data-lucide="package" aria-hidden="true"></i>Produtos <small>Em breve</small>
+            </span>
+        </div>
+        <div class="sidebar-note">
+            <span class="note-dot">
+            </span>
+            <strong>Mais clareza em cada etapa.</strong>
+            <p>Do primeiro atendimento à entrega do aparelho.</p>
+        </div>
+        <a class="site-link" href="/Pages/index.html">
+            <i data-lucide="arrow-left" aria-hidden="true"></i>Visitar o site</a>
+    </aside>
+    <main>
+        <div class="topbar">
+            <p>Área empresarial <span>/</span> <strong>Aparelhos cadastrados</strong></p>
+            <span class="demo-badge"><span></span>Modo demonstração</span>
+        </div>
+        <header class="page-heading">
+            <div>
+                <p class="eyebrow">ORGANIZAÇÃO DOS APARELHOS</p>
+                <h1>Aparelhos cadastrados</h1>
+                <p>Consulte os aparelhos vinculados aos atendimentos da assistência.</p>
+            </div>
+            <a class="button secondary" href="/Pages/Empresa/ordensServico.html#nova-ordem">
+                Preparar atendimento
+            </a>
+        </header>
+
+        <section class="card order-card" aria-labelledby="titulo-aparelhos">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">APARELHOS</p>
+                    <h2 id="titulo-aparelhos">Aparelhos da assistência</h2>
+                </div>
+                <span class="count-badge">Demonstração</span>
+            </div>
+
+            <div class="aparelhos-grid">
+                <article class="aparelho-card">
+                    <div class="aparelho-topo">
+                        <span class="aparelho-icone">
+                            <i data-lucide="smartphone" aria-hidden="true"></i>
+                        </span>
+                        <span class="aparelho-status status-diagnostico">
+                            Em diagnóstico
+                        </span>
+                    </div>
+
+                    <h3>Samsung Galaxy S23</h3>
+                    <p class="aparelho-categoria">Celular · Exemplo fictício</p>
+
+                    <dl class="aparelho-dados">
+                        <div>
+                            <dt>Cliente</dt>
+                            <dd>Cliente exemplo A</dd>
+                        </div>
+                        <div>
+                            <dt>Problema relatado</dt>
+                            <dd>Tela não acende após queda.</dd>
+                        </div>
+                        <div>
+                            <dt>Previsão de entrega</dt>
+                            <dd>A definir após avaliação</dd>
+                        </div>
+                    </dl>
+                </article>
+
+                <article class="aparelho-card">
+                    <div class="aparelho-topo">
+                        <span class="aparelho-icone">
+                            <i data-lucide="laptop" aria-hidden="true"></i>
+                        </span>
+                        <span class="aparelho-status status-pronto">
+                            Pronto para retirada
+                        </span>
+                    </div>
+
+                    <h3>Notebook Dell Inspiron</h3>
+                    <p class="aparelho-categoria">Notebook · Exemplo fictício</p>
+
+                    <dl class="aparelho-dados">
+                        <div>
+                            <dt>Cliente</dt>
+                            <dd>Cliente exemplo B</dd>
+                        </div>
+                        <div>
+                            <dt>Problema relatado</dt>
+                            <dd>Aparelho desligava durante o uso.</dd>
+                        </div>
+                        <div>
+                            <dt>Previsão de entrega</dt>
+                            <dd>Disponível para retirada</dd>
+                        </div>
+                    </dl>
+                </article>
+            </div>
+        </section>
+
+        <p class="demo-note">
+            Interface em demonstração · Os aparelhos e clientes são fictícios.
+            Nenhum dado é consultado ou salvo no banco.
+        </p>
+
+        <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span></footer>
+    </main>
+</body>
+
+</html>
