@@ -6,7 +6,7 @@ import hmac
 import smtplib
 import ssl
 import time
-from datetime import timedelta
+from datetime import date, timedelta
 from email.message import EmailMessage
 from pathlib import Path
 from urllib.parse import quote, unquote, urlsplit, urlunsplit
@@ -534,6 +534,147 @@ def destino_local_seguro(valor):
 
     return urlunsplit(("", "", destino.path, destino.query, destino.fragment))
 
+def buscar_usuario_sessao():
+    usuario_id = session.get("usuario_id")
+
+    if not usuario_id:
+        return None
+
+    conexao = conectar_banco()
+
+    try:
+        usuario = conexao.execute(
+            """
+            SELECT id, nome, email, telefone, versao_sessao, tipo
+            FROM usuarios
+            WHERE id = ?
+            """,
+            (usuario_id,)
+        ).fetchone()
+    finally:
+        conexao.close()
+    
+    if (
+        usuario is None or usuario["versao_sessao"] != session.get("versao_sessao")
+    ):
+        session.clear()
+        return None
+
+    return usuario
+
+def pagina_inicial_usuario(tipo):
+    if tipo == "empresa":
+        return "/Pages/Empresa/painelEmpresa.html"
+    
+    return "/Pages/Perfil.html"
+
+def destino_permitido_para_usuario(destino, tipo):
+    if not destino:
+        return None
+
+    caminho = urlsplit(destino).path
+
+    if caminho.startswith ("/Pages/Empresa/") and tipo != "empresa":
+        return None
+    
+    paginas_cliente = {
+        "/Pages/Perfil.html",
+        "/Pages/editarPerfil.html",
+    }
+
+    if caminho in paginas_cliente and tipo != "cliente":
+        return None 
+    
+    return destino
+
+@app.before_request
+def proteger_area_empresarial():
+    if not request.path.startswith("/Pages/Empresa/"):
+        return
+
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        destino = quote(request.full_path.rstrip("?"), safe="/?=&")
+        return redirect (f"/Pages/login.html?next={destino}")
+
+    if usuario["tipo"] != "empresa":
+        abort(403)
+
+@app.route("/Pages/Empresa/dadosEmpresa.html", methods=["GET", "POST"])
+def dados_empresa():
+    usuario = buscar_usuario_sessao()
+    erro = None
+    status = 200
+    conexao = conectar_banco()
+
+    try:
+        empresa = conexao.execute(
+            "SELECT nome, telefone, cnpj FROM empresas WHERE usuario_id = ?",
+            (usuario["id"],)
+        ).fetchone()
+
+        if empresa is None:
+            abort(404, description="Não há uma empresa vinculada a esta conta.")
+
+        if request.method == "POST":
+            empresa = {
+                "nome": request.form.get("nomeEmpresa", "").strip(),
+                "telefone": request.form.get("telefone", "").strip(),
+                "cnpj": request.form.get("cnpj", "").strip() or None,
+            }
+            usuario = dict(usuario)
+            usuario["nome"] = request.form.get("nomeResponsavel", "").strip()
+
+            if not 2 <= len(empresa["nome"]) <= 150:
+                erro = "O nome da empresa deve ter entre 2 e 150 caracteres."
+            elif not 3 <= len(usuario["nome"]) <= 120:
+                erro = "O nome do responsável deve ter entre 3 e 120 caracteres."
+            elif not empresa["telefone"] or len(empresa["telefone"]) > 20:
+                erro = "Informe um telefone com até 20 caracteres."
+            elif empresa["cnpj"] and len(empresa["cnpj"]) > 18:
+                erro = "O CNPJ deve ter até 18 caracteres."
+
+            if erro:
+                status = 400
+            else:
+                try:
+                    conexao.execute(
+                        "UPDATE empresas SET nome = ?, telefone = ?, cnpj = ? WHERE usuario_id = ?",
+                        (empresa["nome"], empresa["telefone"], empresa["cnpj"], usuario["id"])
+                    )
+                    conexao.execute(
+                        "UPDATE usuarios SET nome = ?, telefone = ? WHERE id = ?",
+                        (usuario["nome"], empresa["telefone"], usuario["id"])
+                    )
+                    conexao.commit()
+                except sqlite3.IntegrityError:
+                    conexao.rollback()
+                    erro = "Não foi possível salvar. O CNPJ pode já estar em uso."
+                    status = 409
+                else:
+                    flash("Dados da empresa atualizados com sucesso.", "sucesso")
+                    return redirect("/Pages/Empresa/dadosEmpresa.html")
+    finally:
+        conexao.close()
+
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_urlsafe(32)
+
+    return render_template(
+        "Empresa/dadosEmpresa.html", empresa=empresa, usuario=usuario,
+        erro=erro, csrf_token=session["csrf_token"]
+    ), status
+
+
+@app.after_request
+def impedir_cache_area_protegida(resposta):
+    if request.path.startswith("/Pages/Empresa/"):
+        resposta.headers["Cache-Control"] = "no-store"
+
+    return resposta
+
+
 
 def hash_identificador_login(escopo, valor):
     mensagem = f"{escopo}:{valor}".encode("utf-8")
@@ -608,7 +749,11 @@ def entrar():
             return "E-mail ou senha incorretos.", 401
 
         usuario = conexao.execute(
-            "SELECT id, senha_hash, versao_sessao FROM usuarios WHERE email = ?",
+            """
+            SELECT id, senha_hash, versao_sessao, tipo
+            FROM usuarios
+            WHERE email = ?
+            """,
             (email,)
         ).fetchone()
 
@@ -635,32 +780,22 @@ def entrar():
     session.permanent = True
 
     destino = destino_local_seguro(request.form.get("next", ""))
-    return redirect(destino or "/Pages/Perfil.html")
+    destino = destino_permitido_para_usuario(destino, usuario["tipo"])
+
+    return redirect(
+        destino or pagina_inicial_usuario(usuario["tipo"])
+    )
 
 
 @app.get("/Pages/Perfil.html")
 def perfil():
-    usuario_id = session.get("usuario_id")
+    usuario = buscar_usuario_sessao()
 
-    if not usuario_id:
+    if usuario is None:
         return redirect("/Pages/login.html")
 
-    conexao = conectar_banco()
-
-    try:
-        usuario = conexao.execute(
-            "SELECT nome, email, telefone, versao_sessao FROM usuarios WHERE id = ?",
-            (usuario_id,)
-        ).fetchone()
-    finally:
-        conexao.close()
-
-    if (
-        usuario is None
-        or usuario["versao_sessao"] != session.get("versao_sessao")
-    ):
-        session.clear()
-        return redirect("/Pages/login.html")
+    if usuario["tipo"] != "cliente":
+        return redirect(pagina_inicial_usuario(usuario["tipo"]))
 
     resposta = app.make_response(
         render_template("Perfil.html", usuario=usuario)
@@ -679,10 +814,15 @@ def sair ():
 
 @app.route("/Pages/editarPerfil.html", methods=["GET", "POST"] )
 def editar_perfil():
-    usuario_id = session.get("usuario_id")
+    usuario = buscar_usuario_sessao()
+    
+    if usuario is None:
+        return redirect ("/Pages/login.html")
 
-    if not usuario_id:
-        return redirect("/Pages/login.html")
+    if usuario["tipo"] != "cliente":
+        return redirect(pagina_inicial_usuario(usuario["tipo"]))
+
+    usuario_id = usuario["id"]    
 
     if request.method == "POST":
         token_enviado = request.form.get("csrf_token", "")
@@ -750,5 +890,263 @@ def editar_perfil():
 
     return resposta
 
+
+STATUS_ORDENS = (
+    "Recebido",
+    "Em diagnóstico",
+    "Aguardando aprovação",
+    "Em reparo",
+    "Pronto para retirada",
+    "Entregue",
+)
+
+@app.route(
+    "/Pages/Empresa/ordensServico.html",
+    methods=["GET", "POST"]
+)
+
+def ordens_servico():
+    usuario = buscar_usuario_sessao()
+
+    #verifica o login e tipo da conta
+    conexao = conectar_banco()
+    erro = None
+    codigo_resposta = 200
+
+    try:
+        empresa = conexao.execute(
+            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
+            (usuario["id"],)
+        ).fetchone()
+
+        if empresa is None:
+          abort(
+            404,
+           description="Não há empresa vinculada a esta conta."
+             )
+
+        if request.method == "POST":
+            email = request.form.get(
+                "cliente_email", ""
+            ).strip().lower()
+
+            aparelho = request.form.get("aparelho", "").strip()
+            problema = request.form.get("problema", "").strip()
+            previsao = request.form.get("previsao", "").strip()
+
+            cliente = None
+
+            if not email or len(email) > 254 or "@" not in email:
+                erro = "Informe um e-mail válido."
+
+            elif not 2 <= len(aparelho) <= 120:
+                erro = "O aparelho debe ter entre 2 e 120 caracteres."
+
+            elif not 5 <= len(problema) <=  1000:
+                erro = "Descreva o problema com 5 a 1000 caracteres."
+
+
+            if erro is None and previsao:
+                try:
+                    previsao = date.fromisoformat(previsao).isoformat()
+                except ValueError:
+                    erro = "Informe uma previsão de data válida."
+
+            if erro is None:
+                cliente = conexao.execute(
+                    """
+                    SELECT id 
+                    FROM usuarios
+                    WHERE email = ? AND tipo = 'cliente'
+                    """,
+                    (email,)
+                ).fetchone()
+
+                if cliente is None:
+                    erro = ("Não encontramos uma conta de cliente com esse"
+                            "e-mail. Peça ao cliente para se cadastrar.")
+
+            if erro:
+                codigo_resposta = 400
+            else:
+                conexao.execute(
+                    """
+                    INSERT INTO ordens_servico (
+                        empresa_id, cliente_id, aparelho, problema, previsao
+                    )
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    (
+                        empresa["id"], cliente["id"], aparelho,
+                        problema, previsao or None
+                    )
+                )
+                conexao.commit()
+
+                flash("Ordem cadastrada com sucesso.", "sucesso")
+                return redirect("/Pages/Empresa/ordensServico.html")
+
+        ordens = conexao.execute(
+            """
+            SELECT o.id, o.aparelho, o.problema, o.status, o.previsao,
+                   u.nome AS cliente_nome
+            FROM ordens_servico AS o
+            JOIN usuarios AS u ON u.id = o.cliente_id
+            WHERE o.empresa_id = ?
+            ORDER BY o.id DESC
+            """,
+            (empresa["id"],)
+        ).fetchall()
+    finally:
+        conexao.close()
+
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_urlsafe(32)
+
+    return render_template(
+        "Empresa/ordensServico.html",
+        empresa=empresa,
+        ordens=ordens,
+        erro=erro,
+        csrf_token=session["csrf_token"],
+        status_disponiveis=STATUS_ORDENS
+    ), codigo_resposta
+
+
+@app.post("/Pages/Empresa/ordens/<int:ordem_id>/status")
+def atualizar_status_ordem(ordem_id):
+    usuario = buscar_usuario_sessao()
+
+    novo_status = request.form.get("status", "").strip()
+    observacao = request.form.get("observacao", "").strip()
+
+    if novo_status not in STATUS_ORDENS:
+        flash("Selecione um status válido.", "erro")
+        return redirect("/Pages/Empresa/ordensServico.html")
+
+
+    if len(observacao) > 1000:
+        flash("A observação debe ter até 1000 caracteres.", "erro")
+        return redirect("/Pages/Empresa/ordensServico.html")
+
+
+    conexao = conectar_banco()
+
+    try:
+        conexao.execute("BEGIN IMMEDIATE")
+
+        ordem = conexao.execute(
+            """
+            SELECT o.id, o.status
+            FROM ordens_servico AS o
+            JOIN empresas AS e ON e.id = o.empresa_id
+            WHERE o.id = ? AND e.usuario_id = ?
+            """,
+            (ordem_id, usuario["id"])
+        ).fetchone()
+    
+
+        if ordem is None:
+            abort(404)
+
+        if novo_status == ordem["status"]:
+            flash("A ordem já está nesse status.", "erro")
+            return redirect("/Pages/Empresa/ordensServico.html")
+
+        conexao.execute(
+            """
+            UPDATE ordens_servico
+            SET status  = ?
+            WHERE id = ?
+            """,
+            (novo_status, ordem_id)
+        )
+
+        conexao.execute(
+            """
+            INSERT INTO historico_ordens (
+                ordem_id, status, observacao, criado_em
+            )
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            """,
+            (ordem_id, novo_status, observacao)
+        )
+
+        conexao.commit()
+    finally:
+        conexao.close()
+
+    flash ("Status atualizado com sucesso.", "sucesso")
+    return redirect("/Pages/Empresa/ordensServico.html")
+
+
+@app.get("/Pages/Acompanhar.html")
+def acompanhar_ordens():
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        return redirect("/Pages/login.html?next=/Pages/Acompanhar.html")
+
+    if usuario ["tipo"] != "cliente":
+        return redirect(pagina_inicial_usuario(usuario["tipo"]))
+
+    conexao = conectar_banco()
+
+    try:
+        ordens = conexao.execute(
+            """
+            SELECT 
+                o.id,
+                o.aparelho,
+                o.problema,
+                o.status,
+                o.previsao,
+                e.nome AS empresa_nome
+            FROM ordens_servico AS o
+            JOIN empresas AS e ON e.id = o.empresa_id
+            WHERE o.cliente_id = ?
+            ORDER BY o.id DESC
+            """,
+            (usuario["id"],)
+        ).fetchall()
+
+        registros = conexao.execute(
+            """
+            SELECT 
+                h.id,
+                h.ordem_id,
+                h.status,
+                h.observacao
+            FROM historico_ordens AS h
+            JOIN ordens_servico AS o ON o.id = h.ordem_id
+            WHERE o.cliente_id = ?
+            ORDER BY h.id DESC
+            """,
+            (usuario["id"],)
+        ).fetchall()
+
+    finally:
+        conexao.close()
+
+    historicos = {}
+
+    for registro in registros:
+        historicos.setdefault(
+            registro["ordem_id"], []
+        ).append(registro)
+
+    resposta = app.make_response(
+        render_template(
+            "Acompanhar.html",
+            ordens=ordens, 
+            historicos=historicos
+        )
+    )
+
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
+
+
+    
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)

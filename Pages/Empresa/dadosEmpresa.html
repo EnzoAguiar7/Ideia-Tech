@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
     <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
     <link rel="stylesheet" href="/Style/responsivo.css">
+    <link rel="stylesheet" href="/Style/mensagens.css">
     <script defer src="/Script/vendor/lucide.min.js"></script>
     <script defer src="/Script/icones.js"></script>
 </head>
@@ -21,7 +22,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{ empresa['nome'] }}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -71,7 +72,7 @@
     <main>
         <div class="topbar">
             <p>Área empresarial <span>/</span> <strong>Dados da empresa</strong></p>
-            <span class="demo-badge"><span></span>Modo demonstração</span>
+            <span class="demo-badge"><span></span>Conta empresarial</span>
         </div>
         <header class="page-heading">
             <div>
@@ -80,6 +81,12 @@
                 <p>Informações da assistência e da pessoa responsável.</p>
             </div>
         </header>
+        {% include "_mensagens.html" %}
+        {% if erro %}
+        <p class="mensagem mensagem--erro" role="alert">{{ erro }}</p>
+        {% endif %}
+        <form action="/Pages/Empresa/dadosEmpresa.html" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <div class="order-layout">
             <section class="card order-card" aria-labelledby="titulo-empresa">
                 <div class="section-heading">
@@ -88,19 +95,20 @@
                         <h2 id="titulo-empresa">Dados do negócio</h2>
                     </div>
                 </div>
-                <p class="form-intro">Estas informações serão carregadas do cadastro da empresa.</p>
+                <p class="form-intro">Mantenha as informações da sua assistência atualizadas.</p>
                 <div class="field">
                     <label for="empresaNome">Nome da empresa</label>
-                    <input id="empresaNome" readonly placeholder="Ainda não conectado">
+                    <input id="empresaNome" name="nomeEmpresa" value="{{ empresa['nome'] }}" minlength="2" maxlength="150" autocomplete="organization" required>
                 </div>
                 <div class="field">
                     <label for="empresaCnpj">CNPJ</label>
-                    <input id="empresaCnpj" readonly placeholder="Ainda não conectado">
+                    <input id="empresaCnpj" name="cnpj" value="{{ empresa['cnpj'] or '' }}" maxlength="18" placeholder="Opcional">
                 </div>
                 <div class="field">
                     <label for="empresaTelefone">Telefone</label>
-                    <input id="empresaTelefone" readonly placeholder="Ainda não conectado">
+                    <input type="tel" id="empresaTelefone" name="telefone" value="{{ empresa['telefone'] }}" maxlength="20" autocomplete="tel" required>
                 </div>
+                <button class="button primary" type="submit">Salvar alterações</button>
             </section>
             <aside class="card order-card" aria-labelledby="titulo-responsavel">
                 <div class="section-heading">
@@ -112,16 +120,15 @@
                 <p class="form-intro">Pessoa vinculada ao cadastro empresarial.</p>
                 <div class="field">
                     <label for="responsavelNome">Nome completo</label>
-                    <input id="responsavelNome" readonly placeholder="Ainda não conectado">
+                    <input id="responsavelNome" name="nomeResponsavel" value="{{ usuario['nome'] }}" minlength="3" maxlength="120" autocomplete="name" required>
                 </div>
                 <div class="field">
                     <label for="responsavelEmail">E-mail de acesso</label>
-                    <input id="responsavelEmail" readonly placeholder="Ainda não conectado">
+                    <input type="email" id="responsavelEmail" value="{{ usuario['email'] }}" readonly>
                 </div>
             </aside>
         </div>
-        <p class="demo-note">Demonstração: os dados reais serão exibidos após conectar esta página à conta empresarial.
-        </p>
+        </form>
         <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span></footer>
     </main>
 </body>

@@ -478,3 +478,13 @@ nav a[aria-current="page"]::after {
     background: #0cb19d;
     box-shadow: 0 5px 14px rgba(0, 80, 70, .12);
 }
+
+.ordem-servico + .ordem-servico {
+    margin-top: 24px;
+}
+
+.ordem-servico dd,
+.observacao-os {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}

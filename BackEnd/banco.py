@@ -58,5 +58,13 @@ conexao.execute(
     """
 )
  
+colunas_historico = {
+    linha[1] for linha in conexao.execute("PRAGMA table_info(historico_ordens)")
+}
+if "observacaoa" in colunas_historico and "observacao" not in colunas_historico:
+    conexao.execute(
+        "ALTER TABLE historico_ordens RENAME COLUMN observacaoa TO observacao"
+    )
+
 conexao.commit()
 conexao.close()

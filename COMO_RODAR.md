@@ -41,10 +41,21 @@ Variáveis já definidas no ambiente têm prioridade sobre esse arquivo.
 ## Banco antigo
 
 A configuração de inicialização não migra o banco automaticamente.
-O banco antigo ainda precisa das migrações de `usuarios.tipo` e
-`empresas.usuario_id`; executar banco.py atualmente não adiciona essas
-duas colunas. Não apague o banco para contornar isso: preserve os dados
-e faça a migração quando essa etapa for implementada.
+Execute `.\.venv\Scripts\python.exe BackEnd/banco.py` para adicionar as
+colunas `usuarios.versao_sessao`, `usuarios.tipo` e `empresas.usuario_id`
+que estiverem faltando, preservando os registros existentes. O comando
+pode ser executado novamente sem duplicar as colunas.
+
+Empresas antigas sem `usuario_id` continuam sem vínculo de acesso.
+Esse vínculo precisa ser definido para a conta correta; a migração não
+associa empresas automaticamente a usuários existentes.
+
+## Dados da empresa
+
+Após entrar com uma conta empresarial, abra **Dados da empresa** no menu.
+A página carrega o cadastro da conta autenticada e permite atualizar o
+nome da empresa, CNPJ opcional, telefone e nome do responsável. O e-mail
+de acesso permanece somente para consulta.
 
 ## Erros comuns
 

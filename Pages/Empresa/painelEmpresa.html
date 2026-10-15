@@ -60,14 +60,14 @@
         </nav>
 
 
-            <div class="sidebar-note">
-                <span class="note-dot">
-                </span>
-                <strong>Mais clareza em cada etapa.</strong>
-                <p>Do primeiro atendimento à entrega do aparelho.</p>
-            </div>
-            <a class="site-link" href="/Pages/index.html">
-                <i data-lucide="arrow-left" aria-hidden="true"></i>Visitar o site</a>
+        <div class="sidebar-note">
+            <span class="note-dot">
+            </span>
+            <strong>Mais clareza em cada etapa.</strong>
+            <p>Do primeiro atendimento à entrega do aparelho.</p>
+        </div>
+        <a class="site-link" href="/Pages/index.html">
+            <i data-lucide="arrow-left" aria-hidden="true"></i>Visitar o site</a>
     </aside>
     <main>
         <div class="topbar">
@@ -205,11 +205,21 @@
                 </ol>
             </aside>
         </div>
+
+        <form action="/logout" method="POST">
+            <button type="submit">
+                <i data-lucide="log-out" aria-hidden="true"></i>
+                Sair da conta
+            </button>
+        </form>
+
         <p class="demo-note">Interface em demonstração · Os atendimentos ainda não são salvos no banco.</p>
 
         <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span>
         </footer>
     </main>
 </body>
+
+<script src="/Script/protecaoCsrf.js" defer></script>
 
 </html>

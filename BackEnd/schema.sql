@@ -51,3 +51,46 @@ CREATE TABLE IF NOT EXISTS tentativas_recuperacao (
 
 CREATE INDEX IF NOT EXISTS idx_tentativas_recuperacao_chave_tempo
     ON tentativas_recuperacao(escopo, chave_hash, tentado_em);
+
+
+CREATE TABLE IF NOT EXISTS ordens_servico (
+    id INTEGER PRIMARY KEY,
+    empresa_id INTEGER NOT NULL,
+    cliente_id INTEGER NOT NULL,
+    aparelho TEXT NOT NULL, 
+    problema TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Recebido'
+        CHECK(status IN (
+            'Recebido',
+            'Em diagnóstico',
+            'Aguardando aprovação',
+            'Em reparo',
+            'Pronto para retirada',
+            'Entregue'
+        )),
+        previsao TEXT,
+        criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (empresa_id) REFERENCES empresas(id),
+        FOREIGN KEY (cliente_id) REFERENCES usuarios(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_ordens_empresa
+    ON ordens_servico(empresa_id);
+
+CREATE INDEX IF NOT EXISTS idx_ordens_cliente
+    ON ordens_servico(cliente_id);
+
+
+CREATE TABLE IF NOT EXISTS historico_ordens (
+    id INTEGER PRIMARY KEY,
+    ordem_id INTEGER NOT NULL, 
+    status TEXT NOT NULL, 
+    observacao TEXT NOT NULL DEFAULT '',
+    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ordem_id)
+    REFERENCES ordens_servico(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_historico_ordem
+    ON historico_ordens(ordem_id);
+
