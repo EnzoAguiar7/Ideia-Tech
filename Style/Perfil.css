@@ -2,6 +2,24 @@
    PERFIL
 ========================================= */
 
+.perfil-menu[aria-current="page"] {
+    color: var(--cor-primaria-escura);
+    border-color: var(--cor-primaria);
+}
+
+.perfil-menu[aria-current="page"] i {
+    color: var(--cor-primaria-escura);
+}
+
+/* O estilo global destaca Início por padrão; nesta página, o ativo é Perfil. */
+html[data-responsive~="Perfil"] nav ul li:first-child a {
+    color: inherit;
+}
+
+html[data-responsive~="Perfil"] nav ul li:first-child a::after {
+    display: none;
+}
+
 .perfil-pagina {
     width: min(1180px, 92%);
     margin: 0 auto;

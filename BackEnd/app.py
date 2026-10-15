@@ -14,6 +14,7 @@ from flask import Flask, abort, flash, redirect, send_from_directory, request, s
 from werkzeug.security import generate_password_hash, check_password_hash
 from urllib.parse import urlsplit
 from configuracao import carregar_configuracao
+import banco
 
 carregar_configuracao()
 
