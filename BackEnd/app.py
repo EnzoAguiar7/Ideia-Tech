@@ -1171,6 +1171,8 @@ def produtos_empresa():
 
     erro = None
     codigo_resposta = 200
+    produto_edicao = None
+    campos = {}
     conexao = conectar_banco()
 
     try:
@@ -1198,7 +1200,7 @@ def produtos_empresa():
                     WHERE id = ? AND empresa_id = ?
                     """,
                     (produto_id, empresa["id"])
-                ).fethcone()
+                ).fetchone()
 
                 if produto_edicao is None:
                     abort(404)
@@ -1291,11 +1293,11 @@ def produtos_empresa():
                     conexao.execute(
                         """
                         UPDATE produtos
-                        SET nome = ?
-                             descricao = ?
-                             categoria = ?
-                             preco_centavos = ?
-                             estoque = ?
+                        SET nome = ?,
+                             descricao = ?,
+                             categoria = ?,
+                             preco_centavos = ?,
+                             estoque = ?,
                              imagem = ?
                         WHERE id = ? AND empresa_id = ?
                         """,
@@ -1331,9 +1333,9 @@ def produtos_empresa():
                     )
                     mensagem = "Produto cadastrado com sucesso."
 
-                    conexao.commit()
-                    flash(mensagem, "sucesso")
-                    return redirect("/Pages/Empresa/produtos.html")
+                conexao.commit()
+                flash(mensagem, "sucesso")
+                return redirect("/Pages/Empresa/produtos.html")
 
         produtos = conexao.execute(
             """
@@ -1364,7 +1366,7 @@ def produtos_empresa():
     ), codigo_resposta
 
     
-@app.route("/Pages/Empresa/produtos/<int:produto_id>/situacao")
+@app.post("/Pages/Empresa/produtos/<int:produto_id>/situacao")
 def alterar_situacao_produto(produto_id):
     usuario = buscar_usuario_sessao()
     ativo = request.form.get("ativo", "")
@@ -1380,7 +1382,7 @@ def alterar_situacao_produto(produto_id):
             SELECT p.id
             FROM produtos AS p
             JOIN empresas AS e ON e.id = p.empresa_id
-            WHERE p.id = ? AND e.usuarios_id = ?
+            WHERE p.id = ? AND e.usuario_id = ?
             """,
             (produto_id, usuario["id"])
         ).fetchone()
@@ -1420,9 +1422,9 @@ def buscar_produtos_publicos():
                 p.preco_centavos,
                 p.estoque,
                 p.imagem,
-                e.nome AS empresa_nome,
+                e.nome AS empresa_nome
             FROM produtos AS p
-            JOIN empresas AS e ON e.od = p.empresa_id
+            JOIN empresas AS e ON e.id = p.empresa_id
             WHERE p.ativo = 1
             ORDER BY p.id DESC
             """
@@ -1457,18 +1459,18 @@ def catalogo_produtos_banco():
         for produto in produtos
     }
 
-dados_json = jsonify(catalogo).get_data(as_text=True)
+    dados_json = jsonify(catalogo).get_data(as_text=True)
+    resposta = app.response_class(
+        "window.CatalogoProdutos = Object.freeze("
+        + dados_json
+        + ");",
+        mimetype="application/javascript"
+    )
 
-resposta= app.response_class(
-    "window.CatalogoProdutos = Object.freeze("
-    + dados_json
-    + ");",
-    mimetype="application/javascript"
-)
+    resposta.headers["Cache-Control"] = "no-store"
+    resposta.headers["X-Content-Type-Options"] = "nosniff"
+    return resposta
 
-resposta.headers["Cache-Control"] = "no-store"
-resposta.headers["X-Content-Type-Options"] = "nosniff"
-return resposta
 
 
 

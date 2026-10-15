@@ -7,8 +7,35 @@
             const dados = JSON.parse(localStorage.getItem(chave) || '[]');
             if (!Array.isArray(dados)) return [];
             const vistos = new Set();
-            return dados.filter(item => item && Object.hasOwn(catalogo, item.id) && Number.isInteger(item.quantidade) && item.quantidade > 0 && !vistos.has(item.id) && vistos.add(item.id))
-                .map(item => ({ id: item.id, quantidade: Math.min(item.quantidade, Math.max(1, catalogo[item.id].estoque)) }));
+            return dados 
+                .filter(item =>{
+                    if (
+                        !item 
+                        || !Object.hasOwn(catalogo, item.id)
+                        || !Number.isInteger(item.quantidade)
+                        || item.quantidade <= 0
+                        || vistos.has(item.id)
+                    ) {
+                        return false;
+                    }
+
+                    const produto = catalogo[item.id];
+
+                    if (produto.estoque <= 0) {
+                        return false;
+                    }
+
+                    vistos.add(item.id);
+                    return true;
+                })
+                .map(item => ({
+                    id: item.id,
+                    quantidade: Math.min(
+                        item.quantidade,
+                        catalogo[item.id].estoque
+                    )
+                }));
+                
         } catch { return []; }
     }
     function avisar(texto) {
