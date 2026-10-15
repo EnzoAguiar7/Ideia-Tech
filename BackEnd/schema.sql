@@ -94,3 +94,22 @@ CREATE TABLE IF NOT EXISTS historico_ordens (
 CREATE INDEX IF NOT EXISTS idx_historico_ordem
     ON historico_ordens(ordem_id);
 
+CREATE TABLE IF NOT EXISTS produtos(
+    id INTEGER PRIMARY KEY,
+    empresa_id INTEGER NOT NULL,
+    nome TEXT NOT NULL,
+    descricao TEXT NOT NULL DEFAULT '',
+    categoria TEXT NOT NULL,
+    preco_centavos INTEGER NOT NULL
+        CHECK (preco_centavos > 0),
+    estoque INTEGER NOT NULL DEFAULT 0
+        CHECK (estoque >=0),
+    imagem TEXT,
+    ativo INTEGER NOT NULL DEFAULT 1
+        CHECK (ativo IN (0, 1)),
+    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (empresa_id) REFERENCES empresas(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_produtos_empresa
+    ON produtos(empresa_id)

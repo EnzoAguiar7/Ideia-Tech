@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
     <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
     <link rel="stylesheet" href="/Style/Empresa/listasEmpresa.css">
+    <link rel="stylesheet" href="/Style/mensagens.css">
     <link rel="stylesheet" href="/Style/responsivo.css">
 
     <script defer src="/Script/vendor/lucide.min.js"></script>
@@ -23,7 +24,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{empresa['nome']}}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -73,7 +74,9 @@
     <main>
         <div class="topbar">
             <p>Área empresarial <span>/</span> <strong>Produtos</strong></p>
-            <span class="demo-badge"><span></span>Modo demonstração</span>
+            <span class="demo-badge">
+                <span></span>Conta empresarial
+            </span>
         </div>
 
         <header class="page-heading">
@@ -84,48 +87,166 @@
             </div>
         </header>
 
+
+        {% include "_mensagens.html" %}
+
+        {% if erro %}
+        <p class="mensagem mensagem--erro" role="alert">
+            {{ erro }}
+        </p>
+        {% endif %}
+
+        <section class="card order-card cadastro-produto">
+            <h2>
+                {{ 'Editar produto' if produto_edicao else 'Novo produto' }}
+            </h2>
+
+            <p class="form-intro">
+                Cadastre as peças e acessórios da assistência.
+            </p>
+
+            <form
+                action="{{ url_for('produtos_empresa', editar=produto_edicao['id']) if produto_edicao else url_for('produtos_empresa') }}"
+                method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <div class="field">
+                    <label for="produtoNome">Nome do produto</label>
+                    <input id="produtoNome" name="nome" minlength="2" maxlength="120"
+                        value="{{ request.form.get('nome', '') }}" required>
+                </div>
+
+                <div class="field">
+                    <label for="produtoDescricao">Descrição</label>
+                    <textarea id="produtoDescricao" name="descricao" maxlength="1000"
+                        rows="3">{{ request.form.get('descricao', '') }}</textarea>
+                </div>
+
+                <div class="field">
+                    <label for="produtoCategoria">Categoria</label>
+                    <input id="produtoCategoria" name="categoria" minlength="2" maxlength="60"
+                        placeholder="Ex.: Acessórios" value="{{ request.form.get('categoria', '') }}" required>
+                </div>
+
+                <div class="field">
+                    <label for="produtoPreco">Preço em reais</label>
+                    <input id="produtoPreco" name="preco" type="text" inputmode="decimal" maxlength="12"
+                        placeholder="Ex.: 89,90" value="{{ request.form.get('preco', '') }}" required>
+                    <small>Digite sem separador de milhar.</small>
+                </div>
+
+                <div class="field">
+                    <label for="produtoEstoque">Quantidade em estoque</label>
+                    <input id="produtoEstoque" name="estoque" type="number" min="0" max="999999" step="1"
+                        value="{{ request.form.get('estoque', '0') }}" required>
+                </div>
+
+                <div class="field">
+                    <label for="produtoImagem">Imagem</label>
+                    <select id="produtoImagem" name="imagem">
+                        <option value="">Sem imagem</option>
+
+                        {% for imagem in imagens %}
+                        <option value="{{ imagem }}" {% if request.form.get('imagem')==imagem %}selected{% endif %}>
+                            {{ imagem }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button class="button primary" type="submit">
+                    {{ 'Salvar alterações' if produto_edicao else 'Cadastrar produto' }}
+                </button>
+
+                {% if produto_edicao %}
+                <a href="/Pages/Empresa/produtos.html">
+                    Cancelar edição
+                </a>
+                {% endif %}
+
+
+            </form>
+        </section>
+
+
         <section class="empresa-lista" aria-labelledby="titulo-produtos">
             <div class="empresa-lista-topo">
-                <h2 id="titulo-produtos">Peças e acessórios</h2>
-                <span class="demo-badge">2 exemplos fictícios</span>
+                <h2 id="titulo-produtos">Produtos cadastrados</h2>
+                <span>{{ produtos|length }} produto(s)</span>
             </div>
 
+            {% if produtos %}
             <div class="empresa-tabela-wrap">
                 <table class="empresa-tabela">
                     <thead>
                         <tr>
+                            <th scope="col">Imagem</th>
                             <th scope="col">Produto</th>
                             <th scope="col">Categoria</th>
                             <th scope="col">Preço</th>
                             <th scope="col">Estoque</th>
                             <th scope="col">Situação</th>
+                            <th scope="col">Ações</th>
                         </tr>
                     </thead>
+
                     <tbody>
+                        {% for produto in produtos %}
                         <tr>
-                            <td>Carregador USB-C 20W</td>
-                            <td>Acessórios</td>
-                            <td>R$ 89,90</td>
-                            <td>12 unidades</td>
                             <td>
-                                <span class="empresa-situacao">Disponível</span>
+                                {% if produto['imagem'] %}
+                                <img class="foto-produto-admin" src="{{ produto['imagem'] }}"
+                                    alt="{{ produto['nome'] }}" loading="lazy">
+                                {% else %}
+                                Sem imagem
+                                {% endif %}
+                            </td>
+
+                            <td>{{ produto['nome'] }}</td>
+                            <td>{{ produto['categoria'] }}</td>
+
+                            <td>
+                                R$ {{ ('%.2f' % (produto['preco_centavos'] / 100)).replace('.', ',') }}
+                            </td>
+
+                            <td>
+                                {% if produto['estoque'] > 0 %}
+                                {{ produto['estoque'] }} unidade(s)
+                                {% else %}
+                                Sem estoque
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ 'Ativo' if produto['ativo'] else 'Desativado' }}
+                            </td>
+
+                            <td>
+                                <a href="{{ url_for('produtos_empresa', editar=produto['id']) }}">
+                                    Editar
+                                </a>
+
+                                <form action="/Pages/Empresa/produtos/{{ produto['id'] }}/situacao" method="POST"
+                                    class="acao-produto">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                                    <input type="hidden" name="ativo" value="{{ 0 if produto['ativo'] else 1 }}">
+
+                                    <button class="button primary" type="submit">
+                                        {{ 'Desativar' if produto['ativo'] else 'Reativar' }}
+                                    </button>
+                                </form>
                             </td>
                         </tr>
-                        <tr>
-                            <td>Película para Galaxy S23</td>
-                            <td>Proteção</td>
-                            <td>R$ 29,90</td>
-                            <td>0 unidades</td>
-                            <td>
-                                <span class="empresa-situacao">Sem estoque</span>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% else %}
+            <p>Nenhum produto cadastrado. Use o formulário acima.</p>
+            {% endif %}
         </section>
 
-        <p class="demo-note">Dados fictícios de demonstração. Nada é consultado ou salvo no banco.</p>
+
         <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span></footer>
     </main>
 </body>

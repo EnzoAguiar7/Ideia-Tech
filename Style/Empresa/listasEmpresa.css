@@ -55,3 +55,35 @@
     color: #356442;
     font-size: 11px;
 }
+
+.cadastro-produto {
+    margin-bottom: 28px;
+}
+
+.cadastro-produto select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dfe7e1;
+    border-radius: 8px;
+    background: #fafcf9;
+    color: inherit;
+    font: inherit;
+}
+
+.cadastro-produto select:focus-visible {
+    outline: 2px solid var(--verde);
+    outline-offset: 2px;
+}
+
+.foto-produto-admin {
+    display: block;
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    background: white;
+    border-radius: 8px;
+}
+
+.acao-produto {
+    margin-top: 12px;
+}

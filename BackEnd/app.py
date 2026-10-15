@@ -14,6 +14,7 @@ from flask import Flask, abort, flash, redirect, send_from_directory, request, s
 from werkzeug.security import generate_password_hash, check_password_hash
 from urllib.parse import urlsplit
 from configuracao import carregar_configuracao
+from decimal import Decimal, InvalidOperation
 
 carregar_configuracao()
 
@@ -1147,6 +1148,329 @@ def acompanhar_ordens():
     return resposta
 
 
+def imagens_disponiveis_produto():
+    pasta = raiz / "Assets" / "img"
+    extensoes = {".png", ".jpg", ".jpeg", ".webp"}
+
+    return sorted (
+        arquivo.name
+        for arquivo in pasta.iterdir()
+        if arquivo.is_file()
+        and arquivo.suffix.lower() in extensoes
+    )
+
+@app.route(
+    "/Pages/Empresa/produtos.html",
+    methods=["GET", "POST"]
+)
+
+def produtos_empresa():
+    usuario = buscar_usuario_sessao()
+    imagens = imagens_disponiveis_produto()
+
+    erro = None
+    codigo_resposta = 200
+    conexao = conectar_banco()
+
+    try:
+        empresa = conexao.execute(
+            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
+            (usuario["id"],)
+        ).fetchone()
+
+        if empresa is None:
+            abort(404, description="Empresa não encontrada.")
+
+        if request.method == "POST":
+            produto_edicao = None
+
+            if "editar" in request.args:
+                produto_id = request.args.get("editar", type=int)
+
+                if produto_id is None:
+                    abort(404)
+
+                produto_edicao = conexao.execute(
+                    """
+                    SELECT *
+                    FROM produtos
+                    WHERE id = ? AND empresa_id = ?
+                    """,
+                    (produto_id, empresa["id"])
+                ).fethcone()
+
+                if produto_edicao is None:
+                    abort(404)
+
+                campos = {}
+
+                if produto_edicao is not None:
+                    campos = {
+                        "nome":produto_edicao["nome"],
+                        "descricao":produto_edicao["descricao"],
+                        "categoria":produto_edicao["categoria"],
+                        "preco": format(
+                            Decimal(produto_edicao["preco_centavos"]) / 100,
+                            ".2f"
+                        ),
+                        "estoque":produto_edicao["estoque"],
+                        "imagem": (
+                            produto_edicao["imagem"].rsplit("/", 1)[-1]
+                            if produto_edicao["imagem"]
+                            else ""
+                        )
+                    }
+
+                if request.method == "POST":
+                    campos = request.form
+
+
+            nome = request.form.get("nome", "").strip()
+            descricao = request.form.get("descricao", "").strip()
+            categoria = request.form.get("categoria", "").strip()
+            imagem = request.form.get("imagem", "").strip()
+
+            preco_texto = request.form.get("preco", "").strip()
+            estoque_texto = request.form.get("estoque", "").strip()
+
+            preco_centavos = None
+            estoque= None
+
+            if not 2 <= len (nome) <= 120:
+                erro = "O nome deve ter entre 2 e 120 caracteres."
+
+            elif len (descricao) > 1000:
+                erro = "A descrição deve ter até 1000 caracteres."
+
+            elif not 2 <= len (categoria) <= 60:
+                erro = "A categoria deve ter entre 2 e 60 caracteres."
+
+            elif imagem and imagem not in imagens:
+                erro = "Selecione uma imagem disponível."
+
+            if erro is None:
+                try:
+                    preco = Decimal(preco_texto.replace(",", "."))
+
+                    if(
+                        not preco.is_finite()
+                        or not Decimal("0.01") <= preco <= Decimal ("999999.99")
+                    ):
+                        raise ValueError
+
+                    centavos = preco * 100 
+
+                    if centavos != centavos.to_integral_value():
+                        raise ValueError
+
+                    preco_centavos = int (centavos)
+                except (InvalidOperation, ValueError):
+                    erro = (
+                        "Informe um preço de 0,01 a  999999,99,"
+                        "com até duas casas decimais."
+                    )
+
+            if erro is None:
+                try:
+                    estoque = int(estoque_texto)
+                    if not 0 <= estoque <= 999999:
+                        raise ValueError
+                except ValueError:
+                    erro = "Informe um estoque inteiro de 0 a 999999."
+
+            if erro:
+                codigo_resposta = 400
+
+            else:
+                caminho_imagem = (
+                    f"/Assets/img/{imagem}" if imagem else None
+                )
+
+                if produto_edicao is not None:
+                    conexao.execute(
+                        """
+                        UPDATE produtos
+                        SET nome = ?
+                             descricao = ?
+                             categoria = ?
+                             preco_centavos = ?
+                             estoque = ?
+                             imagem = ?
+                        WHERE id = ? AND empresa_id = ?
+                        """,
+                        (
+                            nome,
+                            descricao,
+                            categoria,
+                            preco_centavos,
+                            estoque,
+                            caminho_imagem,
+                            produto_edicao["id"],
+                            empresa["id"]
+                        )
+                    )
+                    mensagem = "Produto atualizado com sucesso."
+                else:
+                    conexao.execute(
+                        """
+                        INSERT INTO produtos (
+                        empresa_id, nome, descricao, categoria,
+                        preco_centavos, estoque, imagem)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            empresa["id"],
+                            nome,
+                            descricao,
+                            categoria,
+                            preco_centavos,
+                            estoque,
+                            caminho_imagem
+                        )
+                    )
+                    mensagem = "Produto cadastrado com sucesso."
+
+                    conexao.commit()
+                    flash(mensagem, "sucesso")
+                    return redirect("/Pages/Empresa/produtos.html")
+
+        produtos = conexao.execute(
+            """
+            SELECT id, nome, descricao, categoria, preco_centavos,
+                   estoque, imagem, ativo
+            FROM produtos
+            WHERE empresa_id = ?
+            ORDER BY id DESC
+            """,
+            (empresa["id"],)
+        ).fetchall()
+
+    finally:
+        conexao.close()
+
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_urlsafe(32)
+
+    return render_template(
+        "Empresa/produtos.html",
+        empresa=empresa,
+        produtos=produtos,
+        imagens=imagens,
+        erro=erro,
+        csrf_token=session["csrf_token"],
+        produto_edicao=produto_edicao,
+        campos=campos
+    ), codigo_resposta
+
     
+@app.route("/Pages/Empresa/produtos/<int:produto_id>/situacao")
+def alterar_situacao_produto(produto_id):
+    usuario = buscar_usuario_sessao()
+    ativo = request.form.get("ativo", "")
+
+    if ativo not in {"0", "1"}:
+        abort(400)
+
+    conexao = conectar_banco()
+
+    try:
+        produto = conexao.execute(
+            """
+            SELECT p.id
+            FROM produtos AS p
+            JOIN empresas AS e ON e.id = p.empresa_id
+            WHERE p.id = ? AND e.usuarios_id = ?
+            """,
+            (produto_id, usuario["id"])
+        ).fetchone()
+
+        if produto is None:
+            abort(404)
+
+        conexao.execute(
+            "UPDATE produtos SET ativo = ? WHERE id = ?",
+            (int(ativo), produto_id)
+        )
+        conexao.commit()
+    finally:
+        conexao.close()
+
+    mensagem = (
+        "Produto reativado."
+        if ativo == "1"
+        else "Produto desativado."
+    )
+
+    flash(mensagem, "sucesso")
+    return redirect("/Pages/Empresa/produtos.html")
+
+
+def buscar_produtos_publicos():
+    conexao = conectar_banco()
+
+    try:
+        return conexao.execute(
+            """
+            SELECT
+                p.id,
+                p.nome,
+                p.descricao,
+                p.categoria,
+                p.preco_centavos,
+                p.estoque,
+                p.imagem,
+                e.nome AS empresa_nome,
+            FROM produtos AS p
+            JOIN empresas AS e ON e.od = p.empresa_id
+            WHERE p.ativo = 1
+            ORDER BY p.id DESC
+            """
+        ).fetchall()
+    finally:
+        conexao.close()
+
+
+@app.get("/Pages/vitrine.html")
+def vitrine():
+    resposta = app.make_response(
+        render_template(
+            "vitrine.html",
+            produtos=buscar_produtos_publicos()
+        )
+    )
+    resposta.headers["Cache-Control"] = 'no-store'
+    return resposta
+
+@app.get("/Script/catalogoProdutos.js")
+def catalogo_produtos_banco():
+    produtos = buscar_produtos_publicos()
+
+    catalogo = {
+        f"produto-{produto['id']}":{
+            "nome":produto["nome"],
+            "preco":produto["preco_centavos"],
+            "estoque":produto["estoque"],
+            "cor":"Não informada",
+            "imagem":produto["imagem"]
+        }
+        for produto in produtos
+    }
+
+dados_json = jsonify(catalogo).get_data(as_text=True)
+
+resposta= app.response_class(
+    "window.CatalogoProdutos = Object.freeze("
+    + dados_json
+    + ");",
+    mimetype="application/javascript"
+)
+
+resposta.headers["Cache-Control"] = "no-store"
+resposta.headers["X-Content-Type-Options"] = "nosniff"
+return resposta
+
+
+
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
