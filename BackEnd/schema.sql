@@ -79,3 +79,18 @@ CREATE INDEX IF NOT EXISTS idx_ordens_empresa
 
 CREATE INDEX IF NOT EXISTS idx_ordens_cliente
     ON ordens_servico(cliente_id);
+
+
+CREATE TABLE IF NOT EXISTS historico_ordens (
+    id INTEGER PRIMARY KEY,
+    ordem_id INTEGER NOT NULL, 
+    status TEXT NOT NULL, 
+    observacao TEXT NOT NULL DEFAULT '',
+    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ordem_id)
+    REFERENCES ordens_servico(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_historico_ordem
+    ON historico_ordens(ordem_id);
+

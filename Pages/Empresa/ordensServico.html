@@ -220,6 +220,7 @@
                             <th scope="col">Problema</th>
                             <th scope="col">Status</th>
                             <th scope="col">Previsão</th>
+                            <th scope="col">Atualizar atendimento</th>
                         </tr>
                     </thead>
 
@@ -241,6 +242,29 @@
                                 {% else %}
                                 A definir
                                 {% endif %}
+                            </td>
+                            <td>
+                                <form action="/Pages/Empresa/ordens/{{ ordem['id'] }}/status"
+                                    method="POST" class="form-status-os">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                                    <label for="status-{{ ordem['id'] }}">Status</label>
+                                    <select id="status-{{ ordem['id'] }}" name="status" required>
+                                        {% for status in status_disponiveis %}
+                                        <option value="{{ status }}"
+                                            {% if status == ordem['status'] %}selected{% endif %}>
+                                            {{ status }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <label for="observacao-{{ ordem['id'] }}">Recado para o cliente</label>
+                                    <textarea id="observacao-{{ ordem['id'] }}" name="observacao"
+                                        maxlength="1000" rows="3"
+                                        placeholder="Opcional. Ex.: iniciamos a troca da tela."></textarea>
+
+                                    <button class="button primary" type="submit">Salvar status</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}

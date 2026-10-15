@@ -277,3 +277,35 @@ legend>span {
     font-size: 11px;
     color: var(--muted);
 }
+
+.form-status-os {
+    display: grid;
+    gap: 10px;
+    min-width: 220px;
+}
+
+.form-status-os label {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.form-status-os select,
+.form-status-os textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #dfe7e1;
+    border-radius: 8px;
+    background: #fafcf9;
+    color: inherit;
+    font: inherit;
+}
+
+.form-status-os textarea {
+    resize: vertical;
+}
+
+.form-status-os select:focus-visible,
+.form-status-os textarea:focus-visible {
+    outline: 2px solid var(--verde);
+    outline-offset: 2px;
+}

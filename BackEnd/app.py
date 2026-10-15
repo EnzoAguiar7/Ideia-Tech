@@ -891,6 +891,15 @@ def editar_perfil():
     return resposta
 
 
+STATUS_ORDENS = (
+    "Recebido",
+    "Em diagnóstico",
+    "Aguardando aprovação",
+    "Em reparo",
+    "Pronto para retirada",
+    "Entregue",
+)
+
 @app.route(
     "/Pages/Empresa/ordensServico.html",
     methods=["GET", "POST"]
@@ -999,9 +1008,145 @@ def ordens_servico():
         empresa=empresa,
         ordens=ordens,
         erro=erro,
-        csrf_token=session["csrf_token"]
+        csrf_token=session["csrf_token"],
+        status_disponiveis=STATUS_ORDENS
     ), codigo_resposta
 
 
+@app.post("/Pages/Empresa/ordens/<int:ordem_id>/status")
+def atualizar_status_ordem(ordem_id):
+    usuario = buscar_usuario_sessao()
+
+    novo_status = request.form.get("status", "").strip()
+    observacao = request.form.get("observacao", "").strip()
+
+    if novo_status not in STATUS_ORDENS:
+        flash("Selecione um status válido.", "erro")
+        return redirect("/Pages/Empresa/ordensServico.html")
+
+
+    if len(observacao) > 1000:
+        flash("A observação debe ter até 1000 caracteres.", "erro")
+        return redirect("/Pages/Empresa/ordensServico.html")
+
+
+    conexao = conectar_banco()
+
+    try:
+        conexao.execute("BEGIN IMMEDIATE")
+
+        ordem = conexao.execute(
+            """
+            SELECT o.id, o.status
+            FROM ordens_servico AS o
+            JOIN empresas AS e ON e.id = o.empresa_id
+            WHERE o.id = ? AND e.usuario_id = ?
+            """,
+            (ordem_id, usuario["id"])
+        ).fetchone()
+    
+
+        if ordem is None:
+            abort(404)
+
+        if novo_status == ordem["status"]:
+            flash("A ordem já está nesse status.", "erro")
+            return redirect("/Pages/Empresa/ordensServico.html")
+
+        conexao.execute(
+            """
+            UPDATE ordens_servico
+            SET status  = ?
+            WHERE id = ?
+            """,
+            (novo_status, ordem_id)
+        )
+
+        conexao.execute(
+            """
+            INSERT INTO historico_ordens (
+                ordem_id, status, observacao, criado_em
+            )
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            """,
+            (ordem_id, novo_status, observacao)
+        )
+
+        conexao.commit()
+    finally:
+        conexao.close()
+
+    flash ("Status atualizado com sucesso.", "sucesso")
+    return redirect("/Pages/Empresa/ordensServico.html")
+
+
+@app.get("/Pages/Acompanhar.html")
+def acompanhar_ordens():
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        return redirect("/Pages/login.html?next=/Pages/Acompanhar.html")
+
+    if usuario ["tipo"] != "cliente":
+        return redirect(pagina_inicial_usuario(usuario["tipo"]))
+
+    conexao = conectar_banco()
+
+    try:
+        ordens = conexao.execute(
+            """
+            SELECT 
+                o.id,
+                o.aparelho,
+                o.problema,
+                o.status,
+                o.previsao,
+                e.nome AS empresa_nome
+            FROM ordens_servico AS o
+            JOIN empresas AS e ON e.id = o.empresa_id
+            WHERE o.cliente_id = ?
+            ORDER BY o.id DESC
+            """,
+            (usuario["id"],)
+        ).fetchall()
+
+        registros = conexao.execute(
+            """
+            SELECT 
+                h.id,
+                h.ordem_id,
+                h.status,
+                h.observacao
+            FROM historico_ordens AS h
+            JOIN ordens_servico AS o ON o.id = h.ordem_id
+            WHERE o.cliente_id = ?
+            ORDER BY h.id DESC
+            """,
+            (usuario["id"],)
+        ).fetchall()
+
+    finally:
+        conexao.close()
+
+    historicos = {}
+
+    for registro in registros:
+        historicos.setdefault(
+            registro["ordem_id"], []
+        ).append(registro)
+
+    resposta = app.make_response(
+        render_template(
+            "Acompanhar.html",
+            ordens=ordens, 
+            historicos=historicos
+        )
+    )
+
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
+
+
+    
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
