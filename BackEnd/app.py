@@ -6,6 +6,7 @@ import hmac
 import smtplib
 import ssl
 import time
+import json
 from datetime import date, timedelta
 from email.message import EmailMessage
 from pathlib import Path
@@ -1471,8 +1472,91 @@ def catalogo_produtos_banco():
     return resposta
 
 
+@app.post("/pedidos")
+def criar_pedido():
+    usuario = buscar_usuario_sessao()
 
+    if usuario is None:
+        return jsonify({
+            "erro":"Entre na sua conta para confirmar o pedido."
+        }),401
 
+    if usuario["tipo"] != "cliente":
+        return jsonify({
+            "erro": "Somente cliente podem realizar pedidos."
+        }),403
+
+    itens_texto = request.form.get("itens", "")
+
+    try:
+        itens_recebidos = json.loads(itens_texto)
+    except (json.JSONDecodeError, TypeError):
+        return jsonify({
+            "erro": "Os itens do pedido são inválidos"
+        }),400
+
+    if not isinstance (itens_recebidos, list) or not itens_recebidos:
+        return jsonify({
+            "erro": "O carrinho está vazio."
+        }), 400
+
+    if len (itens_recebidos) > 50:
+        return jsonify({
+            "erro": "O pedido possui itens demais."
+        }),400
+
+    quantidades = {}
+
+    for item in itens_recebidos:
+        if not isinstance (item, dict):
+            return jsonify({
+                "erro": "Existe um item inválido no carrinho."
+            }), 400
+
+        identificador = item.get("id")
+        quantidade = item.get("quantidade")
+
+        if(
+            not isinstance(identificador, str)
+            or not identificador.startswith("produto-")
+            or not isinstance(quantidade, int)
+            or isinstance(quantidade, bool)
+            or quantidade <= 0
+        ):
+
+            return jsonify({
+                "erro": "Existe um item inválido no carrinho."
+            }), 400
+
+            try:
+                produto_id = int (identificador.removeprefix("produto-"))
+
+            except ValueError:
+                return jsonify({
+                    "erro": "Existe um produto inválido no carrinho"
+                }), 400
+
+            if produto_id <= 0 or produto_id in quantidades:
+                return jsonify({
+                    "erro": "Existem produtos repetidos ou inválidos."
+                }),400
+
+            quantidades[produto_id] = quantidade
+
+        marcadores = ",".join("?" for _ in quantidades)
+        conexao = conectar_banco()
+
+        try:
+            conexao.execute("BEGIN IMMEDIATE")
+
+            produtos = conexao.execute(
+                f"""
+                SELECT id, empresa_id, nome, preco_centavos, estoque, ativo
+                FROM produtos
+                WHERE id IN ({marcadores})
+                """,
+                tuple(quantidades)
+            ).fetchall()
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)

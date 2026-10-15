@@ -112,4 +112,55 @@ CREATE TABLE IF NOT EXISTS produtos(
 );
 
 CREATE INDEX IF NOT EXISTS idx_produtos_empresa
-    ON produtos(empresa_id)
+    ON produtos(empresa_id);
+
+CREATE TABLE IF NOT EXISTS pedidos (
+    id INTEGER PRIMARY KEY,
+    empresa_id INTEGER NOT NULL,
+    cliente_id INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Recebido'
+        CHECK (status IN(
+        'Recebido',
+        'Em separação',
+        'Pronto para retirada',
+        'Entregue',
+        'Cancelado'
+        )),
+    total_centavos INTEGER NOT NULL
+        CHECK (total_centavos >= 0),
+
+    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (empresa_id)
+        REFERENCES empresas(id),
+    
+    FOREIGN KEY (cliente_id)
+        REFERENCES usuarios(id)
+);
+
+CREATE TABLE IF NOT EXISTS itens_pedido(
+    id INTEGER PRIMARY KEY,
+    pedido_id INTEGER NOT NULL,
+    produto_id INTEGER NOT NULL,
+    nome_produto TEXT NOT NULL,
+    preco_unitario_centavos INTEGER NOT NULL
+        CHECK (preco_unitario_centavos > 0),
+    quantidade INTEGER NOT NULL
+        CHECK (quantidade > 0),
+
+    FOREIGN KEY(pedido_id)
+        REFERENCES pedidos(id) ON DELETE CASCADE,
+
+    FOREIGN KEY (produto_id)
+        REFERENCES produtos(id)
+);
+
+CREATE INDEX IF NOT EXISTS ixd_pedidos_empresa
+    ON pedidos(empresa_id);
+ 
+CREATE INDEX IF NOT EXISTS idx_pedidos_cliente
+    ON pedidos(cliente_id);
+
+CREATE INDEX IF NOT EXISTS idx_intesn_pedido_pedido
+    ON itens_pedido(pedido_id);
