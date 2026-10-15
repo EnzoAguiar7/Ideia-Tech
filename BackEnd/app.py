@@ -15,6 +15,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from urllib.parse import urlsplit
 from configuracao import carregar_configuracao
 from decimal import Decimal, InvalidOperation
+import banco
 
 carregar_configuracao()
 

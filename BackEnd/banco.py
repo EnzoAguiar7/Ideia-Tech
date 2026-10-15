@@ -68,4 +68,3 @@ if "observacaoa" in colunas_historico and "observacao" not in colunas_historico:
 
 conexao.commit()
 conexao.close()
-
