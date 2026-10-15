@@ -1184,7 +1184,7 @@ def produtos_empresa():
         if empresa is None:
             abort(404, description="Empresa não encontrada.")
 
-        if request.method == "POST":
+        if request.method == "POST" "GET":
             produto_edicao = None
 
             if "editar" in request.args:
@@ -1224,7 +1224,6 @@ def produtos_empresa():
                         )
                     }
 
-                if request.method == "POST":
                     campos = request.form
 
 
