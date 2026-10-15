@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
     <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
     <link rel="stylesheet" href="/Style/responsivo.css">
+    <link rel="stylesheet" href="/Style/mensagens.css">
+    <link rel="stylesheet" href="/Style/Empresa/listasEmpresa.css">
+
+
     <script defer src="/Script/vendor/lucide.min.js"></script>
     <script defer src="/Script/icones.js"></script>
 </head>
@@ -22,7 +26,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{ empresa['nome'] }}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -87,6 +91,15 @@
             <a class="button secondary" href="/Pages/Empresa/painelEmpresa.html">
                 <i data-lucide="arrow-left" aria-hidden="true"></i>Voltar ao painel</a>
         </header>
+
+        {% include "_mensagens.html" %}
+
+        {% if erro %}
+        <p class="mensagem mensagem--erro" role="alert">
+            {{ erro }}
+        </p>
+        {% endif %}
+
         <div class="order-layout">
             <section class="card order-card" id="nova-ordem">
                 <div class="section-heading">
@@ -99,7 +112,11 @@
                     </span>
                 </div>
                 <p class="form-intro">Preencha os dados do cliente e do aparelho. Os campos com * são obrigatórios.</p>
-                <form id="formOrdemServico">
+
+
+
+                <form id="formOrdemServico" action="/Pages/Empresa/ordensServico.html" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <fieldset>
                         <legend>
                             <span>01</span>Cliente e aparelho
@@ -107,12 +124,14 @@
                         <div class="field">
                             <label for="clienteEmail">E-mail do cliente *</label>
                             <input id="clienteEmail" name="cliente_email" type="email" maxlength="254"
-                                autocomplete="email" placeholder="cliente@email.com" required>
+                                autocomplete="email" placeholder="cliente@email.com"
+                                value="{{ request.form.get('cliente_email', '') }}" required>
                             <small>Use o e-mail da conta do cliente para vincular o atendimento.</small>
                         </div>
                         <div class="field">
                             <label for="aparelho">Aparelho e modelo *</label>
-                            <input id="aparelho" name="aparelho" maxlength="120" placeholder="Ex.: Samsung Galaxy S23"
+                            <input id="aparelho" name="aparelho" minlength="2" maxlength="120"
+                                placeholder="Ex.: Samsung Galaxy S23" value="{{ request.form.get('aparelho', '') }}"
                                 required>
                         </div>
                     </fieldset>
@@ -122,27 +141,32 @@
                         </legend>
                         <div class="field">
                             <label for="problema">Problema relatado *</label>
-                            <textarea id="problema" name="problema" maxlength="1000" rows="5"
-                                placeholder="Descreva os sintomas, como o problema começou e o que o cliente observou."
-                                required>
-</textarea>
+                            <textarea id="problema" name="problema" minlength="5" maxlength="1000" rows="5"
+                                placeholder="Descreva os sintomas relatados pelo cliente."
+                                required>{{ request.form.get('problema', '') }}</textarea>
                             <small>Inclua as informações que ajudam na avaliação técnica.</small>
                         </div>
                         <div class="field">
                             <label for="previsao">Previsão de entrega <span class="optional">Opcional</span>
                             </label>
-                            <input id="previsao" name="previsao" type="date">
+                            <input id="previsao" name="previsao" type="date"
+                                value="{{ request.form.get('previsao', '') }}">
                             <small>A estimativa poderá ser ajustada após o diagnóstico.</small>
                         </div>
                     </fieldset>
+
                     <div class="form-bottom">
                         <p>
-                            <i data-lucide="clock-3" aria-hidden="true"></i>O cadastro será habilitado ao conectar as
-                            ordens ao banco.
+                            <i data-lucide="info" aria-hidden="true"></i>
+                            A ordem ficará vinculada à conta do cliente informado.
                         </p>
-                        <button class="button primary" type="button" disabled>
-                            <i data-lucide="plus" aria-hidden="true"></i>Salvar ordem</button>
+
+                        <button class="button primary" type="submit">
+                            <i data-lucide="plus" aria-hidden="true"></i>
+                            Salvar ordem
+                        </button>
                     </div>
+
                 </form>
             </section>
             <aside class="order-aside">
@@ -172,23 +196,67 @@
                 </section>
             </aside>
         </div>
+
         <section class="card lista-ordens">
             <div class="section-heading">
                 <div>
-                    <p class="eyebrow">HISTÓRICO</p>
+                    <p class="eyebrow">ATENDIMENTOS</p>
                     <h2>Ordens cadastradas</h2>
                 </div>
-                <span class="count-badge">0 ordens</span>
+
+                <span class="count-badge">
+                    {{ ordens|length }} atendimento(s)
+                </span>
             </div>
+
+            {% if ordens %}
+            <div class="empresa-tabela-wrap">
+                <table class="empresa-tabela">
+                    <thead>
+                        <tr>
+                            <th scope="col">OS</th>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Aparelho</th>
+                            <th scope="col">Problema</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Previsão</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for ordem in ordens %}
+                        <tr>
+                            <td>#{{ ordem['id'] }}</td>
+                            <td>{{ ordem['cliente_nome'] }}</td>
+                            <td>{{ ordem['aparelho'] }}</td>
+                            <td>{{ ordem['problema'] }}</td>
+                            <td>
+                                <span class="empresa-situacao">
+                                    {{ ordem['status'] }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if ordem['previsao'] %}
+                                {{ ordem['previsao'][8:10] }}/{{ ordem['previsao'][5:7] }}/{{ ordem['previsao'][:4] }}
+                                {% else %}
+                                A definir
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
             <div class="compact-empty">
                 <i data-lucide="clipboard-list" aria-hidden="true"></i>
                 <div>
                     <h3>Nenhuma ordem por enquanto.</h3>
-                    <p>Os atendimentos aparecerão aqui quando o cadastro estiver conectado.</p>
+                    <p>Cadastre o primeiro atendimento no formulário acima.</p>
                 </div>
             </div>
+            {% endif %}
         </section>
-        <p class="demo-note">Interface em demonstração · Nenhuma informação preenchida nesta tela é salva.</p>
 
         <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span>
         </footer>
