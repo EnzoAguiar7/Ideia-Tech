@@ -113,32 +113,32 @@
                 <div class="field">
                     <label for="produtoNome">Nome do produto</label>
                     <input id="produtoNome" name="nome" minlength="2" maxlength="120"
-                        value="{{ request.form.get('nome', '') }}" required>
+                        value="{{ campos.get('nome', '') }}" required>
                 </div>
 
                 <div class="field">
                     <label for="produtoDescricao">Descrição</label>
                     <textarea id="produtoDescricao" name="descricao" maxlength="1000"
-                        rows="3">{{ request.form.get('descricao', '') }}</textarea>
+                        rows="3">{{campos.get('descricao', '') }}</textarea>
                 </div>
 
                 <div class="field">
                     <label for="produtoCategoria">Categoria</label>
                     <input id="produtoCategoria" name="categoria" minlength="2" maxlength="60"
-                        placeholder="Ex.: Acessórios" value="{{ request.form.get('categoria', '') }}" required>
+                        placeholder="Ex.: Acessórios" value="{{ campos.get('categoria', '') }}" required>
                 </div>
 
                 <div class="field">
                     <label for="produtoPreco">Preço em reais</label>
                     <input id="produtoPreco" name="preco" type="text" inputmode="decimal" maxlength="12"
-                        placeholder="Ex.: 89,90" value="{{ request.form.get('preco', '') }}" required>
+                        placeholder="Ex.: 89,90" value="{{ campos.get('preco', '') }}" required>
                     <small>Digite sem separador de milhar.</small>
                 </div>
 
                 <div class="field">
                     <label for="produtoEstoque">Quantidade em estoque</label>
                     <input id="produtoEstoque" name="estoque" type="number" min="0" max="999999" step="1"
-                        value="{{ request.form.get('estoque', '0') }}" required>
+                        value="{{ campos.get('estoque', '0') }}" required>
                 </div>
 
                 <div class="field">
@@ -147,7 +147,7 @@
                         <option value="">Sem imagem</option>
 
                         {% for imagem in imagens %}
-                        <option value="{{ imagem }}" {% if request.form.get('imagem')==imagem %}selected{% endif %}>
+                        <option value="{{ imagem }}" {% if campos.get('imagem')== imagem %}selected{% endif %}>
                             {{ imagem }}
                         </option>
                         {% endfor %}

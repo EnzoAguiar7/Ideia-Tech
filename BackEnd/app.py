@@ -1184,8 +1184,46 @@ def produtos_empresa():
         if empresa is None:
             abort(404, description="Empresa não encontrada.")
 
+        if "editar" in request.args:
+            produto_id = request.args.get("editar", type=int)
+
+            if produto_id is None:
+                abort(404)
+
+            produto_edicao = conexao.execute(
+                """
+                SELECT *
+                FROM produtos
+                WHERE id = ? AND empresa_id = ?
+                """,
+                (produto_id, empresa["id"])
+            ).fetchone()
+
+            if produto_edicao is None:
+                abort(404)
+
+        if produto_edicao is not None:
+            campos = {
+                "nome": produto_edicao["nome"],
+                "descricao": produto_edicao["descricao"],
+                "categoria": produto_edicao["categoria"],
+                "preco": format(
+                    Decimal(produto_edicao["preco_centavos"]) / 100,
+                    ".2f"
+                ),
+                "estoque": produto_edicao["estoque"],
+                "imagem": (
+                    produto_edicao["imagem"].rsplit("/", 1)[-1]
+                    if produto_edicao["imagem"]
+                    else ""
+                )
+            }
+
+        
+
         if request.method == "POST":
-            produto_edicao = None
+            campos = request.form
+
 
             if "editar" in request.args:
                 produto_id = request.args.get("editar", type=int)
@@ -1193,39 +1231,14 @@ def produtos_empresa():
                 if produto_id is None:
                     abort(404)
 
-                produto_edicao = conexao.execute(
-                    """
-                    SELECT *
-                    FROM produtos
-                    WHERE id = ? AND empresa_id = ?
-                    """,
-                    (produto_id, empresa["id"])
-                ).fetchone()
-
                 if produto_edicao is None:
                     abort(404)
 
-                campos = {}
+              
 
-                if produto_edicao is not None:
-                    campos = {
-                        "nome":produto_edicao["nome"],
-                        "descricao":produto_edicao["descricao"],
-                        "categoria":produto_edicao["categoria"],
-                        "preco": format(
-                            Decimal(produto_edicao["preco_centavos"]) / 100,
-                            ".2f"
-                        ),
-                        "estoque":produto_edicao["estoque"],
-                        "imagem": (
-                            produto_edicao["imagem"].rsplit("/", 1)[-1]
-                            if produto_edicao["imagem"]
-                            else ""
-                        )
-                    }
+               
 
-                if request.method == "POST":
-                    campos = request.form
+             
 
 
             nome = request.form.get("nome", "").strip()
@@ -1386,6 +1399,8 @@ def alterar_situacao_produto(produto_id):
             """,
             (produto_id, usuario["id"])
         ).fetchone()
+
+
 
         if produto is None:
             abort(404)
