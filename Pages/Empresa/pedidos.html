@@ -25,7 +25,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{ empresa['nome'] }}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -89,14 +89,21 @@
 
     <main>
         <div class="topbar">
-            <p>Área empresarial <span>/</span> <strong>Pedidos</strong></p>
+            <p>
+                Área empresarial <span>/</span>
+                <strong>Pedidos</strong>
+            </p>
         </div>
 
         <header class="page-heading">
             <div>
                 <p class="eyebrow">VENDAS DA ASSISTÊNCIA</p>
-                <h1>Pedidos</h1>
-                <p>Acompanhe as compras de peças e acessórios dos clientes.</p>
+                <h1>Pedidos recebidos</h1>
+                <p>
+                    Confira as compras realizadas na
+                    {{ empresa['nome'] }}.
+                    Atualize a página para consultar novos pedidos.
+                </p>
             </div>
 
             <a class="button secondary" href="/Pages/Empresa/produtos.html">
@@ -108,17 +115,22 @@
         <section class="empresa-lista" aria-labelledby="titulo-pedidos">
             <div class="empresa-lista-topo">
                 <h2 id="titulo-pedidos">Pedidos dos clientes</h2>
+
+                <span>
+                    {{ pedidos|length }}
+                    {{ 'pedido' if pedidos|length == 1 else 'pedidos' }}
+                </span>
             </div>
 
+            {% if pedidos %}
             <div class="empresa-tabela-wrap">
                 <table class="empresa-tabela">
                     <thead>
                         <tr>
                             <th scope="col">Pedido</th>
                             <th scope="col">Cliente</th>
-                            <th scope="col">Produto</th>
-                            <th scope="col">Quantidade</th>
-                            <th scope="col">Total</th>
+                            <th scope="col">Produtos</th>
+                            <th scope="col">Total do pedido</th>
                             <th scope="col">Situação</th>
                         </tr>
                     </thead>
@@ -126,35 +138,47 @@
                     <tbody>
                         {% for pedido in pedidos %}
                         <tr>
-                            <td>#{{ pedido['id'] }}</td>
+                            <th scope="row">
+                                #{{ pedido['id'] }}
+                            </th>
+
                             <td>{{ pedido['cliente_nome'] }}</td>
+
                             <td>
                                 {% for item in itens_por_pedido.get(pedido['id'], []) %}
-                                <div>{{ item['nome_produto'] }}</div>
-                                {% else %}
-                                <span>Itens não encontrados.</span>
+                                <p>
+                                    <strong>
+                                        {{ item['nome_produto'] }}
+                                    </strong>
+                                    <br>
+                                    Quantidade: {{ item['quantidade'] }}
+                                    <br>
+                                    Preço unitário:
+                                    R$ {{ ('%.2f' % (item['preco_unitario_centavos'] / 100)).replace('.', ',') }}
+                                </p>
                                 {% endfor %}
                             </td>
+
                             <td>
-                                {% for item in itens_por_pedido.get(pedido['id'], []) %}
-                                <div>{{ item['quantidade'] }}</div>
-                                {% endfor %}
+                                R$ {{ ('%.2f' % (pedido['total_centavos'] / 100)).replace('.', ',') }}
                             </td>
-                            <td>R$ {{ ('%.2f' % (pedido['total_centavos'] / 100)).replace('.', ',') }}</td>
+
                             <td>
                                 <span class="empresa-situacao">
                                     {{ pedido['status'] }}
                                 </span>
                             </td>
                         </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6">Nenhum pedido recebido ainda.</td>
-                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% else %}
+            <p>
+                Sua empresa ainda não recebeu pedidos.
+                As compras confirmadas aparecerão aqui.
+            </p>
+            {% endif %}
         </section>
 
         <footer>
@@ -162,6 +186,7 @@
             <span>Organização para quem cuida de tecnologia.</span>
         </footer>
     </main>
+
 </body>
 
 </html>
