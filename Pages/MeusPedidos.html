@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html data-responsive="Style Acompanhar" lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus pedidos | Ideia Tech</title>
+
+    <link rel="stylesheet" href="/Style/Style.css">
+    <link rel="stylesheet" href="/Style/Acompanhar.css">
+    <link rel="stylesheet" href="/Style/responsivo.css">
+</head>
+
+<body>
+    <header>
+        <nav aria-label="Navegação principal">
+            <ul>
+                <li><a href="/Pages/index.html">Início</a></li>
+                <li><a href="/Pages/vitrine.html">Vitrine</a></li>
+                <li><a href="/Pages/Acompanhar.html">Acompanhar serviço</a></li>
+                <li>
+                    <a href="/Pages/MeusPedidos.html" aria-current="page">
+                        Meus pedidos
+                    </a>
+                </li>
+                <li><a href="/Pages/Carrinho.html">Carrinho</a></li>
+            </ul>
+
+            <a href="/Pages/Perfil.html">Perfil</a>
+        </nav>
+    </header>
+
+    <main class="pagina-acompanhar">
+        <section class="acompanhar-topo">
+            <div>
+                <span class="texto-destaque">MINHAS COMPRAS</span>
+                <h1>Meus pedidos</h1>
+                <p>
+                    Confira os produtos comprados e o status de cada pedido.
+                    Atualize a página para consultar novas informações.
+                </p>
+            </div>
+        </section>
+
+        {% for pedido in pedidos %}
+        <section
+            class="ordem-servico"
+            aria-labelledby="pedido-{{ pedido['id'] }}"
+        >
+            <div class="ordem-cabecalho">
+                <div>
+                    <span class="texto-destaque">
+                        {{ pedido['empresa_nome'] }}
+                    </span>
+
+                    <h2 id="pedido-{{ pedido['id'] }}">
+                        Pedido #{{ pedido['id'] }}
+                    </h2>
+                </div>
+
+                <span class="status-atual">
+                    {{ pedido['status'] }}
+                </span>
+            </div>
+
+            <dl class="resumo-ordem">
+                {% for item in itens_por_pedido.get(pedido['id'], []) %}
+                <div>
+                    <dt>{{ item['nome_produto'] }}</dt>
+                    <dd>
+                        Quantidade: {{ item['quantidade'] }}
+                        · Preço unitário:
+                        R$ {{ ('%.2f' % (item['preco_unitario_centavos'] / 100)).replace('.', ',') }}
+                    </dd>
+                </div>
+                {% endfor %}
+            </dl>
+
+            <p>
+                <strong>
+                    Total:
+                    R$ {{ ('%.2f' % (pedido['total_centavos'] / 100)).replace('.', ',') }}
+                </strong>
+            </p>
+        </section>
+        {% else %}
+        <section class="ordem-servico">
+            <h2>Você ainda não tem pedidos.</h2>
+            <p>Suas compras confirmadas aparecerão aqui.</p>
+            <a href="/Pages/vitrine.html">Explorar a vitrine</a>
+        </section>
+        {% endfor %}
+    </main>
+
+    <footer>
+        <p>Ideia Tech · Projeto desenvolvido no Senac DF · 2026</p>
+    </footer>
+</body>
+
+</html>

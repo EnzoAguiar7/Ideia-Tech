@@ -583,6 +583,7 @@ def destino_permitido_para_usuario(destino, tipo):
     paginas_cliente = {
         "/Pages/Perfil.html",
         "/Pages/editarPerfil.html",
+        "/Pages/MeusPedidos.html",
     }
 
     if caminho in paginas_cliente and tipo != "cliente":
@@ -1679,6 +1680,64 @@ def criar_pedido():
         "pedidos": pedidos_criados
     }), 201
 
+
+@app.get("/Pages/MeusPedidos.html")
+def meus_pedidos():
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        return redirect("/Pages/login.html?next=/Pages/MeusPedidos.html")
+
+    if usuario["tipo"] != "cliente":
+        return redirect(pagina_inicial_usuario(usuario["tipo"]))
+
+    conexao = conectar_banco()
+
+    try:
+        pedidos = conexao.execute(
+            """
+            SELECT p.id, p.status, p.total_centavos,
+                    e.nome AS empresa_nome
+            FROM pedidos AS p
+            JOIN empresas AS e ON e.id = p.empresa_id
+            WHERE p.cliente_id = ?
+            ORDER BY p.id DESC
+            """,
+            (usuario["id"],)
+        ).fetchall()
+
+        itens = conexao.execute(
+            """
+            SELECT i.pedido_id, i.nome_produto,
+                    i.preco_unitario_centavos, i.quantidade
+            FROM itens_pedidos AS i
+            JOIN pedidos AS p ON p.id = i.pedido_id
+            WHERE p.cliente_id = ?
+            ORDER BY i.id
+            """,
+            (usuario["id"],)
+        ).fetchall()
+
+    finally:
+        conexao.close()
+
+    itens_por_pedido = {}
+
+    for item in itens:
+        itens_por_pedido.setdefault(
+            item["pedido_id"], []
+        ).append(item)
+
+    resposta = app.make_response(
+        render_template(
+            "MeusPedidos.html",
+            pedidos=pedidos,
+            itens_por_pedido=itens_por_pedido
+        )
+    )
+
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
