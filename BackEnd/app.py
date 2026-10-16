@@ -6,6 +6,7 @@ import hmac
 import smtplib
 import ssl
 import time
+import json
 from datetime import date, timedelta
 from email.message import EmailMessage
 from pathlib import Path
@@ -582,6 +583,7 @@ def destino_permitido_para_usuario(destino, tipo):
     paginas_cliente = {
         "/Pages/Perfil.html",
         "/Pages/editarPerfil.html",
+        "/Pages/MeusPedidos.html",
     }
 
     if caminho in paginas_cliente and tipo != "cliente":
@@ -922,10 +924,10 @@ def ordens_servico():
         ).fetchone()
 
         if empresa is None:
-          abort(
-            404,
-           description="Não há empresa vinculada a esta conta."
-             )
+            abort(
+                404,
+                description="Não há empresa vinculada a esta conta."
+            )
 
         if request.method == "POST":
             email = request.form.get(
@@ -1184,8 +1186,11 @@ def produtos_empresa():
         if empresa is None:
             abort(404, description="Empresa não encontrada.")
 
-        if "editar" in request.args:
-            produto_id = request.args.get("editar", type=int)
+        if request.method == "POST":
+            produto_edicao = None
+
+            if "editar" in request.args:
+                produto_id = request.args.get("editar", type=int)
 
             if produto_id is None:
                 abort(404)
@@ -1219,10 +1224,8 @@ def produtos_empresa():
                 )
             }
 
-        
-
-        if request.method == "POST":
-            campos = request.form
+                if request.method == "POST":
+                    campos = request.form
 
 
             if "editar" in request.args:
@@ -1487,8 +1490,271 @@ def catalogo_produtos_banco():
     return resposta
 
 
+@app.post("/pedidos")
+def criar_pedido():
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        return jsonify({
+            "erro":"Entre na sua conta para confirmar o pedido."
+        }),401
+
+    if usuario["tipo"] != "cliente":
+        return jsonify({
+            "erro": "Somente cliente podem realizar pedidos."
+        }),403
+
+    itens_texto = request.form.get("itens", "")
+
+    try:
+        itens_recebidos = json.loads(itens_texto)
+    except (json.JSONDecodeError, TypeError):
+        return jsonify({
+            "erro": "Os itens do pedido são inválidos"
+        }),400
+
+    if not isinstance (itens_recebidos, list) or not itens_recebidos:
+        return jsonify({
+            "erro": "O carrinho está vazio."
+        }), 400
+
+    if len (itens_recebidos) > 50:
+        return jsonify({
+            "erro": "O pedido possui itens demais."
+        }),400
+
+    quantidades = {}
+
+    for item in itens_recebidos:
+        if not isinstance (item, dict):
+            return jsonify({
+                "erro": "Existe um item inválido no carrinho."
+            }), 400
+
+        identificador = item.get("id")
+        quantidade = item.get("quantidade")
+
+        if(
+            not isinstance(identificador, str)
+            or not identificador.startswith("produto-")
+            or not isinstance(quantidade, int)
+            or isinstance(quantidade, bool)
+            or quantidade <= 0
+        ):
+
+            return jsonify({
+                "erro": "Existe um item inválido no carrinho."
+            }), 400
+
+        try:
+            produto_id = int (identificador.removeprefix("produto-"))
+
+        except ValueError:
+            return jsonify({
+                "erro": "Existe um produto inválido no carrinho"
+            }), 400
+
+        if produto_id <= 0 or produto_id in quantidades:
+            return jsonify({
+                "erro": "Existem produtos repetidos ou inválidos."
+            }),400
+
+        quantidades[produto_id] = quantidade
+
+    marcadores = ",".join("?" for _ in quantidades)
+    conexao = conectar_banco()
+
+    try:
+        conexao.execute("BEGIN IMMEDIATE")
+
+        produtos = conexao.execute(
+            f"""
+            SELECT id, empresa_id, nome, preco_centavos, estoque, ativo
+            FROM produtos
+            WHERE id IN ({marcadores})
+            """,
+            tuple(quantidades)
+        ).fetchall()
+
+        if len (produtos) != len(quantidades):
+            conexao.rollback()
+            return jsonify({
+                "erro": "Um dos produtos não está mais disponível."
+            }),400
+
+        produtos_por_empresa = {}
+
+        for produto in produtos:
+            quantidade = quantidades[produto["id"]]
+
+            if not produto["ativo"]:
+                conexao.rollback()
+                return jsonify({
+                    "erro": f"{produto['nome']} não está mais disponivel."
+                }),400
+
+            if produto ["estoque"] < quantidade:
+                conexao.rollback()
+                return jsonify({
+                    "erro": (
+                        f"Estoque insuficiente para {produto['nome']}."
+                        f"Disponível: {produto['estoque']}."
+                    )
+                }),400
+
+            produtos_por_empresa.setdefault(
+                produto["empresa_id"], []
+            ).append((produto, quantidade))
+
+        pedidos_criados = []
+
+        for empresa_id, itens_empresa in produtos_por_empresa.items():
+            total_centavos = sum(
+                produto["preco_centavos"] * quantidade
+                for produto, quantidade in itens_empresa
+            )
+
+            cursor = conexao.execute(
+                """
+                INSERT INTO pedidos (
+                empresa_id,
+                cliente_id,
+                total_centavos
+                )
+                VALUES (?, ?, ?)
+                """,
+                (
+                    empresa_id,
+                    usuario["id"],
+                    total_centavos
+                )
+            )
+
+            pedido_id = cursor.lastrowid
+
+            for produto, quantidade in itens_empresa:
+                conexao.execute(
+                    """
+                    INSERT INTO itens_pedido(
+                    pedido_id,
+                    produto_id,
+                    nome_produto,
+                    preco_unitario_centavos,
+                    quantidade)
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    (
+                        pedido_id,
+                        produto["id"],
+                        produto["nome"],
+                        produto["preco_centavos"],
+                        quantidade
+                    )
+                )
+
+                atualizacao = conexao.execute(
+                    """
+                    UPDATE produtos
+                    SET estoque = estoque - ?
+                    WHERE id = ?
+                        AND ativo = 1
+                        AND estoque >= ?
+                    """,
+                    (
+                        quantidade,
+                        produto["id"],
+                        quantidade
+                    )
+                )
+
+                if atualizacao.rowcount != 1:
+                    raise ValueError(
+                        f"Não foi possivel reservar {produto['nome']}."
+                    )
+
+            pedidos_criados.append(pedido_id)
+
+        conexao.commit()
+
+    except sqlite3.Error:
+        conexao.rollback()
+        app.logger.exception("Erro ao criar pedido.")
+        return jsonify({
+            "erro": "Não foi possível criar o pedido."
+        }), 500
+
+    except ValueError as erro:
+        conexao.rollback()
+        return jsonify({
+            "erro": str(erro)
+        }), 400
+
+    finally:
+        conexao.close()
+
+    return jsonify({
+        "mensagem": "Pedido confirmado com sucesso.",
+        "pedidos": pedidos_criados
+    }), 201
 
 
+@app.get("/Pages/MeusPedidos.html")
+def meus_pedidos():
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        return redirect("/Pages/login.html?next=/Pages/MeusPedidos.html")
+
+    if usuario["tipo"] != "cliente":
+        return redirect(pagina_inicial_usuario(usuario["tipo"]))
+
+    conexao = conectar_banco()
+
+    try:
+        pedidos = conexao.execute(
+            """
+            SELECT p.id, p.status, p.total_centavos,
+                    e.nome AS empresa_nome
+            FROM pedidos AS p
+            JOIN empresas AS e ON e.id = p.empresa_id
+            WHERE p.cliente_id = ?
+            ORDER BY p.id DESC
+            """,
+            (usuario["id"],)
+        ).fetchall()
+
+        itens = conexao.execute(
+            """
+            SELECT i.pedido_id, i.nome_produto,
+                    i.preco_unitario_centavos, i.quantidade
+            FROM itens_pedidos AS i
+            JOIN pedidos AS p ON p.id = i.pedido_id
+            WHERE p.cliente_id = ?
+            ORDER BY i.id
+            """,
+            (usuario["id"],)
+        ).fetchall()
+
+    finally:
+        conexao.close()
+
+    itens_por_pedido = {}
+
+    for item in itens:
+        itens_por_pedido.setdefault(
+            item["pedido_id"], []
+        ).append(item)
+
+    resposta = app.make_response(
+        render_template(
+            "MeusPedidos.html",
+            pedidos=pedidos,
+            itens_por_pedido=itens_por_pedido
+        )
+    )
+
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
