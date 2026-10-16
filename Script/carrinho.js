@@ -1,16 +1,17 @@
 (() => {
     const chave = 'ideiaTech.carrinho.v1';
     const catalogo = window.CatalogoProdutos;
+    let enviandoPedido = false;
     const moeda = valor => (valor / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     function ler() {
         try {
             const dados = JSON.parse(localStorage.getItem(chave) || '[]');
             if (!Array.isArray(dados)) return [];
             const vistos = new Set();
-            return dados 
-                .filter(item =>{
+            return dados
+                .filter(item => {
                     if (
-                        !item 
+                        !item
                         || !Object.hasOwn(catalogo, item.id)
                         || !Number.isInteger(item.quantidade)
                         || item.quantidade <= 0
@@ -35,7 +36,7 @@
                         catalogo[item.id].estoque
                     )
                 }));
-                
+
         } catch { return []; }
     }
     function avisar(texto) {
@@ -101,7 +102,7 @@
         });
         document.querySelector('[data-total-carrinho]').textContent = moeda(total);
         document.querySelector('[data-quantidade-resumo]').textContent = quantidade + (quantidade === 1 ? ' produto' : ' produtos');
-        document.querySelector('[data-pagar]').disabled = !itens.length || itens.some(item => catalogo[item.id].estoque < item.quantidade);
+        document.querySelector('[data-pagar]').disabled = enviandoPedido || !itens.length || itens.some(item => catalogo[item.id].estoque < item.quantidade);
     }
     document.querySelectorAll('.botao-carrinho[data-produto-id]').forEach(botao => {
         const produto = catalogo[botao.dataset.produtoId];
@@ -121,12 +122,30 @@
     });
     document.querySelector('[data-pagar]')?.addEventListener('click', async event => {
         const botao = event.currentTarget;
+        if (enviandoPedido) return;
         const itens = ler();
         if (!itens.length || itens.some(item => item.quantidade > catalogo[item.id].estoque)) { atualizar(); return; }
+        enviandoPedido = true;
         botao.disabled = true;
-        try { await window.FluxoAutenticacao.pagar(itens); }
+        try {
+            const resposta = await window.FluxoAutenticacao.pagar(itens);
+
+            if (resposta) {
+                const carrinhoLimpo = salvar([]);
+
+                if (carrinhoLimpo) {
+                    avisar(resposta.mensagem || 'Pedido confirmado com sucesso.')
+                } else {
+                    avisar(
+                        'Pedido confirmado, mas não foi possível limpar o carrinho. ' +
+                        'Não confirme o mesmo pedido novamente.'
+                    );
+                }
+            }
+
+        }
         catch (erro) { avisar(erro.message || 'Não foi possível continuar. Tente novamente.'); }
-        finally { atualizar(); }
+        finally { enviandoPedido = false; atualizar(); }
     });
     window.addEventListener('storage', event => { if (event.key === chave || event.key === null) atualizar(); });
     atualizar();

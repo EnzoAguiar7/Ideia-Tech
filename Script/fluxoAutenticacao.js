@@ -1,8 +1,48 @@
 
 (() => {
     const chave = 'ideiaTech.retornoLogin';
-    let verificarSessao = async () => false;
-    let iniciarPagamento = null;
+    let verificarSessao = null;
+    let iniciarPagamento = confirmarPedido;
+    async function confirmarPedido(itens) {
+        const respostaToken = await fetch('/csrf-token', {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { Accept: 'application/json' }
+        });
+        if (!respostaToken.ok) {
+            throw new Error('Não foi possível obter o token de segurança. Tente novamente.');
+        }
+        const token = await respostaToken.json();
+        if (typeof token.csrf_token !== 'string' || !token.csrf_token) {
+            throw new Error('Não foi possível proteger o envio do pedido. Atualize a página.');
+        }
+        const resposta = await fetch('/pedidos', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' },
+            body: new URLSearchParams({
+                csrf_token: token.csrf_token,
+                itens: JSON.stringify(itens.map(item => ({ id: item.id, quantidade: item.quantidade })))
+            })
+        });
+        const dados = await resposta.json().catch(() => null);
+        if (!resposta.ok) {
+            const erro = new Error(dados?.erro || 'Não foi possível confirmar o pedido. Atualize a página e tente novamente.');
+            erro.status = resposta.status;
+            throw erro;
+        }
+        if (!dados || !Array.isArray(dados.pedidos) || !dados.pedidos.length) {
+            throw new Error('O servidor retornou uma confirmação inválida. Confira seus pedidos antes de tentar novamente.');
+        }
+        return dados;
+    }
+    function encaminharLogin() {
+        const destino = location.href;
+        try { sessionStorage.setItem(chave, destino); } catch {}
+        const url = new URL('login.html', location.href);
+        url.searchParams.set('next', destino);
+        location.assign(url.href);
+    }
     function destinoSeguro(valor) {
         if (!valor) return null;
         try {
@@ -23,16 +63,19 @@
             if (typeof opcoes.iniciarPagamento === 'function') iniciarPagamento = opcoes.iniciarPagamento;
         },
         async pagar(itens) {
-            if (!await verificarSessao()) {
-                const destino = location.href;
-                try { sessionStorage.setItem(chave, destino); } catch {}
-                const url = new URL('login.html', location.href);
-                url.searchParams.set('next', destino);
-                location.assign(url.href);
+            if (verificarSessao && !await verificarSessao()) {
+                encaminharLogin();
                 return;
             }
-            if (!iniciarPagamento) throw new Error('O pagamento ainda não está disponível. Seu carrinho continua salvo.');
-            await iniciarPagamento(itens);
+            try {
+                return await iniciarPagamento(itens);
+            } catch (erro) {
+                if (erro.status === 401) {
+                    encaminharLogin();
+                    return;
+                }
+                throw erro;
+            }
         },
         concluirLogin() {
             const destino = retorno() || new URL('Carrinho.html', location.href).href;

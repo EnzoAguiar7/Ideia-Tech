@@ -113,13 +113,13 @@
                 <div class="field">
                     <label for="produtoNome">Nome do produto</label>
                     <input id="produtoNome" name="nome" minlength="2" maxlength="120"
-                        value="{{ campos.get('nome', '') }}" required>
+                        value="{{ request.form.get('nome', '') }}" required>
                 </div>
 
                 <div class="field">
                     <label for="produtoDescricao">Descrição</label>
                     <textarea id="produtoDescricao" name="descricao" maxlength="1000"
-                        rows="3">{{campos.get('descricao', '') }}</textarea>
+                        rows="3">{{ request.form.get('descricao', '') }}</textarea>
                 </div>
 
                 <div class="field">
