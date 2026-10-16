@@ -25,7 +25,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{ empresa['nome'] }}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -89,17 +89,21 @@
 
     <main>
         <div class="topbar">
-            <p>Área empresarial <span>/</span> <strong>Pedidos</strong></p>
-            <span class="demo-badge">
-                <span></span>Modo demonstração
-            </span>
+            <p>
+                Área empresarial <span>/</span>
+                <strong>Pedidos</strong>
+            </p>
         </div>
 
         <header class="page-heading">
             <div>
                 <p class="eyebrow">VENDAS DA ASSISTÊNCIA</p>
-                <h1>Pedidos</h1>
-                <p>Acompanhe as compras de peças e acessórios dos clientes.</p>
+                <h1>Pedidos recebidos</h1>
+                <p>
+                    Confira as compras realizadas na
+                    {{ empresa['nome'] }}.
+                    Atualize a página para consultar novos pedidos.
+                </p>
             </div>
 
             <a class="button secondary" href="/Pages/Empresa/produtos.html">
@@ -111,62 +115,78 @@
         <section class="empresa-lista" aria-labelledby="titulo-pedidos">
             <div class="empresa-lista-topo">
                 <h2 id="titulo-pedidos">Pedidos dos clientes</h2>
-                <span class="demo-badge">2 exemplos fictícios</span>
+
+                <span>
+                    {{ pedidos|length }}
+                    {{ 'pedido' if pedidos|length == 1 else 'pedidos' }}
+                </span>
             </div>
 
+            {% if pedidos %}
             <div class="empresa-tabela-wrap">
                 <table class="empresa-tabela">
                     <thead>
                         <tr>
                             <th scope="col">Pedido</th>
                             <th scope="col">Cliente</th>
-                            <th scope="col">Produto</th>
-                            <th scope="col">Quantidade</th>
-                            <th scope="col">Total</th>
+                            <th scope="col">Produtos</th>
+                            <th scope="col">Total do pedido</th>
                             <th scope="col">Situação</th>
                         </tr>
                     </thead>
 
                     <tbody>
+                        {% for pedido in pedidos %}
                         <tr>
-                            <td>#EX-001</td>
-                            <td>Cliente exemplo A</td>
-                            <td>Carregador USB-C 20W</td>
-                            <td>1</td>
-                            <td>R$ 89,90</td>
-                            <td>
-                                <span class="empresa-situacao">
-                                    Aguardando pagamento
-                                </span>
-                            </td>
-                        </tr>
+                            <th scope="row">
+                                #{{ pedido['id'] }}
+                            </th>
 
-                        <tr>
-                            <td>#EX-002</td>
-                            <td>Cliente exemplo B</td>
-                            <td>Película para Galaxy S23</td>
-                            <td>2</td>
-                            <td>R$ 59,80</td>
+                            <td>{{ pedido['cliente_nome'] }}</td>
+
+                            <td>
+                                {% for item in itens_por_pedido.get(pedido['id'], []) %}
+                                <p>
+                                    <strong>
+                                        {{ item['nome_produto'] }}
+                                    </strong>
+                                    <br>
+                                    Quantidade: {{ item['quantidade'] }}
+                                    <br>
+                                    Preço unitário:
+                                    R$ {{ ('%.2f' % (item['preco_unitario_centavos'] / 100)).replace('.', ',') }}
+                                </p>
+                                {% endfor %}
+                            </td>
+
+                            <td>
+                                R$ {{ ('%.2f' % (pedido['total_centavos'] / 100)).replace('.', ',') }}
+                            </td>
+
                             <td>
                                 <span class="empresa-situacao">
-                                    Entregue
+                                    {{ pedido['status'] }}
                                 </span>
                             </td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% else %}
+            <p>
+                Sua empresa ainda não recebeu pedidos.
+                As compras confirmadas aparecerão aqui.
+            </p>
+            {% endif %}
         </section>
-
-        <p class="demo-note">
-            Dados fictícios de demonstração. Nada é consultado ou salvo no banco.
-        </p>
 
         <footer>
             IdeiaTech
             <span>Organização para quem cuida de tecnologia.</span>
         </footer>
     </main>
+
 </body>
 
 </html>
