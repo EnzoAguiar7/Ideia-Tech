@@ -1678,63 +1678,6 @@ def criar_pedido():
     }), 201
 
 
-@app.get("/Pages/Empresa/pedidos.html")
-def pedidos_empresa():
-    usuario = buscar_usuario_sessao()
-    conexao = conectar_banco()
-
-    try:
-        empresa = conexao.execute(
-            "SELECT id FROM empresas WHERE usuario_id = ?",
-            (usuario["id"],)
-        ).fetchone()
-
-        if empresa is None:
-            abort(404, description="Não há uma empresa vinculada a esta conta.")
-
-        pedidos = conexao.execute(
-            """
-            SELECT p.id, p.status, p.total_centavos,
-                   u.nome AS cliente_nome
-            FROM pedidos AS p
-            JOIN usuarios AS u ON u.id = p.cliente_id
-            WHERE p.empresa_id = ?
-            ORDER BY p.id DESC
-            """,
-            (empresa["id"],)
-        ).fetchall()
-
-        itens = conexao.execute(
-            """
-            SELECT i.pedido_id, i.nome_produto, i.quantidade
-            FROM itens_pedido AS i
-            JOIN pedidos AS p ON p.id = i.pedido_id
-            WHERE p.empresa_id = ?
-            ORDER BY i.id
-            """,
-            (empresa["id"],)
-        ).fetchall()
-    finally:
-        conexao.close()
-
-    itens_por_pedido = {}
-
-    for item in itens:
-        itens_por_pedido.setdefault(
-            item["pedido_id"], []
-        ).append(item)
-
-    resposta = app.make_response(
-        render_template(
-            "Empresa/pedidos.html",
-            pedidos=pedidos,
-            itens_por_pedido=itens_por_pedido
-        )
-    )
-    resposta.headers["Cache-Control"] = "no-store"
-    return resposta
-
-
 @app.get("/Pages/MeusPedidos.html")
 def meus_pedidos():
     usuario = buscar_usuario_sessao()
@@ -1795,7 +1738,7 @@ def meus_pedidos():
 
 
 @app.get("/Pages/Empresa/pedidos.html")
-def pedidos_empresa():
+def listar_pedidos_empresa():
     usuario = buscar_usuario_sessao()
 
     if usuario is None:
