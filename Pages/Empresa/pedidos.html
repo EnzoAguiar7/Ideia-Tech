@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
     <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
     <link rel="stylesheet" href="/Style/Empresa/listasEmpresa.css">
+    <link rel="stylesheet" href="/Style/mensagens.css">
     <link rel="stylesheet" href="/Style/responsivo.css">
 
     <script defer src="/Script/vendor/lucide.min.js"></script>
@@ -112,6 +113,8 @@
             </a>
         </header>
 
+        {% include "_mensagens.html" %}
+
         <section class="empresa-lista" aria-labelledby="titulo-pedidos">
             <div class="empresa-lista-topo">
                 <h2 id="titulo-pedidos">Pedidos dos clientes</h2>
@@ -163,11 +166,48 @@
                                 R$ {{ ('%.2f' % (pedido['total_centavos'] / 100)).replace('.', ',') }}
                             </td>
 
+
                             <td>
                                 <span class="empresa-situacao">
                                     {{ pedido['status'] }}
                                 </span>
+
+                                {% set opcoes = transicoes_pedidos.get(pedido['status'], ()) %}
+
+                                {% if opcoes %}
+                                <form action="{{ url_for('atualizar_status_pedido', pedido_id=pedido['id']) }}"
+                                    method="POST" class="form-status-os acao-produto">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                                    <label for="status-pedido-{{ pedido['id'] }}">
+                                        Alterar situação
+                                    </label>
+
+                                    <select id="status-pedido-{{ pedido['id'] }}" name="status" required>
+                                        <option value="" selected disabled>
+                                            Selecione
+                                        </option>
+
+                                        {% for status in opcoes %}
+                                        <option value="{{ status }}">
+                                            {{ status }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <button class="button primary" type="submit">
+                                        Salvar status
+                                    </button>
+
+                                    <small>
+                                        Cancelar devolve os produtos ao estoque.
+                                    </small>
+                                </form>
+                                {% else %}
+                                <p>Pedido encerrado.</p>
+                                {% endif %}
                             </td>
+
                         </tr>
                         {% endfor %}
                     </tbody>
