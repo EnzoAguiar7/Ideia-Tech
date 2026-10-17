@@ -1,0 +1,116 @@
+/* Formulário de atendimento. Usa a paleta compartilhada de Style.css. */
+.pagina-atendimento {
+    min-height: 100vh;
+    padding: 48px 20px;
+    background: radial-gradient(ellipse at top left, #dff5ef, transparent 65%), var(--fundo-pagina);
+}
+
+.atendimento-card {
+    width: 100%;
+    max-width: 680px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: clamp(24px, 5vw, 48px);
+    border: 1px solid var(--cor-borda);
+    border-radius: 18px;
+    background: var(--cor-branca);
+    box-shadow: 0 18px 50px rgba(0, 30, 35, 0.08);
+    overflow-wrap: anywhere;
+}
+
+.atendimento-voltar {
+    display: inline-block;
+    margin-bottom: 28px;
+    color: var(--cor-primaria-escura);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.atendimento-voltar:hover {
+    text-decoration: underline;
+}
+
+.atendimento-card h1 {
+    margin-bottom: 12px;
+    font-size: clamp(1.65rem, 5vw, 2.25rem);
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+}
+
+.atendimento-card > p {
+    margin-bottom: 24px;
+}
+
+.atendimento-card > p:not(.mensagem) {
+    color: var(--cor-texto-secundario);
+}
+
+.atendimento-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.atendimento-form label {
+    margin-top: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.atendimento-form :is(input:not([type="hidden"]), select, textarea) {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 10px;
+    background: #fafcfb;
+    color: var(--cor-texto);
+    font: inherit;
+    font-size: 1rem;
+}
+
+.atendimento-form textarea {
+    min-height: 160px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.atendimento-form :is(input, textarea)::placeholder {
+    color: var(--cor-texto-secundario);
+    opacity: 1;
+}
+
+.atendimento-form :is(input, select, textarea):focus-visible,
+.atendimento-submit:focus-visible,
+.atendimento-voltar:focus-visible {
+    outline: 3px solid var(--cor-primaria-escura);
+    outline-offset: 3px;
+}
+
+.atendimento-submit {
+    width: 100%;
+    min-height: 52px;
+    margin-top: 18px;
+    padding: 14px 20px;
+    border-radius: 10px;
+    background: var(--cor-primaria);
+    color: #002d29;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.atendimento-submit:hover {
+    background: #0fb39d;
+}
+
+@media (max-width: 480px) {
+    .pagina-atendimento {
+        padding: 20px 12px;
+    }
+
+    .atendimento-card {
+        padding: 24px 18px;
+        border-radius: 12px;
+    }
+}

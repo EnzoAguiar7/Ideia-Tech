@@ -10,6 +10,37 @@ conexao = sqlite3.connect(caminho)
 conexao.execute("PRAGMA foreign_keys = ON")
 
 sql = (pasta / "schema.sql").read_text(encoding="utf-8")
+# Uma execução interrompida pode ter criado solicitacoes com a FK e o
+# valor padrão incorretos. CREATE TABLE IF NOT EXISTS não os corrige.
+tabela_solicitacoes = conexao.execute(
+    "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'solicitacoes'"
+).fetchone()
+if tabela_solicitacoes:
+    referencias = conexao.execute("PRAGMA foreign_key_list(solicitacoes)").fetchall()
+    colunas = conexao.execute("PRAGMA table_info(solicitacoes)").fetchall()
+    padrao_status = next(c[4] for c in colunas if c[1] == "status")
+    if any(r[2] == "cliente" for r in referencias) or padrao_status != "'Nova solicitação'":
+        inicio = sql.index("CREATE TABLE IF NOT EXISTS solicitacoes (")
+        fim = sql.index(";", inicio)
+        criar_tabela = sql[inicio:fim].replace(
+            "IF NOT EXISTS solicitacoes (", "solicitacoes_corrigidas (", 1
+        )
+        # A substituição inteira é transacional e preserva os registros.
+        with conexao:
+            conexao.execute("BEGIN IMMEDIATE")
+            conexao.execute(criar_tabela)
+            conexao.execute("""
+                INSERT INTO solicitacoes_corrigidas
+                    (id, empresa_id, cliente_id, aparelho, problema, status, criado_em)
+                SELECT id, empresa_id, cliente_id, aparelho, problema,
+                       CASE WHEN status = 'Nova solicitacao'
+                            THEN 'Nova solicitação' ELSE status END,
+                       criado_em
+                FROM solicitacoes
+            """)
+            conexao.execute("DROP TABLE solicitacoes")
+            conexao.execute("ALTER TABLE solicitacoes_corrigidas RENAME TO solicitacoes")
+
 conexao.executescript(sql)
 
 # CREATE TABLE IF NOT EXISTS não adiciona colunas em bancos já existentes.

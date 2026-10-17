@@ -23,7 +23,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{ empresa['nome'] }}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -73,7 +73,7 @@
     <main>
         <div class="topbar">
             <p>Área empresarial <span>/</span> <strong>Solicitações recebidas</strong></p>
-            <span class="demo-badge"><span></span>Modo demonstração</span>
+
         </div>
 
         <header class="page-heading">
@@ -84,40 +84,70 @@
             </div>
         </header>
 
+
         <section class="empresa-lista" aria-labelledby="titulo-solicitacoes">
             <div class="empresa-lista-topo">
-                <h2 id="titulo-solicitacoes">Pedidos dos clientes</h2>
-                <span class="demo-badge">2 exemplos fictícios</span>
+                <h2 id="titulo-solicitacoes">Solicitações dos clientes</h2>
+
+                <span>
+                    {{ solicitacoes|length }}
+                    {{ 'solicitação' if solicitacoes|length == 1 else 'solicitações' }}
+                </span>
             </div>
 
+            {% if solicitacoes %}
             <div class="empresa-tabela-wrap">
                 <table class="empresa-tabela">
                     <thead>
                         <tr>
+                            <th scope="col">Solicitação</th>
                             <th scope="col">Cliente</th>
                             <th scope="col">Aparelho</th>
                             <th scope="col">Problema relatado</th>
                             <th scope="col">Situação</th>
                         </tr>
                     </thead>
+
                     <tbody>
+                        {% for solicitacao in solicitacoes %}
                         <tr>
-                            <td>Cliente exemplo A</td>
-                            <td>Samsung Galaxy S23</td>
-                            <td>Tela não acende após queda.</td>
-                            <td><span class="empresa-situacao">Nova solicitação</span></td>
+                            <th scope="row">
+                                #{{ solicitacao['id'] }}
+                                <br>
+                                <small>{{ solicitacao['criado_em'] }}</small>
+                            </th>
+
+                            <td>
+                                <strong>{{ solicitacao['cliente_nome'] }}</strong>
+                                <br>
+                                {{ solicitacao['cliente_email'] }}
+                                <br>
+                                {{ solicitacao['cliente_telefone'] }}
+                            </td>
+
+                            <td>{{ solicitacao['aparelho'] }}</td>
+
+                            <td>{{ solicitacao['problema'] }}</td>
+
+                            <td>
+                                <span class="empresa-situacao">
+                                    {{ solicitacao['status'] }}
+                                </span>
+                            </td>
                         </tr>
-                        <tr>
-                            <td>Cliente exemplo B</td>
-                            <td>Notebook Dell Inspiron</td>
-                            <td>Aparelho desliga durante o uso.</td>
-                            <td><span class="empresa-situacao">Em análise</span></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% else %}
+            <p>
+                Sua empresa ainda não recebeu solicitações.
+                Os atendimentos enviados pelos clientes aparecerão aqui.
+            </p>
+            {% endif %}
         </section>
-        <p class="demo-note">Dados fictícios de demonstração. Nada é consultado ou salvo no banco.</p>
+
+
         <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span></footer>
     </main>
 </body>

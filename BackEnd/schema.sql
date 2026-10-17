@@ -6,7 +6,7 @@ CREATE TABLE if  NOT EXISTS empresas(
     cnpj TEXT UNIQUE,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
-    
+
 CREATE TABLE if NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY,
     nome TEXT NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS ordens_servico (
     id INTEGER PRIMARY KEY,
     empresa_id INTEGER NOT NULL,
     cliente_id INTEGER NOT NULL,
-    aparelho TEXT NOT NULL, 
+    aparelho TEXT NOT NULL,
     problema TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'Recebido'
         CHECK(status IN (
@@ -83,8 +83,8 @@ CREATE INDEX IF NOT EXISTS idx_ordens_cliente
 
 CREATE TABLE IF NOT EXISTS historico_ordens (
     id INTEGER PRIMARY KEY,
-    ordem_id INTEGER NOT NULL, 
-    status TEXT NOT NULL, 
+    ordem_id INTEGER NOT NULL,
+    status TEXT NOT NULL,
     observacao TEXT NOT NULL DEFAULT '',
     criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (ordem_id)
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS pedidos (
 
     FOREIGN KEY (empresa_id)
         REFERENCES empresas(id),
-    
+
     FOREIGN KEY (cliente_id)
         REFERENCES usuarios(id)
 );
@@ -158,9 +158,34 @@ CREATE TABLE IF NOT EXISTS itens_pedido(
 
 CREATE INDEX IF NOT EXISTS ixd_pedidos_empresa
     ON pedidos(empresa_id);
- 
+
 CREATE INDEX IF NOT EXISTS idx_pedidos_cliente
     ON pedidos(cliente_id);
 
 CREATE INDEX IF NOT EXISTS idx_intesn_pedido_pedido
     ON itens_pedido(pedido_id);
+
+CREATE TABLE IF NOT EXISTS solicitacoes (
+    id INTEGER PRIMARY KEY,
+    empresa_id INTEGER NOT NULL,
+    cliente_id INTEGER NOT NULL,
+    aparelho TEXT NOT NULL,
+    problema TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Nova solicitação'
+        CHECK (status IN(
+            'Nova solicitação',
+            'Em análise',
+            'Concluída',
+            'Cancelada'
+        )),
+    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (empresa_id) REFERENCES empresas(id),
+    FOREIGN KEY (cliente_id) REFERENCES usuarios(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_solicitacoes_empresa
+    ON solicitacoes(empresa_id);
+
+CREATE INDEX IF NOT EXISTS idx_solicitacoes_cliente
+    ON solicitacoes(cliente_id);
