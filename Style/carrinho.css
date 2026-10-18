@@ -67,6 +67,7 @@
     opacity: .5;
     cursor: not-allowed;
 }
+
 .item-carrinho {
     display: grid;
     grid-template-columns: 110px minmax(0, 1fr) auto;
@@ -156,6 +157,62 @@
     margin: 12px 0;
 }
 
+.consulta-frete {
+    margin: 20px 0;
+}
+
+.consulta-frete label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.consulta-frete-campo {
+    display: flex;
+    gap: 8px;
+}
+
+.consulta-frete-campo input {
+    min-width: 0;
+    flex: 1;
+    border: 1px solid var(--cor-borda);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font: inherit;
+}
+
+.consulta-frete-campo button {
+    border: 1px solid var(--cor-primaria-escura);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: white;
+    color: var(--cor-primaria-escura);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.consulta-frete-campo input:focus-visible,
+.consulta-frete-campo button:focus-visible {
+    outline: 2px solid var(--cor-primaria-escura);
+    outline-offset: 2px;
+}
+
+.consulta-frete small {
+    display: block;
+    margin-top: 8px;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.consulta-frete [data-resultado-frete] {
+    min-height: 1.4em;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
 .resumo-total {
     border-top: 1px solid var(--cor-borda);
     padding-top: 18px;
@@ -231,4 +288,50 @@
 .pagina-carrinho footer {
     min-height: 44px;
     padding: 12px 20px;
+}
+
+.endereco-entrega {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px 12px;
+    margin-top: 16px;
+}
+
+.endereco-entrega label {
+    align-self: end;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.endereco-entrega input {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font: inherit;
+}
+
+.endereco-entrega input:focus-visible {
+    outline: 2px solid var(--cor-primaria-escura);
+    outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+    .endereco-entrega {
+        grid-template-columns: 1fr;
+    }
+}
+
+.resumo-linha {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.resumo-linha strong {
+    text-align: right;
 }

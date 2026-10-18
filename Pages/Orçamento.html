@@ -31,7 +31,8 @@
                 <li><a href="Servicos.html">Serviços</a></li>
                 <li><a href="Orçamento.html">Orçamento</a></li>
                 <li><a href="Acompanhar.html">Acompanhar</a></li>
-                <li><a href="Carrinho.html" class="acesso-carrinho" aria-label="Ver carrinho"><i data-lucide="shopping-cart" aria-hidden="true"></i><span>Carrinho</span></a></li>
+                <li><a href="Carrinho.html" class="acesso-carrinho" aria-label="Ver carrinho"><i
+                            data-lucide="shopping-cart" aria-hidden="true"></i><span>Carrinho</span></a></li>
             </ul>
 
             <a href="Perfil.html">
@@ -174,7 +175,7 @@
                         <div class="campo">
                             <label for="marca">Marca</label>
 
-                            <select id="marca" required>
+                            <select id="marca" name="marca" required>
                                 <option value="">Selecione a marca</option>
                                 <option value="Apple">Apple</option>
                                 <option value="Samsung">Samsung</option>
@@ -187,12 +188,7 @@
                         <div class="campo">
                             <label for="modelo">Modelo</label>
 
-                            <input
-                                type="text"
-                                id="modelo"
-                                placeholder="Ex: iPhone 15"
-                                required
-                            >
+                            <input type="text" id="modelo" name="modelo" placeholder="Ex: iPhone 15" required>
                         </div>
 
                     </div>
@@ -200,7 +196,7 @@
                     <div class="campo">
                         <label for="categoriaProblema">O que parece estar com problema?</label>
 
-                        <select id="categoriaProblema">
+                        <select id="categoriaProblema" name="categoria_problema">
                             <option value="">Não tenho certeza</option>
                             <option value="tela">Tela ou touch</option>
                             <option value="bateria">Bateria</option>
@@ -221,19 +217,85 @@
                             </span>
                         </div>
 
-                        <textarea
-                            id="descricaoProblema"
-                            rows="6"
-                            maxlength="500"
+                        <textarea id="descricaoProblema" name="descricao_problema" rows="6" maxlength="500"
                             placeholder="Ex: Meu celular caiu no chão. A tela trincou, apareceu uma mancha preta e agora parte do touch não responde..."
-                            required
-                        ></textarea>
+                            required></textarea>
 
                         <div class="contador-texto">
                             <span>Quanto mais detalhes, melhor a análise.</span>
                             <span id="contadorCaracteres">0 / 500</span>
                         </div>
                     </div>
+
+                    <fieldset class="campo escolha-chegada">
+                        <legend>Como o aparelho chegará à loja?</legend>
+
+                        <label class="opcao-chegada" for="entrada-coleta">
+                            <input id="entrada-coleta" type="radio" name="modalidade_entrada" value="coleta" required>
+                            <span>Quero solicitar a busca do aparelho</span>
+                        </label>
+
+                        <label class="opcao-chegada" for="entrada-loja">
+                            <input id="entrada-loja" type="radio" name="modalidade_entrada" value="loja">
+                            <span>Vou levar o aparelho à loja</span>
+                        </label>
+
+                        <small id="ajuda-modalidade-entrada">
+                            A busca do aparelho está disponível somente em endereços a até 10 km da loja.
+                        </small>
+                    </fieldset>
+
+                    <fieldset class="campo endereco-coleta" data-endereco-coleta hidden disabled>
+                        <legend>Endereço para buscar o aparelho</legend>
+
+                        <p id="ajuda-endereco-coleta">
+                            A busca está disponível em endereços a até 10 km da loja.
+                        </p>
+
+                        <div class="grupo-campos">
+                            <div class="campo">
+                                <label for="cep-coleta">CEP</label>
+                                <input id="cep-coleta" name="cep_coleta" type="text" inputmode="numeric"
+                                    autocomplete="postal-code" maxlength="9" placeholder="00000-000" required>
+                                <small id="status-cep-coleta" role="status" aria-live="polite"></small>
+                            </div>
+
+                            <div class="campo">
+                                <label for="logradouro-coleta">Rua ou avenida</label>
+                                <input id="logradouro-coleta" name="logradouro_coleta" type="text"
+                                    autocomplete="address-line1" required>
+                            </div>
+
+                            <div class="campo">
+                                <label for="numero-coleta">Número</label>
+                                <input id="numero-coleta" name="numero_coleta" type="text" required>
+                            </div>
+
+                            <div class="campo">
+                                <label for="complemento-coleta">Complemento</label>
+                                <input id="complemento-coleta" name="complemento_coleta" type="text"
+                                    autocomplete="address-line2">
+                            </div>
+
+                            <div class="campo">
+                                <label for="bairro-coleta">Bairro</label>
+                                <input id="bairro-coleta" name="bairro_coleta" type="text" required>
+                            </div>
+
+                            <div class="campo">
+                                <label for="cidade-coleta">Cidade</label>
+                                <input id="cidade-coleta" name="cidade_coleta" type="text" autocomplete="address-level2"
+                                    required>
+                            </div>
+
+                            <div class="campo">
+                                <label for="uf-coleta">Estado (UF)</label>
+                                <input id="uf-coleta" name="uf_coleta" type="text" autocomplete="address-level1"
+                                    maxlength="2" pattern="[A-Za-z]{2}"
+                                    title="Digite a sigla do estado com duas letras." required>
+                            </div>
+                        </div>
+                    </fieldset>
 
                     <button type="submit" class="botao-analisar" id="botaoAnalisar">
                         <span>Analisar com Ideia AI</span>
@@ -427,12 +489,12 @@
 
     <footer>
 
-   <p>Ideia Tech · Projeto desenvolvido no Senac DF · 2026</p>
+        <p>Ideia Tech · Projeto desenvolvido no Senac DF · 2026</p>
 
 
     </footer>
-</body>
 
+    <script defer src="/Script/fluxoServico.js"></script>
 </body>
 
 </html>

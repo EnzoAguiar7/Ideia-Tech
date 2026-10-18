@@ -35,7 +35,7 @@
     </header>
 
     <main class="carrinho-conteudo">
-        
+
         <div class="carrinho-titulo">
             <span class="texto-destaque">SUA COMPRA</span>
             <h1>Meu carrinho</h1>
@@ -62,10 +62,59 @@
                 <h2>Resumo da compra</h2>
 
                 <p data-quantidade-resumo>0 produtos</p>
-                <div class="resumo-total"><span>Total dos produtos</span><strong data-total-carrinho>R$ 0,00</strong>
+                <form class="consulta-frete" data-forma-frete>
+                    <label for="cep-entrega">CEP de entrega</label>
+                    <div class="consulta-frete-campo">
+                        <input id="cep-entrega" name="cep" type="text" inputmode="numeric" autocomplete="postal-code"
+                            maxlength="9" placeholder="00000-000" aria-describedby="frete-ajuda frete-resultado">
+                        <button type="button" data-consultar-cep="">Buscar endereço</button>
+                    </div>
+
+                    <div class="endereco-entrega">
+                        <label for="logradouro-entrega">Rua ou avenida</label>
+                        <input id="logradouro-entrega" name="logradouro" type="text" autocomplete="address-line1"
+                            required>
+
+                        <label for="numero-entrega">Número</label>
+                        <input id="numero-entrega" name="numero" type="text" required>
+
+                        <label for="complemento-entrega">Complemento</label>
+                        <input id="complemento-entrega" name="complemento" type="text" autocomplete="address-line2">
+
+                        <label for="bairro-entrega">Bairro</label>
+                        <input id="bairro-entrega" name="bairro" type="text" required>
+
+                        <label for="cidade-entrega">Cidade</label>
+                        <input id="cidade-entrega" name="cidade" type="text" autocomplete="address-level2" required>
+
+                        <label for="uf-entrega">Estado (UF)</label>
+                        <input id="uf-entrega" name="uf" type="text" autocomplete="address-level1" maxlength="2"
+                            pattern="[A-Za-z]{2}" title="Digite a sigla do estado com duas letras." required>
+                    </div>
+
+                    <button type="submit" class="carrinho-botao">Salvar endereço</button>
+
+                    <small id="frete-ajuda">Entregamos produtos para todo o Brasil. O frete será definido pela faixa de
+                        CEP ou região.</small>
+                    <p id="frete-resultado" data-resultado-frete role="status" aria-live="polite">Informe o CEP para
+                        consultar a região de entrega.</p>
+                </form>
+                <div class="resumo-linha">
+
+                    <span>Produtos</span>
+                    <strong data-total-carrinho>R$ 0,00</strong>
                 </div>
 
-                <p>Frete não incluído.</p>
+                <div class="resumo-linha">
+                    <span>Frete</span>
+                    <strong data-valor-frete>Aguardando CEP</strong>
+                </div>
+
+                <div class="resumo-total">
+                    <span>Total do pedido</span>
+                    <strong data-total-pedido>Aguardando cotação</strong>
+                </div>
+
                 <button type="button" class="carrinho-botao" data-pagar disabled>Confirmar pedido</button>
                 <p>Para confirmar o pedido, entre na sua conta ou crie uma. Seu carrinho será mantido.</p>
             </aside>
@@ -77,7 +126,7 @@
     <footer>
 
         <p>Ideia Tech · Projeto desenvolvido no Senac DF · 2026</p>
-        
+
     </footer>
 
 </body>

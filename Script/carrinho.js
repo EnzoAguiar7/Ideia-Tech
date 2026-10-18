@@ -1,5 +1,6 @@
 (() => {
     const chave = 'ideiaTech.carrinho.v1';
+    const chaveEnderecoEntrega = 'ideiaTech.enderecoEntrega.v1';
     const catalogo = window.CatalogoProdutos;
     let enviandoPedido = false;
     const moeda = valor => (valor / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -103,6 +104,145 @@
         document.querySelector('[data-total-carrinho]').textContent = moeda(total);
         document.querySelector('[data-quantidade-resumo]').textContent = quantidade + (quantidade === 1 ? ' produto' : ' produtos');
         document.querySelector('[data-pagar]').disabled = enviandoPedido || !itens.length || itens.some(item => catalogo[item.id].estoque < item.quantidade);
+    }
+
+    const formularioFrete = document.querySelector('[data-forma-frete]');
+    const campoCep = formularioFrete?.querySelector('[name="cep"]');
+    const resultadoFrete = document.querySelector('[data-resultado-frete]');
+    const botaoConsultarCep = formularioFrete?.querySelector('[data-consultar-cep]');
+
+
+    if (formularioFrete && campoCep && resultadoFrete && botaoConsultarCep) {
+        function formatarCep() {
+            const numeros = campoCep.value.replace(/\D/g, '').slice(0, 8);
+
+            campoCep.value = numeros.length > 5
+                ? numeros.slice(0, 5) + '-' + numeros.slice(5)
+                : numeros;
+        }
+
+        try {
+            const enderecoSalvo = JSON.parse(
+                sessionStorage.getItem(chaveEnderecoEntrega) || 'null'
+            );
+
+            if (
+                enderecoSalvo
+                && typeof enderecoSalvo === 'object'
+                && !Array.isArray(enderecoSalvo)
+            ) {
+                formularioFrete.querySelectorAll('[name]').forEach(campo => {
+                    if (typeof enderecoSalvo[campo.name] === 'string') {
+                        campo.value = enderecoSalvo[campo.name];
+                    }
+                });
+            }
+        } catch { }
+
+        formatarCep();
+        campoCep.addEventListener('input', formatarCep);
+
+        async function consultarCep() {
+            const cep = campoCep.value.replace(/\D/g, '');
+
+            if (!/^\d{8}$/.test(cep)) {
+                resultadoFrete.textContent = 'Informe um CEP válido com 8 números.';
+                campoCep.setAttribute('aria-invalid', 'true');
+                campoCep.focus();
+                return;
+            }
+
+            campoCep.removeAttribute('aria-invalid');
+            botaoConsultarCep.disabled = true;
+            resultadoFrete.textContent = 'Consultando o CEP...';
+
+            try {
+                const resposta = await fetch(
+                    `https://viacep.com.br/ws/${cep}/json/`
+                );
+
+                if (!resposta.ok) {
+                    throw new Error('Não foi possível consultar o CEP agora.');
+                }
+
+                const enderecoApi = await resposta.json();
+
+                if (enderecoApi.erro) {
+                    throw new Error('CEP não encontrado. Confira o número digitado.');
+                }
+
+                if (campoCep.value.replace(/\D/g, '') !== cep) {
+                    resultadoFrete.textContent =
+                        'O CEP foi alterado durante a consulta. Consulte novamente.';
+                    return;
+                }
+
+                const camposParaPreencher = {
+                    logradouro: enderecoApi.logradouro,
+                    bairro: enderecoApi.bairro,
+                    cidade: enderecoApi.localidade,
+                    uf: enderecoApi.uf
+                };
+
+                Object.entries(camposParaPreencher).forEach(([nome, valor]) => {
+                    const campo = formularioFrete.elements.namedItem(nome);
+
+                    if (
+                        campo
+                        && typeof valor === 'string'
+                        && valor.trim()
+                    ) {
+                        campo.value = valor;
+                    }
+                });
+
+                resultadoFrete.textContent =
+                    'Endereço localizado. Confira os dados e preencha o número.';
+            } catch (erro) {
+                resultadoFrete.textContent =
+                    erro.message || 'Falha ao consultar o CEP. Tente novamente.';
+            } finally {
+                botaoConsultarCep.disabled = false;
+            }
+        }
+
+        botaoConsultarCep.addEventListener('click', consultarCep);
+
+        formularioFrete.addEventListener('submit', event => {
+            event.preventDefault();
+
+            const cep = campoCep.value.replace(/\D/g, '');
+
+            if (!/^\d{8}$/.test(cep)) {
+                resultadoFrete.textContent = 'Informe um CEP válido com 8 números.';
+                campoCep.setAttribute('aria-invalid', 'true');
+                campoCep.focus();
+                return;
+            }
+
+            campoCep.removeAttribute('aria-invalid');
+
+            const endereco = Object.fromEntries(
+                new FormData(formularioFrete).entries()
+            );
+
+            endereco.cep = cep;
+            endereco.uf = (endereco.uf || '').trim().toUpperCase();
+
+            let enderecoGuardado = false;
+
+            try {
+                sessionStorage.setItem(
+                    chaveEnderecoEntrega,
+                    JSON.stringify(endereco)
+                );
+                enderecoGuardado = true;
+            } catch { }
+
+            resultadoFrete.textContent = enderecoGuardado
+                ? 'Endereço guardado nesta sessão. A consulta do valor depende do cadastro das faixas regionais de frete.'
+                : 'Endereço preenchido. A consulta do valor depende do cadastro das faixas regionais de frete.';
+        });
     }
     document.querySelectorAll('.botao-carrinho[data-produto-id]').forEach(botao => {
         const produto = catalogo[botao.dataset.produtoId];

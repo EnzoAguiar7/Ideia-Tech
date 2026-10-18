@@ -363,7 +363,10 @@ def validar_csrf():
     if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
         return
 
-    token_enviado = request.form.get("csrf_token", "")
+    token_enviado = (
+        request.form.get("csrf_token", "")
+        or request.headers.get("X-CSRF-Token", "")
+    )
     token_esperado = session.get("csrf_token", "")
 
     if not token_enviado or not token_esperado:
@@ -1676,63 +1679,6 @@ def criar_pedido():
         "mensagem": "Pedido confirmado com sucesso.",
         "pedidos": pedidos_criados
     }), 201
-
-
-@app.get("/Pages/Empresa/pedidos.html")
-def pedidos_empresa():
-    usuario = buscar_usuario_sessao()
-    conexao = conectar_banco()
-
-    try:
-        empresa = conexao.execute(
-            "SELECT id FROM empresas WHERE usuario_id = ?",
-            (usuario["id"],)
-        ).fetchone()
-
-        if empresa is None:
-            abort(404, description="Não há uma empresa vinculada a esta conta.")
-
-        pedidos = conexao.execute(
-            """
-            SELECT p.id, p.status, p.total_centavos,
-                   u.nome AS cliente_nome
-            FROM pedidos AS p
-            JOIN usuarios AS u ON u.id = p.cliente_id
-            WHERE p.empresa_id = ?
-            ORDER BY p.id DESC
-            """,
-            (empresa["id"],)
-        ).fetchall()
-
-        itens = conexao.execute(
-            """
-            SELECT i.pedido_id, i.nome_produto, i.quantidade
-            FROM itens_pedido AS i
-            JOIN pedidos AS p ON p.id = i.pedido_id
-            WHERE p.empresa_id = ?
-            ORDER BY i.id
-            """,
-            (empresa["id"],)
-        ).fetchall()
-    finally:
-        conexao.close()
-
-    itens_por_pedido = {}
-
-    for item in itens:
-        itens_por_pedido.setdefault(
-            item["pedido_id"], []
-        ).append(item)
-
-    resposta = app.make_response(
-        render_template(
-            "Empresa/pedidos.html",
-            pedidos=pedidos,
-            itens_por_pedido=itens_por_pedido
-        )
-    )
-    resposta.headers["Cache-Control"] = "no-store"
-    return resposta
 
 
 @app.get("/Pages/MeusPedidos.html")

@@ -836,3 +836,62 @@ nav ul li:nth-child(4) a::after {
         transform: translateX(230%);
     }
 }
+
+.escolha-chegada {
+    min-width: 0;
+    margin: 0 0 22px;
+    padding: 0;
+    border: 0;
+}
+
+.escolha-chegada legend {
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.opcao-chegada {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 8px 0;
+    padding: 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.opcao-chegada input {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    margin: 3px 0 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.escolha-chegada small {
+    display: block;
+    margin-top: 8px;
+    color: var(--cor-texto-secundario);
+    line-height: 1.5;
+}
+
+.endereco-coleta {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+}
+
+.endereco-coleta legend {
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.endereco-coleta > p {
+    margin: 0 0 16px;
+    color: var(--cor-texto-secundario);
+    font-size: 12px;
+    line-height: 1.5;
+}
