@@ -156,5 +156,93 @@ class PedidosTest(unittest.TestCase):
         self.verificar_sem_alteracoes()
 
 
+
+    def criar_pedido_status(self):
+        resposta = self.enviar([{"id": "produto-1", "quantidade": 2}])
+        self.assertEqual(resposta.status_code, 201)
+        return resposta.get_json()["pedidos"][0]
+
+    def alterar_status(self, pedido_id, status, token="token-teste"):
+        return self.cliente.post(
+            f"/Pages/Empresa/pedidos/{pedido_id}/status",
+            data={"status": status, "csrf_token": token},
+        )
+
+    def test_avanca_status_e_exibe_para_cliente(self):
+        pedido_id = self.criar_pedido_status()
+        self.autenticar(1)
+        pagina = self.cliente.get("/Pages/Empresa/pedidos.html")
+        self.assertEqual(pagina.status_code, 200)
+        html = pagina.get_data(as_text=True)
+        self.assertIn(f'/Pages/Empresa/pedidos/{pedido_id}/status', html)
+        self.assertIn('name="csrf_token"', html)
+        for status in ["Em separação", "Pronto para retirada", "Entregue"]:
+            resposta = self.alterar_status(pedido_id, status)
+            self.assertEqual(resposta.status_code, 302)
+            self.assertEqual(resposta.location, "/Pages/Empresa/pedidos.html")
+            self.assertEqual(self.consultar("SELECT status FROM pedidos"), [(status,)])
+        self.assertEqual(self.consultar("SELECT estoque FROM produtos WHERE id = 1"), [(8,)])
+        self.autenticar(3)
+        pagina = self.cliente.get("/Pages/MeusPedidos.html")
+        self.assertEqual(pagina.status_code, 200)
+        self.assertIn("Entregue", pagina.get_data(as_text=True))
+        self.autenticar(1)
+        self.alterar_status(pedido_id, "Cancelado")
+        self.assertEqual(self.consultar("SELECT status FROM pedidos"), [("Entregue",)])
+        self.assertEqual(self.consultar("SELECT estoque FROM produtos WHERE id = 1"), [(8,)])
+
+    def test_cancelamento_devolve_estoque_uma_vez(self):
+        pedido_id = self.criar_pedido_status()
+        self.autenticar(1)
+        resposta = self.alterar_status(pedido_id, "Cancelado")
+        self.assertEqual(resposta.status_code, 302)
+        pagina = self.cliente.get(resposta.location)
+        self.assertIn("produtos foram devolvidos", pagina.get_data(as_text=True))
+        self.assertIn("Pedido encerrado", pagina.get_data(as_text=True))
+        for status in ["Cancelado", "Recebido", "Em separação"]:
+            self.alterar_status(pedido_id, status)
+        self.assertEqual(self.consultar("SELECT status FROM pedidos"), [("Cancelado",)])
+        self.assertEqual(self.consultar("SELECT estoque FROM produtos WHERE id = 1"), [(10,)])
+
+    def test_status_rejeita_salto_retrocesso_e_valor_invalido(self):
+        pedido_id = self.criar_pedido_status()
+        self.autenticar(1)
+        for status in ["Entregue", "Pronto para retirada", "Inexistente", ""]:
+            self.alterar_status(pedido_id, status)
+            self.assertEqual(self.consultar("SELECT status FROM pedidos"), [("Recebido",)])
+        self.alterar_status(pedido_id, "Em separação")
+        self.alterar_status(pedido_id, "Recebido")
+        self.assertEqual(self.consultar("SELECT status FROM pedidos"), [("Em separação",)])
+        self.alterar_status(pedido_id, "Cancelado")
+        self.assertEqual(self.consultar("SELECT estoque FROM produtos WHERE id = 1"), [(10,)])
+
+    def test_status_acesso_empresa_e_csrf(self):
+        pedido_id = self.criar_pedido_status()
+        self.assertEqual(self.alterar_status(pedido_id, "Cancelado").status_code, 403)
+        self.autenticar(2)
+        self.assertEqual(self.alterar_status(pedido_id, "Cancelado").status_code, 404)
+        self.autenticar(1)
+        self.assertEqual(self.alterar_status(pedido_id, "Cancelado", token="").status_code, 400)
+        self.assertEqual(self.alterar_status(99999, "Cancelado").status_code, 404)
+        self.autenticar(None)
+        self.assertEqual(self.alterar_status(pedido_id, "Cancelado").status_code, 302)
+        self.assertEqual(self.consultar("SELECT status FROM pedidos"), [("Recebido",)])
+        self.assertEqual(self.consultar("SELECT estoque FROM produtos WHERE id = 1"), [(8,)])
+
+    def test_cancelamento_reverte_estoque_se_status_falhar(self):
+        pedido_id = self.criar_pedido_status()
+        self.autenticar(1)
+        with closing(sqlite3.connect(self.banco)) as conexao, conexao:
+            conexao.executescript("""
+                CREATE TRIGGER impedir_status BEFORE UPDATE OF status ON pedidos
+                BEGIN SELECT RAISE(ABORT, 'falha de teste'); END;
+            """)
+        with self.assertLogs(servidor.app.logger, level="ERROR"):
+            resposta = self.alterar_status(pedido_id, "Cancelado")
+        self.assertEqual(resposta.status_code, 302)
+        self.assertEqual(self.consultar("SELECT status FROM pedidos"), [("Recebido",)])
+        self.assertEqual(self.consultar("SELECT estoque FROM produtos WHERE id = 1"), [(8,)])
+
+
 if __name__ == "__main__":
     unittest.main()

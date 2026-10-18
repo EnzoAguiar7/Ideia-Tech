@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Solicitar atendimento | IdeiaTech</title>
+
+    <link rel="stylesheet" href="/Style/Style.css">
+    <link rel="stylesheet" href="/Style/solicitarAtendimento.css">
+    <link rel="stylesheet" href="/Style/mensagens.css">
+</head>
+
+<body class="pagina-atendimento">
+    <main class="atendimento-card">
+        <a class="atendimento-voltar" href="/Pages/Servicos.html">← Voltar aos serviços</a>
+
+        <h1>Solicitar atendimento</h1>
+        <p>
+            Escolha uma assistência e descreva o problema do aparelho.
+        </p>
+
+        {% include "_mensagens.html" %}
+
+        {% if erro %}
+        <p class="mensagem mensagem--erro" role="alert">
+            {{ erro }}
+        </p>
+        {% endif %}
+
+        {% if empresas %}
+        <form
+            action="{{ url_for('solicitar_atendimento') }}"
+            method="POST"
+            class="atendimento-form"
+        >
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token }}"
+            >
+
+            <label for="empresa">Assistência</label>
+            <select id="empresa" name="empresa_id" required>
+                <option value="">Selecione a assistência</option>
+
+                {% for empresa in empresas %}
+                <option
+                    value="{{ empresa['id'] }}"
+                    {% if request.form.get('empresa_id') == empresa['id']|string %}
+                    selected
+                    {% endif %}
+                >
+                    {{ empresa['nome'] }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <label for="aparelho">Marca e modelo do aparelho</label>
+            <input
+                id="aparelho"
+                name="aparelho"
+                type="text"
+                minlength="2"
+                maxlength="150"
+                placeholder="Ex.: Samsung Galaxy S23"
+                value="{{ request.form.get('aparelho', '') }}"
+                required
+            >
+
+            <label for="problema">Descreva o problema</label>
+            <textarea
+                id="problema"
+                name="problema"
+                rows="6"
+                minlength="10"
+                maxlength="2000"
+                placeholder="Explique o que aconteceu e os sintomas."
+                required
+            >{{ request.form.get('problema', '') }}</textarea>
+
+            <button type="submit" class="atendimento-submit">
+                Enviar solicitação
+            </button>
+        </form>
+        {% elif not erro %}
+        <p>Nenhuma assistência está disponível no momento.</p>
+        {% endif %}
+    </main>
+</body>
+</html>

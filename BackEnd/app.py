@@ -1740,8 +1740,16 @@ def meus_pedidos():
     return resposta
 
 
+TRANSICOES_PEDIDOS = {
+    "Recebido": ("Em separação", "Cancelado"),
+    "Em separação": ("Pronto para retirada", "Cancelado"),
+    "Pronto para retirada": ("Entregue", "Cancelado"),
+    "Entregue": (),
+    "Cancelado":(),
+    }
+
 @app.get("/Pages/Empresa/pedidos.html")
-def pedidos_empresa():
+def listar_pedidos_empresa():
     usuario = buscar_usuario_sessao()
 
     if usuario is None:
@@ -1802,17 +1810,233 @@ def pedidos_empresa():
             item["pedido_id"],[]
         ).append(item)
 
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_urlsafe(32)
+
     resposta = app.make_response(
         render_template(
             "Empresa/pedidos.html",
             empresa=empresa,
             pedidos=pedidos,
-            itens_por_pedido=itens_por_pedido
+            itens_por_pedido=itens_por_pedido,
+            transicoes_pedidos=TRANSICOES_PEDIDOS,
+            csrf_token=session["csrf_token"],
         )
     )
 
     resposta.headers["Cache-Control"] = "no-store"
     return resposta
+
+
+@app.post("/Pages/Empresa/pedidos/<int:pedido_id>/status")
+def atualizar_status_pedido(pedido_id):
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        return redirect(
+            "/Pages/login.html?next=/Pages/Empresa/pedidos.html"
+        )
+
+    if usuario["tipo"] != "empresa":
+        abort(403)
+
+    novo_status = request.form.get("status", "").strip()
+    conexao = conectar_banco()
+
+    try:
+        conexao.execute("BEGIN IMMEDIATE")
+
+        pedido = conexao.execute(
+            """
+            SELECT p.id, p.status
+            FROM pedidos AS p
+            JOIN empresas AS e ON e.id = p.empresa_id
+            WHERE p.id = ? AND e.usuario_id = ?
+            """,
+            (pedido_id, usuario["id"]),
+        ).fetchone()
+
+        if pedido is None:
+            abort(404)
+
+        permitidos = TRANSICOES_PEDIDOS.get(pedido["status"], ())
+
+        if novo_status not in permitidos:
+            conexao.rollback()
+            flash(
+                "Essa mudança não é permitida. "
+                "Confira a situação atual do pedido.",
+                "erro",
+            )
+            return redirect("/Pages/Empresa/pedidos.html")
+
+        if novo_status == "Cancelado":
+            itens = conexao.execute(
+                """
+                SELECT produto_id, quantidade
+                FROM itens_pedido
+                WHERE pedido_id = ?
+                """,
+                (pedido_id,),
+            ).fetchall()
+
+            for item in itens:
+                atualizacao = conexao.execute(
+                    """
+                    UPDATE produtos
+                    SET estoque = estoque + ?
+                    WHERE id = ?
+                    """,
+                    (item["quantidade"], item["produto_id"]),
+                )
+
+                if atualizacao.rowcount != 1:
+                    raise ValueError(
+                        "Não foi possível devolver um produto ao estoque."
+                    )
+
+        conexao.execute(
+            """
+            UPDATE pedidos
+            SET status = ?, atualizado_em = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (novo_status, pedido_id),
+        )
+
+        conexao.commit()
+
+    except (sqlite3.Error, ValueError):
+        conexao.rollback()
+        app.logger.exception("Erro ao atualizar o pedido.")
+        flash(
+            "Não foi possível atualizar o pedido. Tente novamente.",
+            "erro",
+        )
+
+        return redirect("/Pages/Empresa/pedidos.html")
+
+    finally:
+        conexao.close()
+
+    if novo_status == "Cancelado":
+        flash(
+            "Pedido cancelado. Os produtos foram devolvidos ao estoque.",
+            "sucesso"
+        )
+
+    else:
+        flash("Status do pedido atualizado com sucesso.", "sucesso")
+
+    return redirect("/Pages/Empresa/pedidos.html")
+
+
+@app.route("/Pages/solicitarAtendimento.html", methods=["GET", "POST"])
+def solicitar_atendimento():
+    usuario = buscar_usuario_sessao()
+    if usuario is None:
+        return redirect("/Pages/login.html?next=/Pages/solicitarAtendimento.html")
+    if usuario["tipo"] != "cliente":
+        abort(403)
+
+    erro = None
+    codigo_resposta = 200
+    empresas = []
+    conexao = conectar_banco()
+    try:
+        empresas = conexao.execute(
+            """
+            SELECT e.id, e.nome
+            FROM empresas AS e
+            JOIN usuarios AS u ON u.id = e.usuario_id
+            WHERE u.tipo = 'empresa'
+            ORDER BY e.nome, e.id
+            """
+        ).fetchall()
+
+        if request.method == "POST":
+            empresa_id = request.form.get("empresa_id", type=int)
+            aparelho = request.form.get("aparelho", "").strip()
+            problema = request.form.get("problema", "").strip()
+            empresas_validas = {empresa["id"] for empresa in empresas}
+
+            if empresa_id not in empresas_validas:
+                erro = "Selecione uma assistência válida."
+            elif not 2 <= len(aparelho) <= 150:
+                erro = "Informe o aparelho usando entre 2 e 150 caracteres."
+            elif not 10 <= len(problema) <= 2000:
+                erro = "Descreva o problema usando entre 10 e 2000 caracteres."
+
+            if erro:
+                codigo_resposta = 400
+            else:
+                conexao.execute(
+                    """
+                    INSERT INTO solicitacoes (empresa_id, cliente_id, aparelho, problema)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (empresa_id, usuario["id"], aparelho, problema),
+                )
+                conexao.commit()
+                flash("Solicitação enviada à assistência com sucesso.", "sucesso")
+                return redirect("/Pages/solicitarAtendimento.html")
+    except sqlite3.Error:
+        conexao.rollback()
+        app.logger.exception("Erro ao registrar solicitação.")
+        erro = "Não foi possível processar a solicitação. Tente novamente."
+        codigo_resposta = 500
+    finally:
+        conexao.close()
+
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_urlsafe(32)
+    resposta = app.make_response((
+        render_template(
+            "solicitarAtendimento.html", empresas=empresas, erro=erro,
+            csrf_token=session["csrf_token"],
+        ),
+        codigo_resposta,
+    ))
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
+
+
+@app.get("/Pages/Empresa/solicitacoes.html")
+def listar_solicitacoes_empresa():
+    usuario = buscar_usuario_sessao()
+    if usuario is None:
+        return redirect("/Pages/login.html?next=/Pages/Empresa/solicitacoes.html")
+    if usuario["tipo"] != "empresa":
+        abort(403)
+
+    conexao = conectar_banco()
+    try:
+        empresa = conexao.execute(
+            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
+            (usuario["id"],),
+        ).fetchone()
+        if empresa is None:
+            abort(404, description="Empresa não encontrada.")
+        solicitacoes = conexao.execute(
+            """
+            SELECT s.id, s.aparelho, s.problema, s.status, s.criado_em,
+                   u.nome AS cliente_nome, u.email AS cliente_email,
+                   u.telefone AS cliente_telefone
+            FROM solicitacoes AS s
+            JOIN usuarios AS u ON u.id = s.cliente_id
+            WHERE s.empresa_id = ?
+            ORDER BY s.id DESC
+            """,
+            (empresa["id"],),
+        ).fetchall()
+    finally:
+        conexao.close()
+    resposta = app.make_response(render_template(
+        "Empresa/solicitacoes.html", empresa=empresa, solicitacoes=solicitacoes,
+    ))
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
