@@ -1285,6 +1285,21 @@ def ordens_servico():
         ).fetchone()
 
         if empresa is None:
+            abort(404, description="Empresa não encontrada.")
+
+        aparelhos = conexao.execute(
+            """
+            SELECT o.id, o.aparelho, o.problema, o.previsao, o.status,
+                   u.nome AS cliente_nome
+            FROM ordens_servico AS o
+            JOIN usuarios AS u ON u.id = o.cliente_id
+            WHERE o.empresa_id = ?
+            ORDER BY o.id DESC
+            """,
+            (empresa["id"],)
+        ).fetchall()
+
+        if empresa is None:
             abort(
                 404,
                 description="Não há empresa vinculada a esta conta."
@@ -2489,11 +2504,7 @@ def listar_solicitacoes_empresa():
     resposta.headers["Cache-Control"] = "no-store"
     return resposta
 
-from orcamentos import registrar_rotas_orcamentos
 
-registrar_rotas_orcamentos(
-    app, conectar_banco, buscar_usuario_sessao
-)
 
 @app.route("/Pages/Empresa/aparelhosCadastrados.html")
 def aparelhos_cadastrados():
@@ -2521,6 +2532,92 @@ def aparelhos_cadastrados():
         empresa=empresa,
         aparelhos=aparelhos
     )
+
+@app.get("/Pages/Empresa/painelEmpresa.html")
+def painel_empresa():
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        return redirect("/Pages/login.html")
+
+    if usuario["tipo"] != "empresa":
+        abort(403)
+
+    conexao = conectar_banco()
+
+    try:
+        empresa = conexao.execute(
+            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
+            (usuario["id"],)
+        ).fetchone()
+
+        if empresa is None:
+            abort(404, description="Empresa não encontrada.")
+
+        metricas = conexao.execute(
+            """
+            SELECT
+                SUM(
+                    CASE
+                        WHEN status IN (
+                        'Recebido',
+                        'Em diagnóstico',
+                        'Aguardando aprovação',
+                        'Em reparo'
+                        ) THEN 1
+                        ELSE 0
+                    END
+                ) AS servicos_ativos,
+
+                SUM(
+                 CASE
+                    WHEN status = 'Aguardando aprovação'
+                    THEN 1
+                    ELSE 0
+                 END
+                ) AS orcamentos_pendentes,
+
+                SUM(
+                    CASE
+                        WHEN status = 'Pronto para retirada'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS prontos_retirada
+
+            FROM ordens_servico
+            WHERE empresa_id = ?
+            """,
+            (empresa["id"],)
+        ).fetchone()
+
+        ordens_recentes = conexao.execute(
+            """
+            SELECT id, aparelho, status, previsao
+            FROM ordens_servico
+            WHERE empresa_id = ?
+            ORDER BY id DESC
+            LIMIT 5
+            """,
+            (empresa["id"],)
+        ).fetchall()
+
+    finally:
+        conexao.close()
+
+    return render_template(
+        "Empresa/painelEmpresa.html",
+        empresa=empresa,
+        metricas=metricas,
+        ordens_recentes=ordens_recentes
+    )
+
+from orcamentos import registrar_rotas_orcamentos
+
+registrar_rotas_orcamentos(
+    app, conectar_banco, buscar_usuario_sessao
+)
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)

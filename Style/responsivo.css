@@ -123,6 +123,14 @@
         padding: 13px 0;
     }
 
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .logout-form {
+        width: 100%;
+    }
+
+:where(html[data-responsive~="Empresa/painelEmpresa"]) .logout-button {
+        width: 100%;
+    }
+
 :where(html[data-responsive~="Empresa/painelEmpresa"]) .welcome-banner {
         padding: 24px;
     }

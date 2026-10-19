@@ -21,7 +21,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{ empresa["nome"] }}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -73,9 +73,12 @@
         <div class="topbar">
             <p>Área empresarial <span>/</span> <strong>Visão geral</strong>
             </p>
-            <span class="demo-badge">
-                <span>
-                </span>Modo demonstração</span>
+            <form class="logout-form" action="/logout" method="POST">
+                <button class="logout-button" type="submit">
+                    <i data-lucide="log-out" aria-hidden="true"></i>
+                    Sair da conta
+                </button>
+            </form>
         </div>
 
         <header class="page-heading">
@@ -118,7 +121,11 @@
                         <i data-lucide="smartphone" aria-hidden="true"></i>
                     </span>
                 </div>
-                <strong class="metric-value">0</strong>
+
+                <strong class="metric-value">
+                    {{ metricas["orcamentos_pendentes"] or 0 }}
+                </strong>
+
                 <p>Aparelhos em atendimento</p>
                 <span class="metric-foot">Recebidos, em diagnóstico ou reparo</span>
             </article>
@@ -129,7 +136,11 @@
                         <i data-lucide="clock-3" aria-hidden="true"></i>
                     </span>
                 </div>
-                <strong class="metric-value">0</strong>
+
+                <strong class="metric-value">
+                    {{ metricas["prontos_retirada"] or 0 }}
+                </strong>
+
                 <p>Aguardando aprovação do cliente</p>
                 <span class="metric-foot">Acompanhe antes de iniciar o serviço</span>
             </article>
@@ -140,7 +151,11 @@
                         <i data-lucide="circle-check" aria-hidden="true"></i>
                     </span>
                 </div>
-                <strong class="metric-value">0</strong>
+
+                <strong class="metric-value">
+                    {{ metricas["servicos_ativos"] or 0 }}
+                </strong>
+
                 <p>Serviços finalizados</p>
                 <span class="metric-foot">Organize a entrega dos aparelhos</span>
             </article>
@@ -156,18 +171,60 @@
                             data-lucide="arrow-right" aria-hidden="true"></i>
                     </a>
                 </div>
+
+                {% if ordens_recentes %}
                 <div class="empty-state">
                     <span class="empty-icon">
                         <i data-lucide="clipboard-list" aria-hidden="true"></i>
                     </span>
-                    <h3>Seu próximo atendimento começa aqui.</h3>
-                    <p>Ainda não há ordens cadastradas. Quando forem conectadas ao sistema, os serviços e seus status
-                        aparecerão neste espaço.</p>
-                    <a class="button secondary" href="/Pages/Empresa/ordensServico.html#nova-ordem">Preparar uma ordem
+
+                    <h3>Atendimentos recentes</h3>
+
+                    {% for ordem in ordens_recentes %}
+                    <p>
+                        <strong>
+                            Ordem #{{ ordem["id"] }} · {{ ordem["aparelho"] }}
+                        </strong>
+
+                        <br>
+
+                        Status: {{ ordem["status"] }}
+
+                        {% if ordem["previsao"] %}
+                        · Previsão: {{ ordem["previsao"] }}
+                        {% endif %}
+                    </p>
+                    {% endfor %}
+
+                    <a class="button secondary" href="/Pages/Empresa/ordensServico.html">
+                        Ver todas as ordens
                         <i data-lucide="arrow-right" aria-hidden="true"></i>
                     </a>
                 </div>
-                <div class="panel-foot">Os números exibidos são demonstrativos.</div>
+
+                {% else %}
+                <div class="empty-state">
+                    <span class="empty-icon">
+                        <i data-lucide="clipboard-list" aria-hidden="true"></i>
+                    </span>
+
+                    <h3>Seu próximo atendimento começa aqui.</h3>
+
+                    <p>
+                        Ainda não há ordens cadastradas. Registre o primeiro atendimento
+                        para acompanhar os serviços aqui.
+                    </p>
+
+                    <a class="button secondary" href="/Pages/Empresa/ordensServico.html#nova-ordem">
+                        Preparar uma ordem
+                        <i data-lucide="arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="panel-foot">
+                    Os números refletem as ordens cadastradas nesta assistência.
+                </div>
             </section>
             <aside class="card workflow">
                 <p class="eyebrow">ROTINA DA ASSISTÊNCIA</p>
@@ -205,15 +262,6 @@
                 </ol>
             </aside>
         </div>
-
-        <form action="/logout" method="POST">
-            <button type="submit">
-                <i data-lucide="log-out" aria-hidden="true"></i>
-                Sair da conta
-            </button>
-        </form>
-
-        <p class="demo-note">Interface em demonstração · Os atendimentos ainda não são salvos no banco.</p>
 
         <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span>
         </footer>

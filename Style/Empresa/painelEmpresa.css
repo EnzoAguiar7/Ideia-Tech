@@ -264,6 +264,38 @@ main {
     color: var(--texto);
 }
 
+.logout-form {
+    margin: 0;
+}
+
+.logout-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 8px 13px;
+    border: 1px solid #d7e1dd;
+    border-radius: 8px;
+    color: #31534e;
+    background: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 160ms, border-color 160ms, color 160ms;
+}
+
+.logout-button:hover {
+    color: #8c2f2f;
+    border-color: #efcdcd;
+    background: #fff7f7;
+}
+
+.logout-button svg {
+    width: 16px;
+    height: 16px;
+}
+
 .demo-badge {
     display: inline-flex;
     align-items: center;
