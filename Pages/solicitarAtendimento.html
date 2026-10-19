@@ -63,7 +63,7 @@
                 minlength="2"
                 maxlength="150"
                 placeholder="Ex.: Samsung Galaxy S23"
-                value="{{ request.form.get('aparelho', '') }}"
+                value="{{ request.form.get('aparelho', rascunho.get('aparelho', '')) }}"
                 required
             >
 
@@ -76,7 +76,32 @@
                 maxlength="2000"
                 placeholder="Explique o que aconteceu e os sintomas."
                 required
-            >{{ request.form.get('problema', '') }}</textarea>
+            >{{ request.form.get('problema', rascunho.get('problema', '')) }}</textarea>
+
+            <fieldset class="atendimento-logistica">
+                <legend>Como o aparelho chegará à assistência?</legend>
+                <label>
+                    <input type="radio" name="modalidade_entrada" value="coleta"
+                        {% if request.form.get('modalidade_entrada', rascunho.get('modalidade_entrada')) == 'coleta' %}checked{% endif %}>
+                    Solicitar busca no endereço informado
+                </label>
+                <label>
+                    <input type="radio" name="modalidade_entrada" value="loja"
+                        {% if request.form.get('modalidade_entrada', rascunho.get('modalidade_entrada', 'loja')) == 'loja' %}checked{% endif %}>
+                    Vou levar o aparelho à assistência
+                </label>
+                <p>Se escolher a busca, informe o endereço. A assistência confirmará a disponibilidade e eventual taxa.</p>
+                {% set endereco = rascunho.get('endereco_coleta', {}) %}
+                <div class="endereco-atendimento">
+                    <label>CEP <input name="cep_coleta" maxlength="9" value="{{ request.form.get('cep_coleta', endereco.get('cep_coleta', '')) }}"></label>
+                    <label>Rua/avenida <input name="logradouro_coleta" maxlength="120" value="{{ request.form.get('logradouro_coleta', endereco.get('logradouro_coleta', '')) }}"></label>
+                    <label>Número <input name="numero_coleta" maxlength="20" value="{{ request.form.get('numero_coleta', endereco.get('numero_coleta', '')) }}"></label>
+                    <label>Bairro <input name="bairro_coleta" maxlength="100" value="{{ request.form.get('bairro_coleta', endereco.get('bairro_coleta', '')) }}"></label>
+                    <label>Cidade <input name="cidade_coleta" maxlength="100" value="{{ request.form.get('cidade_coleta', endereco.get('cidade_coleta', '')) }}"></label>
+                    <label>UF <input name="uf_coleta" maxlength="2" value="{{ request.form.get('uf_coleta', endereco.get('uf_coleta', '')) }}"></label>
+                    <label>Complemento <input name="complemento_coleta" maxlength="100" value="{{ request.form.get('complemento_coleta', endereco.get('complemento_coleta', '')) }}"></label>
+                </div>
+            </fieldset>
 
             <button type="submit" class="atendimento-submit">
                 Enviar solicitação

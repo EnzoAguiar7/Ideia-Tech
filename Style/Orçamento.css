@@ -202,6 +202,11 @@ nav ul li:nth-child(4) a::after {
     box-shadow: 0 0 0 4px rgba(17, 197, 173, .12);
 }
 
+.ia-status small {
+    color: #a6babf;
+    font-size: 10px;
+}
+
 .ia-conversa {
     margin: 45px 0;
     position: relative;
@@ -227,6 +232,22 @@ nav ul li:nth-child(4) a::after {
     font-size: 13px;
     line-height: 1.7;
     color: #c5d1d5;
+}
+
+.mensagem-cliente-ia {
+    max-width: 86%;
+    margin: 22px 0 18px auto;
+    padding: 12px 14px;
+    border: 1px solid #294049;
+    border-radius: 10px 10px 2px 10px;
+    background: #102831;
+}
+
+.mensagem-cliente-ia p {
+    color: #e1ecee;
+    font-size: 11px;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
 }
 
 .ia-exemplo {
@@ -443,6 +464,12 @@ nav ul li:nth-child(4) a::after {
     box-shadow: 0 10px 22px rgba(17, 197, 173, .2);
 }
 
+.botao-analisar:disabled {
+    cursor: wait;
+    opacity: .72;
+    transform: none;
+}
+
 .botao-analisar svg {
     width: 17px;
     height: 17px;
@@ -623,6 +650,46 @@ nav ul li:nth-child(4) a::after {
     display: flex;
     flex-direction: column;
     gap: 3px;
+    min-width: 0;
+}
+
+.resultado-servico>div:last-child p,
+.orientacao-diagnostico p,
+.perguntas-diagnostico li {
+    color: #51656d;
+    font-size: 11px;
+    line-height: 1.65;
+}
+
+.orientacao-diagnostico,
+.perguntas-diagnostico {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: #f4f8f7;
+}
+
+.orientacao-diagnostico strong,
+.perguntas-diagnostico strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #17343d;
+    font-size: 11px;
+}
+
+.perguntas-diagnostico ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.resultado-erro {
+    padding: 16px;
+    border: 1px solid #e7b8b3;
+    border-radius: 8px;
+    background: #fff5f4;
+    color: #8a3028;
+    font-size: 12px;
+    line-height: 1.6;
 }
 
 .resultado-servico span,
@@ -650,8 +717,8 @@ nav ul li:nth-child(4) a::after {
 .resultado-preco strong {
     display: block;
     font-family: "Manrope", sans-serif;
-    font-size: 30px;
-    letter-spacing: -1.4px;
+    font-size: clamp(18px, 2vw, 24px);
+    letter-spacing: -.6px;
     color: #03141e;
 }
 

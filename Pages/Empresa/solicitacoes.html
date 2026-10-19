@@ -84,6 +84,7 @@
             </div>
         </header>
 
+        {% include "_mensagens.html" %}
 
         <section class="empresa-lista" aria-labelledby="titulo-solicitacoes">
             <div class="empresa-lista-topo">
@@ -104,7 +105,7 @@
                             <th scope="col">Cliente</th>
                             <th scope="col">Aparelho</th>
                             <th scope="col">Problema relatado</th>
-                            <th scope="col">Situação</th>
+                            <th scope="col">Orçamento e logística</th>
                         </tr>
                     </thead>
 
@@ -127,12 +128,58 @@
 
                             <td>{{ solicitacao['aparelho'] }}</td>
 
-                            <td>{{ solicitacao['problema'] }}</td>
+                            <td>
+                                {{ solicitacao['problema'] }}
+                                {% if solicitacao['modalidade_entrada'] == 'coleta' %}
+                                <p><strong>Buscar em:</strong> {{ solicitacao['endereco_coleta_formatado'] or 'Endereço não informado' }}</p>
+                                {% else %}
+                                <p>Cliente levará o aparelho à loja.</p>
+                                {% endif %}
+                            </td>
 
                             <td>
                                 <span class="empresa-situacao">
-                                    {{ solicitacao['status'] }}
+                                    {{ solicitacao['orcamento_status'] }}
                                 </span>
+                                {% if solicitacao['valor_final_centavos'] is not none %}
+                                <p>Reparo: R$ {{ ('%.2f' % (solicitacao['valor_final_centavos'] / 100)).replace('.', ',') }}</p>
+                                {% if solicitacao['prazo_minimo_dias'] and solicitacao['prazo_maximo_dias'] %}
+                                <p>Prazo estimado: {{ solicitacao['prazo_minimo_dias'] }} a {{ solicitacao['prazo_maximo_dias'] }} dias úteis.</p>
+                                {% endif %}
+                                {% if solicitacao['taxa_devolucao_centavos'] is not none and solicitacao['modalidade_entrada'] == 'coleta' %}
+                                <p>Devolução: R$ {{ ('%.2f' % (solicitacao['taxa_devolucao_centavos'] / 100)).replace('.', ',') }}</p>
+                                {% endif %}
+                                {% if solicitacao['resposta_cliente'] %}
+                                <p>Cliente {{ 'aceitou' if solicitacao['resposta_cliente'] == 'aceitar' else 'recusou' }}.
+                                    {% if solicitacao['modalidade_saida'] %}Saída: {{ 'devolução no endereço' if solicitacao['modalidade_saida'] == 'devolucao' else 'retirada na assistência' }}.{% endif %}</p>
+                                {% endif %}
+                                {% else %}
+                                <form method="post" action="/Pages/Empresa/solicitacoes/{{ solicitacao['id'] }}/orcamento" class="cadastro-produto">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <label>Valor final do reparo (R$)
+                                        <input name="valor_final" type="number" min="0.01" step="0.01" required>
+                                    </label>
+                                    {% if solicitacao['modalidade_entrada'] == 'coleta' %}
+                                    <label>Taxa de devolução ao endereço (R$)
+                                        <input name="taxa_devolucao" type="number" min="0" step="0.01" required>
+                                    </label>
+                                    {% else %}<input type="hidden" name="taxa_devolucao" value="0">{% endif %}
+                                    {% if solicitacao['prazo_minimo_dias'] and solicitacao['prazo_maximo_dias'] %}
+                                    <p>Faixa preliminar da análise: {{ solicitacao['prazo_minimo_dias'] }} a {{ solicitacao['prazo_maximo_dias'] }} dias úteis. Ajuste conforme o diagnóstico e a disponibilidade de peças.</p>
+                                    {% endif %}
+                                    <label>Prazo mínimo estimado (dias úteis)
+                                        <input name="prazo_minimo_dias" type="number" min="1" max="60" step="1" value="{{ solicitacao['prazo_minimo_dias'] or 1 }}" required>
+                                    </label>
+                                    <label>Prazo máximo estimado (dias úteis)
+                                        <input name="prazo_maximo_dias" type="number" min="1" max="60" step="1" value="{{ solicitacao['prazo_maximo_dias'] or 3 }}" required>
+                                    </label>
+                                    <small>Ajuste a estimativa inicial após a análise técnica. O prazo exato também depende de peças e fila de atendimento.</small>
+                                    <label>Observação para o cliente
+                                        <textarea name="mensagem_orcamento" maxlength="1000" rows="3"></textarea>
+                                    </label>
+                                    <button type="submit">Enviar orçamento ao cliente</button>
+                                </form>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

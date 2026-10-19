@@ -106,6 +106,43 @@ nav a[aria-current="page"]::after {
     padding: 32px;
 }
 
+.solicitacao-orcamento {
+    padding: 20px 0;
+    border-top: 1px solid var(--cor-borda);
+}
+
+.solicitacao-orcamento h3 {
+    margin: 8px 0;
+}
+
+.resposta-orcamento {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.resposta-orcamento label {
+    display: grid;
+    flex: 1 1 260px;
+    gap: 6px;
+}
+
+.resposta-orcamento select {
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 9px;
+    background: white;
+    font: inherit;
+}
+
+.resposta-orcamento .atendimento-submit {
+    width: auto;
+    margin: 0;
+}
+
 .ordem-cabecalho {
     display: flex;
     justify-content: space-between;

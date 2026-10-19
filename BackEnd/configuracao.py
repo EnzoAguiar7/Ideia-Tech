@@ -15,7 +15,9 @@ def carregar_configuracao(pasta=None):
         configuracao = {
             "IDEIATECH_SECRET_KEY": secrets.token_hex(32),
             "APP_ENV": "development",
-            "RECUPERACAO_LOCAL": "1"
+            "RECUPERACAO_LOCAL": "1",
+            "GROQ_API_KEY": "",
+            "GROQ_MODEL": "openai/gpt-oss-120b"
         }
         try:
             with arquivo.open("x", encoding="utf-8") as destino:

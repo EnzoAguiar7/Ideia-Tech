@@ -70,6 +70,37 @@
     font: inherit;
 }
 
+.cadastro-produto input,
+.cadastro-produto textarea {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px 12px;
+    border: 1px solid #dfe7e1;
+    border-radius: 8px;
+    background: #fafcf9;
+    color: inherit;
+    font: inherit;
+}
+
+.cadastro-produto label {
+    display: block;
+    margin: 12px 0;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cadastro-produto button {
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--verde);
+    color: white;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 .cadastro-produto select:focus-visible {
     outline: 2px solid var(--verde);
     outline-offset: 2px;

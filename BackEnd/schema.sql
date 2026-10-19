@@ -179,6 +179,23 @@ CREATE TABLE IF NOT EXISTS solicitacoes (
             'Cancelada'
         )),
     criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modalidade_entrada TEXT NOT NULL DEFAULT 'loja'
+        CHECK (modalidade_entrada IN ('coleta', 'loja')),
+    endereco_coleta TEXT NOT NULL DEFAULT '',
+    prazo_minimo_dias INTEGER CHECK (prazo_minimo_dias >= 0),
+    prazo_maximo_dias INTEGER CHECK (prazo_maximo_dias >= 0),
+    valor_final_centavos INTEGER CHECK (valor_final_centavos >= 0),
+    taxa_devolucao_centavos INTEGER CHECK (taxa_devolucao_centavos >= 0),
+    mensagem_orcamento TEXT NOT NULL DEFAULT '',
+    orcamento_status TEXT NOT NULL DEFAULT 'Aguardando análise'
+        CHECK (orcamento_status IN (
+            'Aguardando análise', 'Aguardando aprovação', 'Aprovado',
+            'Recusado', 'Aguardando retirada/devolução', 'Concluído'
+        )),
+    resposta_cliente TEXT NOT NULL DEFAULT '',
+    modalidade_saida TEXT NOT NULL DEFAULT '',
+    respondido_em TEXT,
+    atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (empresa_id) REFERENCES empresas(id),
     FOREIGN KEY (cliente_id) REFERENCES usuarios(id)

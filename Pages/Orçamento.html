@@ -51,14 +51,14 @@
                 <span class="etiqueta-secao">ORÇAMENTO INTELIGENTE</span>
 
                 <h1>
-                    Descubra uma estimativa
+                    Entenda o possível reparo
                     <span>antes de levar seu aparelho.</span>
                 </h1>
 
                 <p>
-                    Conte o que aconteceu com seu celular. Nossa inteligência
-                    identifica o possível serviço e apresenta uma faixa média
-                    de preço em poucos instantes.
+                    Conte o que aconteceu com seu aparelho. A Ideia AI sugere
+                    uma hipótese de serviço; a assistência confirma valor e prazo
+                    depois de avaliar o aparelho.
                 </p>
 
                 <div class="vantagens-orcamento">
@@ -108,13 +108,13 @@
                         </div>
                     </div>
 
-                    <div class="ia-status">
+                    <div class="ia-status" aria-live="polite">
                         <span></span>
-                        Online
+                        <small id="statusIdeiaAI">Pronta para analisar</small>
                     </div>
                 </div>
 
-                <div class="ia-conversa">
+                <div class="ia-conversa" id="conversaIdeiaAI" aria-live="polite">
 
                     <div class="mensagem-ia">
                         <i data-lucide="bot"></i>
@@ -144,7 +144,7 @@
 
                     <span>
                         <i data-lucide="lock-keyhole"></i>
-                        Estimativa segura
+                        Hipótese preliminar
                     </span>
                 </div>
 
@@ -188,7 +188,7 @@
                         <div class="campo">
                             <label for="modelo">Modelo</label>
 
-                            <input type="text" id="modelo" name="modelo" placeholder="Ex: iPhone 15" required>
+                            <input type="text" id="modelo" name="modelo" maxlength="80" placeholder="Ex: iPhone 15" required>
                         </div>
 
                     </div>
@@ -217,7 +217,7 @@
                             </span>
                         </div>
 
-                        <textarea id="descricaoProblema" name="descricao_problema" rows="6" maxlength="500"
+                        <textarea id="descricaoProblema" name="descricao_problema" rows="6" minlength="10" maxlength="500"
                             placeholder="Ex: Meu celular caiu no chão. A tela trincou, apareceu uma mancha preta e agora parte do touch não responde..."
                             required></textarea>
 
@@ -297,7 +297,7 @@
                         </div>
                     </fieldset>
 
-                    <button type="submit" class="botao-analisar" id="botaoAnalisar">
+                    <button type="submit" class="botao-analisar" id="botaoAnalisar" formnovalidate>
                         <span>Analisar com Ideia AI</span>
                         <i data-lucide="sparkles"></i>
                     </button>
@@ -307,6 +307,8 @@
             </div>
 
             <aside class="painel-resultado" id="painelResultado">
+
+                <div class="resultado-erro" id="erroAnalise" role="alert" style="display: none;"></div>
 
                 <div class="resultado-espera" id="resultadoEspera">
 
@@ -347,7 +349,7 @@
                     <div class="resultado-cabecalho">
 
                         <div>
-                            <span>ESTIMATIVA GERADA</span>
+                            <span>ANÁLISE CONCLUÍDA</span>
                             <h3>Possível diagnóstico</h3>
                         </div>
 
@@ -366,20 +368,31 @@
 
                         <div>
                             <span>Serviço identificado</span>
-                            <strong id="servicoIdentificado">Troca de tela</strong>
+                            <strong id="servicoIdentificado">Aguardando análise</strong>
+                            <p id="explicacaoDiagnostico"></p>
                         </div>
 
                     </div>
 
+                    <div class="orientacao-diagnostico" id="blocoOrientacao" hidden>
+                        <strong>Próximo passo</strong>
+                        <p id="orientacaoDiagnostico"></p>
+                    </div>
+
+                    <div class="perguntas-diagnostico" id="blocoPerguntas" hidden>
+                        <strong>Para entender melhor</strong>
+                        <ul id="perguntasDiagnostico"></ul>
+                    </div>
+
                     <div class="resultado-preco">
-                        <span>Faixa estimada</span>
+                        <span>Faixa de referência de mercado</span>
 
                         <strong id="precoEstimado">
-                            R$ 400 – R$ 550
+                            A definir após avaliação
                         </strong>
 
-                        <small>
-                            Valor aproximado com base no serviço identificado.
+                        <small id="fontePrecoEstimado">
+                            Referência preliminar. O valor final será definido pela assistência após avaliar o aparelho.
                         </small>
                     </div>
 
@@ -388,8 +401,9 @@
                         <i data-lucide="clock-3"></i>
 
                         <div>
-                            <span>Prazo estimado</span>
-                            <strong id="prazoEstimado">1 a 3 dias úteis</strong>
+                            <span>Prazo do reparo</span>
+                            <strong id="prazoEstimado">A estimar pela assistência</strong>
+                            <small id="avisoPrazoEstimado">O prazo final será confirmado após a análise técnica do aparelho.</small>
                         </div>
 
                     </div>
@@ -398,8 +412,8 @@
                         <i data-lucide="info"></i>
 
                         <p>
-                            Esta é apenas uma estimativa. O valor definitivo
-                            será informado após a avaliação técnica do aparelho.
+                            Esta faixa é apenas uma referência. A assistência informa
+                            o valor final e o prazo depois de avaliar o aparelho.
                         </p>
                     </div>
 
@@ -450,21 +464,20 @@
                     <h3>A IA interpreta</h3>
 
                     <p>
-                        O sistema relaciona sua descrição aos possíveis
-                        serviços cadastrados.
+                        A IA resume possíveis causas e orienta o próximo passo.
                     </p>
                 </article>
 
                 <article>
                     <span>03</span>
 
-                    <i data-lucide="badge-dollar-sign"></i>
+                    <i data-lucide="clipboard-check"></i>
 
-                    <h3>Você recebe a estimativa</h3>
+                    <h3>Você recebe uma orientação inicial</h3>
 
                     <p>
-                        Uma faixa média de preço e prazo é apresentada
-                        antes da abertura do atendimento.
+                        A IA sugere um serviço possível. A assistência informa
+                        preço e prazo depois da avaliação técnica.
                     </p>
                 </article>
 
@@ -495,6 +508,7 @@
     </footer>
 
     <script defer src="/Script/fluxoServico.js"></script>
+    <script defer src="/Script/analiseOrcamento.js"></script>
 </body>
 
 </html>

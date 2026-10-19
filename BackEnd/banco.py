@@ -43,6 +43,34 @@ if tabela_solicitacoes:
 
 conexao.executescript(sql)
 
+# Acrescenta os dados de orçamento e logística em bancos locais já existentes.
+colunas_solicitacoes = {
+    linha[1] for linha in conexao.execute("PRAGMA table_info(solicitacoes)")
+}
+colunas_novas_solicitacoes = {
+    "modalidade_entrada": "TEXT NOT NULL DEFAULT 'loja'",
+    "endereco_coleta": "TEXT NOT NULL DEFAULT ''",
+    "prazo_minimo_dias": "INTEGER",
+    "prazo_maximo_dias": "INTEGER",
+    "valor_final_centavos": "INTEGER",
+    "taxa_devolucao_centavos": "INTEGER",
+    "mensagem_orcamento": "TEXT NOT NULL DEFAULT ''",
+    "orcamento_status": "TEXT NOT NULL DEFAULT 'Aguardando análise'",
+    "resposta_cliente": "TEXT NOT NULL DEFAULT ''",
+    "modalidade_saida": "TEXT NOT NULL DEFAULT ''",
+    "respondido_em": "TEXT",
+    # SQLite não aceita CURRENT_TIMESTAMP como default em ADD COLUMN.
+    "atualizado_em": "TEXT NOT NULL DEFAULT ''",
+}
+for coluna, definicao in colunas_novas_solicitacoes.items():
+    if coluna not in colunas_solicitacoes:
+        conexao.execute(
+            f"ALTER TABLE solicitacoes ADD COLUMN {coluna} {definicao}"
+        )
+conexao.execute(
+    "UPDATE solicitacoes SET atualizado_em = CURRENT_TIMESTAMP WHERE atualizado_em = ''"
+)
+
 # CREATE TABLE IF NOT EXISTS não adiciona colunas em bancos já existentes.
 # Esta migração idempotente mantém o banco local compatível com o schema atual.
 colunas_usuarios = {

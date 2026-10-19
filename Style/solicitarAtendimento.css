@@ -104,6 +104,60 @@
     background: #0fb39d;
 }
 
+.atendimento-logistica {
+    display: grid;
+    gap: 12px;
+    margin: 20px 0 8px;
+    padding: 18px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+}
+
+.atendimento-logistica legend {
+    padding: 0 6px;
+    font-weight: 700;
+}
+
+.atendimento-logistica > label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.atendimento-logistica input[type="radio"] {
+    width: auto;
+    min-height: auto;
+    flex: 0 0 auto;
+}
+
+.endereco-atendimento {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.endereco-atendimento label {
+    display: grid;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.endereco-atendimento input {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 9px 11px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    font: inherit;
+}
+
+.atendimento-logistica p {
+    color: var(--cor-texto-secundario);
+    font-size: 0.9rem;
+}
+
 @media (max-width: 480px) {
     .pagina-atendimento {
         padding: 20px 12px;
@@ -112,5 +166,9 @@
     .atendimento-card {
         padding: 24px 18px;
         border-radius: 12px;
+    }
+
+    .endereco-atendimento {
+        grid-template-columns: 1fr;
     }
 }
