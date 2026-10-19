@@ -92,6 +92,18 @@ conexao.execute(
 colunas_historico = {
     linha[1] for linha in conexao.execute("PRAGMA table_info(historico_ordens)")
 }
+colunas_ordens = {
+    linha[1] for linha in conexao.execute("PRAGMA table_info(ordens_servico)")
+}
+if "orcamento_id" not in colunas_ordens:
+    conexao.execute(
+        "ALTER TABLE ordens_servico ADD COLUMN orcamento_id INTEGER REFERENCES orcamentos(id)"
+    )
+conexao.execute(
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_ordens_orcamento "
+    "ON ordens_servico(orcamento_id) WHERE orcamento_id IS NOT NULL"
+)
+
 if "observacaoa" in colunas_historico and "observacao" not in colunas_historico:
     conexao.execute(
         "ALTER TABLE historico_ordens RENAME COLUMN observacaoa TO observacao"

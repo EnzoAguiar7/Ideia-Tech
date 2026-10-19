@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Orçamentos | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/mensagens.css">
     <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
     <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
     <link rel="stylesheet" href="/Style/Empresa/listasEmpresa.css">
@@ -23,7 +24,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{ empresa['nome'] }}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -61,7 +62,7 @@
             </a>
         </nav>
 
- 
+
         <div class="sidebar-note">
             <span class="note-dot">
             </span>
@@ -85,45 +86,126 @@
             </div>
         </header>
 
+        {% include "_mensagens.html" %}
+
+        {% if erro %}
+        <p class="mensagem mensagem--erro" role="alert">
+            {{ erro }}
+        </p>
+        {% endif %}
+
+        <section class="empresa-lista cadastro-produto">
+            <div class="empresa-lista-topo">
+                <h2>Novo orçamento</h2>
+            </div>
+
+            {% if solicitacoes %}
+            <form action="{{ url_for('orcamentos_empresa') }}" method="POST" class="form-status-os">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <label for="solicitacao">Solicitação recebida</label>
+                <select id="solicitacao" name="solicitacao_id" required>
+                    <option value="">Selecione uma solicitação</option>
+
+                    {% for solicitacao in solicitacoes %}
+                    <option value="{{ solicitacao['id'] }}" {% if
+                        request.form.get('solicitacao_id')==solicitacao['id']|string %} selected {% endif %}>
+                        #{{ solicitacao['id'] }} —
+                        {{ solicitacao['cliente_nome'] }} —
+                        {{ solicitacao['aparelho'] }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <label for="diagnostico">Diagnóstico técnico</label>
+                <textarea id="diagnostico" name="diagnostico" minlength="5" maxlength="2000" rows="4"
+                    required>{{ request.form.get('diagnostico', '') }}</textarea>
+
+                <label for="servico">Serviço proposto</label>
+                <textarea id="servico" name="servico" minlength="3" maxlength="1000" rows="3"
+                    required>{{ request.form.get('servico', '') }}</textarea>
+
+                <label for="valor">Valor total em reais</label>
+                <input id="valor" name="valor" type="text" inputmode="decimal" maxlength="12" placeholder="Ex.: 450,00"
+                    value="{{ request.form.get('valor', '') }}" required>
+                <small>Use vírgula ou ponto, sem separador de milhar.</small>
+
+                <label for="prazo">Prazo estimado em dias</label>
+                <input id="prazo" name="prazo_dias" type="number" min="1" max="365" step="1"
+                    value="{{ request.form.get('prazo_dias', '') }}" required>
+
+                <button type="submit" class="button primary">
+                    Cadastrar orçamento
+                </button>
+            </form>
+            {% else %}
+            <p>
+                Não há solicitações disponíveis para um novo orçamento.
+                Consulte as solicitações recebidas.
+            </p>
+            {% endif %}
+        </section>
 
         <section class="empresa-lista" aria-labelledby="titulo-orcamentos">
             <div class="empresa-lista-topo">
-                <h2 id="titulo-orcamentos">Orçamentos dos atendimentos</h2>
-                <span class="demo-badge">2 exemplos fictícios</span>
+                <h2 id="titulo-orcamentos">Orçamentos cadastrados</h2>
+                <span>{{ orcamentos|length }} orçamento(s)</span>
             </div>
 
+            {% if orcamentos %}
             <div class="empresa-tabela-wrap">
                 <table class="empresa-tabela">
                     <thead>
                         <tr>
-                            <th scope="col">Cliente</th>
-                            <th scope="col">Aparelho</th>
-                            <th scope="col">Serviço proposto</th>
+                            <th scope="col">Cliente / aparelho</th>
+                            <th scope="col">Diagnóstico / serviço</th>
                             <th scope="col">Valor</th>
+                            <th scope="col">Prazo</th>
                             <th scope="col">Situação</th>
                         </tr>
                     </thead>
+
                     <tbody>
+                        {% for orcamento in orcamentos %}
                         <tr>
-                            <td>Cliente exemplo A</td>
-                            <td>Samsung Galaxy S23</td>
-                            <td>Substituição da tela</td>
-                            <td>R$ 450,00</td>
-                            <td><span class="empresa-situacao">Aguardando aprovação</span></td>
+                            <td>
+                                <strong>{{ orcamento['cliente_nome'] }}</strong>
+                                <br>
+                                {{ orcamento['aparelho'] }}
+                            </td>
+
+                            <td>
+                                <strong>Diagnóstico:</strong>
+                                {{ orcamento['diagnostico'] }}
+                                <br>
+                                <strong>Serviço:</strong>
+                                {{ orcamento['servico'] }}
+                            </td>
+
+                            <td>
+                                R$ {{ ('%.2f' % (orcamento['valor_centavos'] / 100)).replace('.', ',') }}
+                            </td>
+
+                            <td>{{ orcamento['prazo_dias'] }} dia(s)</td>
+
+                            <td>
+                                <span class="empresa-situacao">
+                                    {{ orcamento['status'] }}
+                                </span>
+                                {% if orcamento['ordem_criada'] %}
+                                <br><small>OS criada</small>
+                                {% endif %}
+                            </td>
                         </tr>
-                        <tr>
-                            <td>Cliente exemplo B</td>
-                            <td>Notebook Dell Inspiron</td>
-                            <td>Limpeza interna e troca de pasta térmica</td>
-                            <td>R$ 180,00</td>
-                            <td><span class="empresa-situacao">Aprovado</span></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% else %}
+            <p>Sua empresa ainda não cadastrou orçamentos.</p>
+            {% endif %}
         </section>
 
-        <p class="demo-note">Dados fictícios de demonstração. Nada é consultado ou salvo no banco.</p>
         <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span></footer>
     </main>
 </body>

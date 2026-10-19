@@ -55,6 +55,7 @@ CREATE INDEX IF NOT EXISTS idx_tentativas_recuperacao_chave_tempo
 
 CREATE TABLE IF NOT EXISTS ordens_servico (
     id INTEGER PRIMARY KEY,
+    orcamento_id INTEGER UNIQUE,
     empresa_id INTEGER NOT NULL,
     cliente_id INTEGER NOT NULL,
     aparelho TEXT NOT NULL,
@@ -71,7 +72,8 @@ CREATE TABLE IF NOT EXISTS ordens_servico (
         previsao TEXT,
         criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (empresa_id) REFERENCES empresas(id),
-        FOREIGN KEY (cliente_id) REFERENCES usuarios(id)
+        FOREIGN KEY (cliente_id) REFERENCES usuarios(id),
+        FOREIGN KEY (orcamento_id) REFERENCES orcamentos(id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_ordens_empresa
@@ -189,3 +191,23 @@ CREATE INDEX IF NOT EXISTS idx_solicitacoes_empresa
 
 CREATE INDEX IF NOT EXISTS idx_solicitacoes_cliente
     ON solicitacoes(cliente_id);
+
+CREATE TABLE IF NOT EXISTS orcamentos (
+    id INTEGER PRIMARY KEY,
+    solicitacao_id INTEGER NOT NULL UNIQUE,
+    diagnostico TEXT NOT NULL,
+    servico TEXT NOT NULL,
+    valor_centavos INTEGER NOT NULL
+        CHECK (valor_centavos > 0),
+    prazo_dias INTEGER NOT NULL
+        CHECK  (prazo_dias BETWEEN 1 AND 365),
+    status TEXT NOT NULL DEFAULT 'Aguardando aprovação'
+        CHECK (status IN (
+            'Aguardando aprovação',
+            'Aprovado',
+            'Recusado'
+        )),
+    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (solicitacao_id) REFERENCES solicitacoes(id)
+);

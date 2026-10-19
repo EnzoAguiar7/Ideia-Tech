@@ -363,10 +363,7 @@ def validar_csrf():
     if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
         return
 
-    token_enviado = (
-        request.form.get("csrf_token", "")
-        or request.headers.get("X-CSRF-Token", "")
-    )
+    token_enviado = request.form.get("csrf_token", "")
     token_esperado = session.get("csrf_token", "")
 
     if not token_enviado or not token_esperado:
@@ -1931,18 +1928,22 @@ def atualizar_status_pedido(pedido_id):
     return redirect("/Pages/Empresa/pedidos.html")
 
 
-@app.route("/Pages/solicitarAtendimento.html", methods=["GET", "POST"])
+@app.route("/Pages/solicitarAtendimento.html", methods=["GET", "POST"],)
 def solicitar_atendimento():
     usuario = buscar_usuario_sessao()
+
     if usuario is None:
-        return redirect("/Pages/login.html?next=/Pages/solicitarAtendimento.html")
+        return redirect(
+            "/Pages/login.html?next=/Pages/solicitarAtendimento.html"
+        )
+
     if usuario["tipo"] != "cliente":
         abort(403)
 
     erro = None
     codigo_resposta = 200
-    empresas = []
     conexao = conectar_banco()
+
     try:
         empresas = conexao.execute(
             """
@@ -1955,44 +1956,82 @@ def solicitar_atendimento():
         ).fetchall()
 
         if request.method == "POST":
-            empresa_id = request.form.get("empresa_id", type=int)
+            empresa_id = request.form.get(
+                "empresa_id", type=int
+            )
             aparelho = request.form.get("aparelho", "").strip()
+
             problema = request.form.get("problema", "").strip()
-            empresas_validas = {empresa["id"] for empresa in empresas}
+
+            empresas_validas = {
+                empresa["id"] for empresa in empresas
+            }
 
             if empresa_id not in empresas_validas:
                 erro = "Selecione uma assistência válida."
             elif not 2 <= len(aparelho) <= 150:
-                erro = "Informe o aparelho usando entre 2 e 150 caracteres."
+                erro = (
+                    "Informe o aparelho usando entre"
+                    "2 e '50 caracteres."
+                )
             elif not 10 <= len(problema) <= 2000:
-                erro = "Descreva o problema usando entre 10 e 2000 caracteres."
+                erro =(
+                    "Descreva o problema usando entre "
+                    "10 e 2000 caracteres."
+                )
 
             if erro:
                 codigo_resposta = 400
             else:
                 conexao.execute(
-                    """
-                    INSERT INTO solicitacoes (empresa_id, cliente_id, aparelho, problema)
+                     """
+                    INSERT INTO solicitacoes (
+                        empresa_id,
+                        cliente_id,
+                        aparelho,
+                        problema
+                    )
                     VALUES (?, ?, ?, ?)
                     """,
-                    (empresa_id, usuario["id"], aparelho, problema),
+                    (
+                        empresa_id,
+                        usuario["id"],
+                        aparelho,
+                        problema,
+                    ),
                 )
                 conexao.commit()
-                flash("Solicitação enviada à assistência com sucesso.", "sucesso")
-                return redirect("/Pages/solicitarAtendimento.html")
+
+                flash(
+                    "Solicitação enviada à assistência com sucesso.",
+                    "sucesso",
+                )
+                return redirect(
+                    "/Pages/solicitarAtendimento.html"
+                )
+
+
     except sqlite3.Error:
         conexao.rollback()
         app.logger.exception("Erro ao registrar solicitação.")
-        erro = "Não foi possível processar a solicitação. Tente novamente."
+        erro = (
+            "Não foi possível processar a solicitação. "
+            "Tente novamente."
+        )
         codigo_resposta = 500
+        empresas = []
+
     finally:
         conexao.close()
 
     if "csrf_token" not in session:
         session["csrf_token"] = secrets.token_urlsafe(32)
+
     resposta = app.make_response((
         render_template(
-            "solicitarAtendimento.html", empresas=empresas, erro=erro,
+            "solicitarAtendimento.html",
+            empresas=empresas,
+            erro=erro,
             csrf_token=session["csrf_token"],
         ),
         codigo_resposta,
@@ -2004,24 +2043,44 @@ def solicitar_atendimento():
 @app.get("/Pages/Empresa/solicitacoes.html")
 def listar_solicitacoes_empresa():
     usuario = buscar_usuario_sessao()
+
     if usuario is None:
-        return redirect("/Pages/login.html?next=/Pages/Empresa/solicitacoes.html")
+        return redirect(
+            "/Pages/login.html?next=/Pages/Empresa/solicitacoes.html"
+        )
+
     if usuario["tipo"] != "empresa":
         abort(403)
 
     conexao = conectar_banco()
+
     try:
         empresa = conexao.execute(
-            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
+            """
+            SELECT id, nome
+            FROM empresas
+            WHERE usuario_id = ?
+            """,
             (usuario["id"],),
         ).fetchone()
+
         if empresa is None:
-            abort(404, description="Empresa não encontrada.")
+            abort(
+                404,
+                description="Empresa não encontrada.",
+            )
+
         solicitacoes = conexao.execute(
             """
-            SELECT s.id, s.aparelho, s.problema, s.status, s.criado_em,
-                   u.nome AS cliente_nome, u.email AS cliente_email,
-                   u.telefone AS cliente_telefone
+            SELECT
+                s.id,
+                s.aparelho,
+                s.problema,
+                s.status,
+                s.criado_em,
+                u.nome AS cliente_nome,
+                u.email AS cliente_email,
+                u.telefone AS cliente_telefone
             FROM solicitacoes AS s
             JOIN usuarios AS u ON u.id = s.cliente_id
             WHERE s.empresa_id = ?
@@ -2029,14 +2088,25 @@ def listar_solicitacoes_empresa():
             """,
             (empresa["id"],),
         ).fetchall()
+
     finally:
         conexao.close()
-    resposta = app.make_response(render_template(
-        "Empresa/solicitacoes.html", empresa=empresa, solicitacoes=solicitacoes,
-    ))
+
+    resposta = app.make_response(
+        render_template(
+            "Empresa/solicitacoes.html",
+            empresa=empresa,
+            solicitacoes=solicitacoes,
+        )
+    )
     resposta.headers["Cache-Control"] = "no-store"
     return resposta
 
+from orcamentos import registrar_rotas_orcamentos
+
+registrar_rotas_orcamentos(
+    app, conectar_banco, buscar_usuario_sessao
+)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
