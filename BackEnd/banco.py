@@ -43,6 +43,30 @@ if tabela_solicitacoes:
 
 conexao.executescript(sql)
 
+# Compatibilidade com bancos que já tinham a tabela orcamentos anterior.
+colunas_orcamentos = {
+    linha[1] for linha in conexao.execute("PRAGMA table_info(orcamentos)")
+}
+colunas_novas_orcamentos = {
+    "prazo_minimo_dias": "INTEGER NOT NULL DEFAULT 1",
+    "prazo_maximo_dias": "INTEGER NOT NULL DEFAULT 3",
+    "taxa_devolucao_centavos": "INTEGER NOT NULL DEFAULT 0",
+    "modalidade_saida": "TEXT NOT NULL DEFAULT ''",
+    "respondido_em": "TEXT",
+}
+colunas_novas_orcamentos["prazo_dias"] = "INTEGER NOT NULL DEFAULT 3"
+for coluna, definicao in colunas_novas_orcamentos.items():
+    if coluna not in colunas_orcamentos:
+        conexao.execute(
+            f"ALTER TABLE orcamentos ADD COLUMN {coluna} {definicao}"
+        )
+conexao.execute(
+    """UPDATE orcamentos
+       SET prazo_minimo_dias = prazo_dias, prazo_maximo_dias = prazo_dias
+       WHERE prazo_dias IS NOT NULL AND prazo_maximo_dias = 3
+         AND prazo_minimo_dias = 1 AND prazo_dias != 3"""
+)
+
 # Acrescenta os dados de orçamento e logística em bancos locais já existentes.
 colunas_solicitacoes = {
     linha[1] for linha in conexao.execute("PRAGMA table_info(solicitacoes)")
@@ -120,6 +144,18 @@ conexao.execute(
 colunas_historico = {
     linha[1] for linha in conexao.execute("PRAGMA table_info(historico_ordens)")
 }
+colunas_ordens = {
+    linha[1] for linha in conexao.execute("PRAGMA table_info(ordens_servico)")
+}
+if "orcamento_id" not in colunas_ordens:
+    conexao.execute(
+        "ALTER TABLE ordens_servico ADD COLUMN orcamento_id INTEGER REFERENCES orcamentos(id)"
+    )
+conexao.execute(
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_ordens_orcamento "
+    "ON ordens_servico(orcamento_id) WHERE orcamento_id IS NOT NULL"
+)
+
 if "observacaoa" in colunas_historico and "observacao" not in colunas_historico:
     conexao.execute(
         "ALTER TABLE historico_ordens RENAME COLUMN observacaoa TO observacao"

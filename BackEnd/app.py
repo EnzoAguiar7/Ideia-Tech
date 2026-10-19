@@ -2303,18 +2303,22 @@ def atualizar_status_pedido(pedido_id):
     return redirect("/Pages/Empresa/pedidos.html")
 
 
-@app.route("/Pages/solicitarAtendimento.html", methods=["GET", "POST"])
+@app.route("/Pages/solicitarAtendimento.html", methods=["GET", "POST"],)
 def solicitar_atendimento():
     usuario = buscar_usuario_sessao()
+
     if usuario is None:
-        return redirect("/Pages/login.html?next=/Pages/solicitarAtendimento.html")
+        return redirect(
+            "/Pages/login.html?next=/Pages/solicitarAtendimento.html"
+        )
+
     if usuario["tipo"] != "cliente":
         abort(403)
 
     erro = None
     codigo_resposta = 200
-    empresas = []
     conexao = conectar_banco()
+
     try:
         empresas = conexao.execute(
             """
@@ -2327,9 +2331,13 @@ def solicitar_atendimento():
         ).fetchall()
 
         if request.method == "POST":
-            empresa_id = request.form.get("empresa_id", type=int)
+            empresa_id = request.form.get(
+                "empresa_id", type=int
+            )
             aparelho = request.form.get("aparelho", "").strip()
+
             problema = request.form.get("problema", "").strip()
+            empresas_validas = {empresa["id"] for empresa in empresas}
             modalidade_entrada = request.form.get("modalidade_entrada", "loja").strip()
             endereco_coleta = {
                 campo: request.form.get(campo, "").strip()[:120]
@@ -2339,7 +2347,6 @@ def solicitar_atendimento():
                     "complemento_coleta",
                 )
             }
-            empresas_validas = {empresa["id"] for empresa in empresas}
             rascunho = session.get("rascunho_orcamento", {})
             if (
                 not isinstance(rascunho, dict)
@@ -2392,16 +2399,24 @@ def solicitar_atendimento():
     except sqlite3.Error:
         conexao.rollback()
         app.logger.exception("Erro ao registrar solicitação.")
-        erro = "Não foi possível processar a solicitação. Tente novamente."
+        erro = (
+            "Não foi possível processar a solicitação. "
+            "Tente novamente."
+        )
         codigo_resposta = 500
+        empresas = []
+
     finally:
         conexao.close()
 
     if "csrf_token" not in session:
         session["csrf_token"] = secrets.token_urlsafe(32)
+
     resposta = app.make_response((
         render_template(
-            "solicitarAtendimento.html", empresas=empresas, erro=erro,
+            "solicitarAtendimento.html",
+            empresas=empresas,
+            erro=erro,
             csrf_token=session["csrf_token"],
             rascunho=session.get("rascunho_orcamento", {}),
         ),
@@ -2414,58 +2429,71 @@ def solicitar_atendimento():
 @app.get("/Pages/Empresa/solicitacoes.html")
 def listar_solicitacoes_empresa():
     usuario = buscar_usuario_sessao()
+
     if usuario is None:
-        return redirect("/Pages/login.html?next=/Pages/Empresa/solicitacoes.html")
+        return redirect(
+            "/Pages/login.html?next=/Pages/Empresa/solicitacoes.html"
+        )
+
     if usuario["tipo"] != "empresa":
         abort(403)
 
     conexao = conectar_banco()
+
     try:
         empresa = conexao.execute(
-            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
+            """
+            SELECT id, nome
+            FROM empresas
+            WHERE usuario_id = ?
+            """,
             (usuario["id"],),
         ).fetchone()
+
         if empresa is None:
-            abort(404, description="Empresa não encontrada.")
+            abort(
+                404,
+                description="Empresa não encontrada.",
+            )
+
         solicitacoes = conexao.execute(
             """
             SELECT s.id, s.aparelho, s.problema, s.status, s.criado_em,
                    s.modalidade_entrada, s.endereco_coleta,
-                   s.valor_final_centavos, s.taxa_devolucao_centavos,
+                   s.orcamento_status, s.valor_final_centavos,
                    s.prazo_minimo_dias, s.prazo_maximo_dias,
-                   s.mensagem_orcamento, s.orcamento_status,
-                   s.resposta_cliente, s.modalidade_saida,
+                   s.taxa_devolucao_centavos, s.resposta_cliente,
+                   s.modalidade_saida,
+                   o.status AS status_orcamento,
+                   o.valor_centavos AS valor_orcamento_centavos,
+                   o.prazo_minimo_dias AS prazo_orcamento_minimo,
+                   o.prazo_maximo_dias AS prazo_orcamento_maximo,
+                   o.taxa_devolucao_centavos AS taxa_orcamento_centavos,
+                   o.modalidade_saida AS saida_orcamento,
                    u.nome AS cliente_nome, u.email AS cliente_email,
                    u.telefone AS cliente_telefone
             FROM solicitacoes AS s
             JOIN usuarios AS u ON u.id = s.cliente_id
+            LEFT JOIN orcamentos AS o ON o.solicitacao_id = s.id
             WHERE s.empresa_id = ?
             ORDER BY s.id DESC
             """,
             (empresa["id"],),
         ).fetchall()
+
     finally:
         conexao.close()
-    solicitacoes = [dict(solicitacao) for solicitacao in solicitacoes]
-    for solicitacao in solicitacoes:
-        try:
-            endereco = json.loads(solicitacao["endereco_coleta"] or "{}")
-        except (TypeError, ValueError):
-            endereco = {}
-        solicitacao["endereco_coleta_formatado"] = ", ".join(
-            str(endereco.get(campo, "")).strip()
-            for campo in ("logradouro_coleta", "numero_coleta", "bairro_coleta", "cidade_coleta", "uf_coleta", "cep_coleta")
-            if endereco.get(campo)
-        )
-    if "csrf_token" not in session:
-        session["csrf_token"] = secrets.token_urlsafe(32)
     resposta = app.make_response(render_template(
         "Empresa/solicitacoes.html", empresa=empresa, solicitacoes=solicitacoes,
-        csrf_token=session["csrf_token"],
     ))
     resposta.headers["Cache-Control"] = "no-store"
     return resposta
 
+from orcamentos import registrar_rotas_orcamentos
+
+registrar_rotas_orcamentos(
+    app, conectar_banco, buscar_usuario_sessao
+)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)

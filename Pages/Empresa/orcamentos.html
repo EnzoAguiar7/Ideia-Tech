@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Orçamentos | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/mensagens.css">
     <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
     <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
     <link rel="stylesheet" href="/Style/Empresa/listasEmpresa.css">
@@ -23,7 +24,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{ empresa['nome'] }}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -61,7 +62,7 @@
             </a>
         </nav>
 
- 
+
         <div class="sidebar-note">
             <span class="note-dot">
             </span>
@@ -85,47 +86,172 @@
             </div>
         </header>
 
+        {% include "_mensagens.html" %}
+
+        {% if erro %}
+        <p class="mensagem mensagem--erro" role="alert">
+            {{ erro }}
+        </p>
+        {% endif %}
+
+        <section class="empresa-lista cadastro-produto">
+            <div class="empresa-lista-topo">
+                <h2>Novo orçamento</h2>
+            </div>
+
+            {% if solicitacoes %}
+            <form action="{{ url_for('orcamentos_empresa') }}" method="POST" class="form-status-os">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <label for="solicitacao">Solicitação recebida</label>
+                <select id="solicitacao" name="solicitacao_id" required>
+                    <option value="">Selecione uma solicitação</option>
+
+                    {% for solicitacao in solicitacoes %}
+                    <option value="{{ solicitacao['id'] }}"
+                        data-min="{{ solicitacao['prazo_minimo_dias'] or 1 }}"
+                        data-max="{{ solicitacao['prazo_maximo_dias'] or 3 }}"
+                        data-logistica="{{ 'Coleta: ' ~ solicitacao['endereco_coleta_formatado'] if solicitacao['modalidade_entrada'] == 'coleta' else 'Cliente levará à assistência' }}" {% if
+                        request.form.get('solicitacao_id')==solicitacao['id']|string %} selected {% endif %}>
+                        #{{ solicitacao['id'] }} —
+                        {{ solicitacao['cliente_nome'] }} —
+                        {{ solicitacao['aparelho'] }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small id="logisticaSolicitacao" aria-live="polite"></small>
+
+                <label for="diagnostico">Diagnóstico técnico</label>
+                <textarea id="diagnostico" name="diagnostico" minlength="5" maxlength="2000" rows="4"
+                    required>{{ request.form.get('diagnostico', '') }}</textarea>
+
+                <label for="servico">Serviço proposto</label>
+                <textarea id="servico" name="servico" minlength="3" maxlength="1000" rows="3"
+                    required>{{ request.form.get('servico', '') }}</textarea>
+
+                <label for="valor">Valor total em reais</label>
+                <input id="valor" name="valor" type="text" inputmode="decimal" maxlength="12" placeholder="Ex.: 450,00"
+                    value="{{ request.form.get('valor', '') }}" required>
+                <small>Use vírgula ou ponto, sem separador de milhar.</small>
+
+                <label for="prazoMinimo">Prazo mínimo estimado (dias úteis)</label>
+                <input id="prazoMinimo" name="prazo_minimo_dias" type="number" min="1" max="365" step="1"
+                    value="{{ request.form.get('prazo_minimo_dias', '1') }}" required>
+
+                <label for="prazoMaximo">Prazo máximo estimado (dias úteis)</label>
+                <input id="prazoMaximo" name="prazo_maximo_dias" type="number" min="1" max="365" step="1"
+                    value="{{ request.form.get('prazo_maximo_dias', '3') }}" required>
+                <small>O cliente verá a faixa e a média. Ajuste os valores após o diagnóstico técnico.</small>
+
+                <label for="taxaDevolucao">Taxa de devolução ao endereço (R$)</label>
+                <input id="taxaDevolucao" name="taxa_devolucao" type="text" inputmode="decimal" maxlength="12"
+                    placeholder="Ex.: 25,00" value="{{ request.form.get('taxa_devolucao', '0,00') }}" required>
+                <small>Se o cliente não solicitou coleta, deixe R$ 0,00. Valor cobrado apenas se ele recusar o reparo e escolher a devolução.</small>
+
+                <button type="submit" class="button primary">
+                    Cadastrar orçamento
+                </button>
+            </form>
+            {% else %}
+            <p>
+                Não há solicitações disponíveis para um novo orçamento.
+                Consulte as solicitações recebidas.
+            </p>
+            {% endif %}
+        </section>
 
         <section class="empresa-lista" aria-labelledby="titulo-orcamentos">
             <div class="empresa-lista-topo">
-                <h2 id="titulo-orcamentos">Orçamentos dos atendimentos</h2>
-                <span class="demo-badge">2 exemplos fictícios</span>
+                <h2 id="titulo-orcamentos">Orçamentos cadastrados</h2>
+                <span>{{ orcamentos|length }} orçamento(s)</span>
             </div>
 
+            {% if orcamentos %}
             <div class="empresa-tabela-wrap">
                 <table class="empresa-tabela">
                     <thead>
                         <tr>
-                            <th scope="col">Cliente</th>
-                            <th scope="col">Aparelho</th>
-                            <th scope="col">Serviço proposto</th>
+                            <th scope="col">Cliente / aparelho</th>
+                            <th scope="col">Diagnóstico / serviço</th>
                             <th scope="col">Valor</th>
+                            <th scope="col">Prazo</th>
                             <th scope="col">Situação</th>
                         </tr>
                     </thead>
+
                     <tbody>
+                        {% for orcamento in orcamentos %}
                         <tr>
-                            <td>Cliente exemplo A</td>
-                            <td>Samsung Galaxy S23</td>
-                            <td>Substituição da tela</td>
-                            <td>R$ 450,00</td>
-                            <td><span class="empresa-situacao">Aguardando aprovação</span></td>
+                            <td>
+                                <strong>{{ orcamento['cliente_nome'] }}</strong>
+                                <br>
+                                {{ orcamento['aparelho'] }}
+                            </td>
+
+                            <td>
+                                <strong>Diagnóstico:</strong>
+                                {{ orcamento['diagnostico'] }}
+                                <br>
+                                <strong>Serviço:</strong>
+                                {{ orcamento['servico'] }}
+                            </td>
+
+                            <td>
+                                R$ {{ ('%.2f' % (orcamento['valor_centavos'] / 100)).replace('.', ',') }}
+                            </td>
+
+                            <td>{{ orcamento['prazo_minimo_dias'] }} a {{ orcamento['prazo_maximo_dias'] }} dias úteis</td>
+
+                            <td>
+                                <span class="empresa-situacao">
+                                    {{ orcamento['status'] }}
+                                </span>
+                                {% if orcamento['ordem_criada'] %}
+                                <br><small>OS criada</small>
+                                {% endif %}
+                                {% if orcamento['status'] in ['Recusado', 'Aprovado'] %}
+                                <br><small>Cliente {{ 'retirará na assistência' if orcamento['modalidade_saida'] == 'retirada' else ('solicitou devolução por R$ %.2f'|format(orcamento['taxa_devolucao_centavos'] / 100) if orcamento['modalidade_saida'] == 'devolucao' else 'aprovou o serviço') }}.</small>
+                                {% endif %}
+                            </td>
                         </tr>
-                        <tr>
-                            <td>Cliente exemplo B</td>
-                            <td>Notebook Dell Inspiron</td>
-                            <td>Limpeza interna e troca de pasta térmica</td>
-                            <td>R$ 180,00</td>
-                            <td><span class="empresa-situacao">Aprovado</span></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% else %}
+            <p>Sua empresa ainda não cadastrou orçamentos.</p>
+            {% endif %}
         </section>
 
-        <p class="demo-note">Dados fictícios de demonstração. Nada é consultado ou salvo no banco.</p>
         <footer>IdeiaTech <span>Organização para quem cuida de tecnologia.</span></footer>
     </main>
+    <script>
+        (() => {
+            const seletor = document.querySelector('#solicitacao');
+            if (!seletor) return;
+            const minimo = document.querySelector('#prazoMinimo');
+            const maximo = document.querySelector('#prazoMaximo');
+            const logistica = document.querySelector('#logisticaSolicitacao');
+            const atualizar = () => {
+                const opcao = seletor.selectedOptions[0];
+                if (!opcao?.value) {
+                    logistica.textContent = '';
+                    return;
+                }
+                if (minimo.dataset.editado !== 'true') minimo.value = opcao.dataset.min || '1';
+                if (maximo.dataset.editado !== 'true') maximo.value = opcao.dataset.max || '3';
+                logistica.textContent = opcao.dataset.logistica || '';
+            };
+            minimo.addEventListener('input', () => { minimo.dataset.editado = 'true'; });
+            maximo.addEventListener('input', () => { maximo.dataset.editado = 'true'; });
+            seletor.addEventListener('change', () => {
+                minimo.dataset.editado = 'false';
+                maximo.dataset.editado = 'false';
+                atualizar();
+            });
+            atualizar();
+        })();
+    </script>
 </body>
 
 </html>

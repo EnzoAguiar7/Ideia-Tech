@@ -51,63 +51,8 @@
 
         <section class="ordem-servico" aria-labelledby="titulo-orcamentos-cliente">
             <h2 id="titulo-orcamentos-cliente">Orçamentos das assistências</h2>
-            {% for solicitacao in solicitacoes %}
-            <article class="solicitacao-orcamento">
-                <div class="ordem-cabecalho">
-                    <div>
-                        <span class="texto-destaque">{{ solicitacao['empresa_nome'] }} · Solicitação #{{ solicitacao['id'] }}</span>
-                        <h3>{{ solicitacao['aparelho'] }}</h3>
-                    </div>
-                    <span class="status-atual">{{ solicitacao['orcamento_status'] }}</span>
-                </div>
-                <p><strong>Problema:</strong> {{ solicitacao['problema'] }}</p>
-                {% if solicitacao['valor_final_centavos'] is not none %}
-                <p><strong>Orçamento final do reparo:</strong>
-                    R$ {{ ('%.2f' % (solicitacao['valor_final_centavos'] / 100)).replace('.', ',') }}</p>
-                {% if solicitacao['prazo_minimo_dias'] and solicitacao['prazo_maximo_dias'] %}
-                <p><strong>Prazo estimado após análise:</strong>
-                    {{ solicitacao['prazo_minimo_dias'] }} a {{ solicitacao['prazo_maximo_dias'] }} dias úteis
-                    (média {{ ('%.1f' % ((solicitacao['prazo_minimo_dias'] + solicitacao['prazo_maximo_dias']) / 2)).replace('.', ',') }} dias úteis).
-                </p>
-                <p>É uma previsão para sua aprovação; o prazo exato será confirmado pela assistência conforme a disponibilidade das peças e a fila de atendimento.</p>
-                {% endif %}
-                {% if solicitacao['mensagem_orcamento'] %}<p>{{ solicitacao['mensagem_orcamento'] }}</p>{% endif %}
-                {% if solicitacao['modalidade_entrada'] == 'coleta' %}
-                <p><strong>Taxa para devolver o aparelho:</strong>
-                    {% if solicitacao['taxa_devolucao_centavos'] is not none %}
-                    R$ {{ ('%.2f' % (solicitacao['taxa_devolucao_centavos'] / 100)).replace('.', ',') }}
-                    {% else %}A assistência ainda não informou{% endif %}
-                </p>
-                {% endif %}
-                {% if solicitacao['orcamento_status'] == 'Aguardando aprovação' %}
-                <form method="post" action="/Pages/solicitacoes/{{ solicitacao['id'] }}/responder" class="resposta-orcamento">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <button class="atendimento-submit" type="submit" name="resposta" value="aceitar">Aceitar orçamento</button>
-                </form>
-                <form method="post" action="/Pages/solicitacoes/{{ solicitacao['id'] }}/responder" class="resposta-orcamento">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <input type="hidden" name="resposta" value="recusar">
-                    <label for="saida-{{ solicitacao['id'] }}">Se recusar, como deseja receber o aparelho?</label>
-                    <select id="saida-{{ solicitacao['id'] }}" name="modalidade_saida" required>
-                        {% if solicitacao['modalidade_entrada'] == 'coleta' and solicitacao['taxa_devolucao_centavos'] is not none %}
-                        <option value="devolucao">Solicitar devolução por R$ {{ ('%.2f' % (solicitacao['taxa_devolucao_centavos'] / 100)).replace('.', ',') }}</option>
-                        {% endif %}
-                        <option value="retirada">Vou buscar na assistência</option>
-                    </select>
-                    <button class="atendimento-submit" type="submit">Recusar orçamento</button>
-                </form>
-                {% elif solicitacao['orcamento_status'] == 'Aprovado' %}
-                <p>Você aceitou o reparo. A assistência dará continuidade ao atendimento.</p>
-                {% elif solicitacao['orcamento_status'] == 'Recusado' %}
-                <p>Você escolheu: {{ 'receber o aparelho no endereço' if solicitacao['modalidade_saida'] == 'devolucao' else 'buscar o aparelho na assistência' }}.</p>
-                {% endif %}
-                {% else %}
-                <p>A solicitação foi enviada. O valor final e eventual taxa de devolução aparecerão aqui após a análise da assistência.</p>
-                {% endif %}
-            </article>
-            {% else %}
-            <p>Quando você solicitar um atendimento, os orçamentos aparecerão aqui.</p>
-            {% endfor %}
+            <p>Consulte os valores definidos pela assistência, autorize o serviço e escolha como receber o aparelho na página de orçamentos.</p>
+            <a class="atendimento-submit" href="/Pages/MeusOrcamentos.html">Ver meus orçamentos</a>
         </section>
 
         {% for ordem in ordens %}

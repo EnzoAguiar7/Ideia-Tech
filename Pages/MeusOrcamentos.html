@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meus orçamentos | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/mensagens.css">
+    <link rel="stylesheet" href="/Style/Empresa/painelEmpresa.css">
+    <link rel="stylesheet" href="/Style/Empresa/ordensServico.css">
+    <link rel="stylesheet" href="/Style/Empresa/listasEmpresa.css">
+    <link rel="stylesheet" href="/Style/responsivo.css">
+    <script defer src="/Script/vendor/lucide.min.js"></script>
+    <script defer src="/Script/icones.js"></script>
+</head>
+<body>
+    <main class="pagina-orcamentos-cliente">
+        <header class="page-heading">
+            <div>
+                <p class="eyebrow">Área do cliente</p>
+                <h1>Meus orçamentos</h1>
+                <p>Revise o diagnóstico, o serviço, o valor e o prazo antes de decidir.</p>
+                <a href="/Pages/Perfil.html">Voltar ao perfil</a>
+            </div>
+        </header>
+        {% include "_mensagens.html" %}
+        {% if orcamentos %}
+        {% for orcamento in orcamentos %}
+        <section class="empresa-lista">
+            <div class="empresa-lista-topo">
+                <h2>{{ orcamento['empresa_nome'] }} · #{{ orcamento['id'] }}</h2>
+                <span>{{ orcamento['status'] }}</span>
+            </div>
+            <p><strong>Aparelho:</strong> {{ orcamento['aparelho'] }}</p>
+            <p><strong>Problema informado:</strong> {{ orcamento['problema'] }}</p>
+            <p><strong>Diagnóstico:</strong> {{ orcamento['diagnostico'] }}</p>
+            <p><strong>Serviço:</strong> {{ orcamento['servico'] }}</p>
+            <p><strong>Valor:</strong> R$ {{ ('%.2f' % (orcamento['valor_centavos'] / 100)).replace('.', ',') }}</p>
+            <p><strong>Prazo estimado:</strong> de {{ orcamento['prazo_minimo_dias'] }} a {{ orcamento['prazo_maximo_dias'] }} dias úteis.</p>
+            <p class="aviso-orcamento">O valor foi definido pela assistência após analisar o aparelho. O prazo é uma estimativa e pode variar conforme a disponibilidade de peças e a fila de atendimento.</p>
+            {% if orcamento['status'] == 'Recusado' %}
+            <p>Você escolheu: {{ 'receber o aparelho no endereço' if orcamento['modalidade_saida'] == 'devolucao' else 'retirar o aparelho na assistência' }}{% if orcamento['modalidade_saida'] == 'devolucao' %}, com taxa de devolução de R$ {{ ('%.2f' % (orcamento['taxa_devolucao_centavos'] / 100)).replace('.', ',') }}{% endif %}.</p>
+            {% endif %}
+            {% if orcamento['status'] == 'Aguardando aprovação' %}
+            <form action="/Pages/MeusOrcamentos/{{ orcamento['id'] }}/decisao" method="POST" class="acoes-orcamento-cliente">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <button class="button primary" type="submit" name="decisao" value="Aprovado">Aprovar e gerar ordem de serviço</button>
+            </form>
+            <form action="/Pages/MeusOrcamentos/{{ orcamento['id'] }}/decisao" method="POST" class="acoes-orcamento-cliente">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="decisao" value="Recusado">
+                <label for="saida-{{ orcamento['id'] }}">Se recusar, como deseja receber o aparelho?</label>
+                <select id="saida-{{ orcamento['id'] }}" name="modalidade_saida" required>
+                    {% if orcamento['modalidade_entrada'] == 'coleta' %}
+                    <option value="devolucao">Devolução no endereço (taxa: R$ {{ ('%.2f' % (orcamento['taxa_devolucao_centavos'] / 100)).replace('.', ',') }})</option>
+                    {% endif %}
+                    <option value="retirada">Vou retirar na assistência</option>
+                </select>
+                <button class="button secondary" type="submit">Recusar orçamento</button>
+            </form>
+            {% elif orcamento['status'] == 'Aprovado' %}
+            <p>{% if orcamento['ordem_criada'] %}Ordem de serviço criada. <a href="/Pages/Acompanhar.html">Acompanhar atendimento</a>{% else %}Aprovado{% endif %}</p>
+            {% endif %}
+        </section>
+        {% endfor %}
+        {% else %}
+        <section class="empresa-lista"><p>Você ainda não recebeu orçamentos.</p></section>
+        {% endif %}
+    </main>
+</body>
+</html>

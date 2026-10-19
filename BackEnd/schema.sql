@@ -55,6 +55,7 @@ CREATE INDEX IF NOT EXISTS idx_tentativas_recuperacao_chave_tempo
 
 CREATE TABLE IF NOT EXISTS ordens_servico (
     id INTEGER PRIMARY KEY,
+    orcamento_id INTEGER UNIQUE,
     empresa_id INTEGER NOT NULL,
     cliente_id INTEGER NOT NULL,
     aparelho TEXT NOT NULL,
@@ -71,7 +72,8 @@ CREATE TABLE IF NOT EXISTS ordens_servico (
         previsao TEXT,
         criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (empresa_id) REFERENCES empresas(id),
-        FOREIGN KEY (cliente_id) REFERENCES usuarios(id)
+        FOREIGN KEY (cliente_id) REFERENCES usuarios(id),
+        FOREIGN KEY (orcamento_id) REFERENCES orcamentos(id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_ordens_empresa
@@ -206,3 +208,21 @@ CREATE INDEX IF NOT EXISTS idx_solicitacoes_empresa
 
 CREATE INDEX IF NOT EXISTS idx_solicitacoes_cliente
     ON solicitacoes(cliente_id);
+
+CREATE TABLE IF NOT EXISTS orcamentos (
+    id INTEGER PRIMARY KEY,
+    solicitacao_id INTEGER NOT NULL UNIQUE,
+    diagnostico TEXT NOT NULL,
+    servico TEXT NOT NULL,
+    valor_centavos INTEGER NOT NULL CHECK (valor_centavos > 0),
+    prazo_dias INTEGER NOT NULL CHECK (prazo_dias BETWEEN 1 AND 365),
+    prazo_minimo_dias INTEGER NOT NULL DEFAULT 1 CHECK (prazo_minimo_dias BETWEEN 1 AND 365),
+    prazo_maximo_dias INTEGER NOT NULL DEFAULT 3 CHECK (prazo_maximo_dias BETWEEN prazo_minimo_dias AND 365),
+    taxa_devolucao_centavos INTEGER NOT NULL DEFAULT 0 CHECK (taxa_devolucao_centavos >= 0),
+    modalidade_saida TEXT NOT NULL DEFAULT '' CHECK (modalidade_saida IN ('', 'devolucao', 'retirada')),
+    status TEXT NOT NULL DEFAULT 'Aguardando aprovação'
+        CHECK (status IN ('Aguardando aprovação', 'Aprovado', 'Recusado')),
+    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    respondido_em TEXT,
+    FOREIGN KEY (solicitacao_id) REFERENCES solicitacoes(id)
+);
