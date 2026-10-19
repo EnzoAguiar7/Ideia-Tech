@@ -23,7 +23,7 @@
         <div class="workspace">
             <span class="workspace-avatar">IT</span>
             <div>
-                <strong>Sua assistência</strong>
+                <strong>{{ empresa["nome"] }}</strong>
                 <span>Espaço de trabalho</span>
             </div>
         </div>
@@ -85,7 +85,10 @@
         <section aria-labelledby="titulo-aparelhos">
             <div class="lista-barra">
                 <h2 id="titulo-aparelhos">Aparelhos na assistência</h2>
-                <p>2 aparelhos</p>
+                <p>
+                    {{ aparelhos|length }}
+                    {{ 'aparelho' if aparelhos|length == 1 else 'aparelhos' }}
+                </p>
             </div>
 
             <div class="tabela-wrap">
@@ -100,48 +103,49 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for aparelho in aparelhos %}
                         <tr>
                             <td data-label="Aparelho">
                                 <div class="aparelho-nome">
                                     <i data-lucide="smartphone" aria-hidden="true"></i>
                                     <div>
-                                        <strong>Samsung Galaxy S23</strong>
-                                        <small>Celular</small>
+                                        <strong>{{ aparelho["aparelho"] }}</strong>
+                                        <small>Ordem #{{ aparelho["id"] }}</small>
                                     </div>
                                 </div>
                             </td>
-                            <td data-label="Cliente">Cliente exemplo A</td>
-                            <td data-label="Problema">Tela não acende após queda.</td>
-                            <td data-label="Previsão">A definir após avaliação</td>
+
+                            <td data-label="Cliente">
+                                {{ aparelho["cliente_nome"] }}
+                            </td>
+
+                            <td data-label="Problema">
+                                {{ aparelho["problema"] }}
+                            </td>
+
+                            <td data-label="Previsão">
+                                {{ aparelho["previsao"] or "A definir após avaliação" }}
+                            </td>
+
                             <td data-label="Status">
-                                <span class="status status-diagnostico">Em diagnóstico</span>
+                                <span class="status status-diagnostico">
+                                    {{ aparelho["status"] }}
+                                </span>
                             </td>
                         </tr>
+
+                        {% else %}
                         <tr>
-                            <td data-label="Aparelho">
-                                <div class="aparelho-nome">
-                                    <i data-lucide="laptop" aria-hidden="true"></i>
-                                    <div>
-                                        <strong>Notebook Dell Inspiron</strong>
-                                        <small>Notebook</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td data-label="Cliente">Cliente exemplo B</td>
-                            <td data-label="Problema">Aparelho desligava durante o uso.</td>
-                            <td data-label="Previsão">Disponível para retirada</td>
-                            <td data-label="Status">
-                                <span class="status status-pronto">Pronto para retirada</span>
+                            <td colspan="5">
+                                Nenhum aparelho cadastrado. Crie uma ordem de serviço para começar.
                             </td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <p class="demo-note">
-            Dados fictícios de demonstração. Nada é consultado ou salvo no banco.
-        </p>
 
         <footer>IdeiaTech</footer>
     </main>

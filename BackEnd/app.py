@@ -2495,5 +2495,32 @@ registrar_rotas_orcamentos(
     app, conectar_banco, buscar_usuario_sessao
 )
 
+@app.route("/Pages/Empresa/aparelhosCadastrados.html")
+def aparelhos_cadastrados():
+    usuario = buscar_usuario_sessao()
+
+    if usuario is None:
+        return redirect("/Pages/login.html")
+
+    if usuario["tipo"] != "empresa":
+        abort(403)
+
+    conexao = conectar_banco()
+
+    try:
+        empresa = conexao.execute(
+            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
+            (usuario["id"],)
+        ).fetchone()
+
+    finally:
+        conexao.close()
+
+    return render_template(
+        "Empresa/aparelhosCadastrados.html",
+        empresa=empresa,
+        aparelhos=aparelhos
+    )
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)
