@@ -114,6 +114,35 @@ if "tipo" not in colunas_usuarios:
         """
     )
 
+colunas_novos_usuarios = {
+    "cep": "TEXT NOT NULL DEFAULT ''",
+    "logradouro": "TEXT NOT NULL DEFAULT ''",
+    "numero_endereco": "TEXT NOT NULL DEFAULT ''",
+    "complemento": "TEXT NOT NULL DEFAULT ''",
+    "bairro": "TEXT NOT NULL DEFAULT ''",
+    "cidade": "TEXT NOT NULL DEFAULT ''",
+    "uf": "TEXT NOT NULL DEFAULT ''",
+}
+
+for coluna, definicao in colunas_novos_usuarios.items():
+    if coluna not in colunas_usuarios:
+        conexao.execute(f"ALTER TABLE usuarios ADD COLUMN {coluna} {definicao}")
+
+
+colunas_pedidos = {
+    linha[1] for linha in conexao.execute("PRAGMA table_info(pedidos)")
+}
+
+colunas_novos_pedidos = {
+    "modalidade_entrega": "TEXT NOT NULL DEFAULT 'retirada'",
+    "endereco_entrega": "TEXT NOT NULL DEFAULT ''",
+    "frete_centavos": "TEXT NOT NULL DEFAULT 0",
+}
+
+for coluna, definicao in colunas_novas_pedidos.items():
+    if coluna not in colunas_pedidos:
+        conexao.execute(f"ALTER TABLE pedidos ADD COLUMN {coluna} {definicao}")
+
 colunas_empresas = {
     linha [1]
     for linha in conexao.execute("PRAGMA table_info(empresas)")

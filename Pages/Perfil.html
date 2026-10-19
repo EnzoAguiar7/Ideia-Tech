@@ -247,45 +247,28 @@
 
 
             <!-- ENDEREÇO -->
+            {% if usuario['logradouro'] %}
+            <strong id="perfil-endereco">
+                {{ usuario['logradouro'] }}, {{ usuario['numero_endereco'] }}
+                {% if usuario['complemento'] %} · {{ usuario['complemento'] }}{% endif %}
+            </strong>
 
-            <div class="perfil-card">
+            <p id="perfil-cidade">
+                {{ usuario['bairro'] }} · {{ usuario['cidade'] }} - {{ usuario['uf'] }}
+            </p>
 
-                <div class="perfil-card-topo">
+            <p id="perfil-cep">
+                CEP {{ usuario['cep'][:5] }}-{{ usuario['cep'][5:] }}
+            </p>
+            {% else %}
+            <strong id="perfil-endereco">Endereço não informado</strong>
+            <p id="perfil-cidade">Cadastre seu endereço para agilizar suas compras.</p>
+            {% endif %}
 
-                    <div>
-                        <span class="card-etiqueta">
-                            ENDEREÇO
-                        </span>
-
-                        <h2>Endereço principal</h2>
-                    </div>
-
-                    <i data-lucide="map-pin"></i>
-
-                </div>
-
-
-                <div class="endereco">
-
-                    <strong id="perfil-endereco">
-                        Endereço não informado
-                    </strong>
-
-                    <p id="perfil-cidade">
-                        Cidade - UF
-                    </p>
-
-                    <p id="perfil-cep">
-                        CEP 00000-000
-                    </p>
-
-                </div>
-
-
-                <button type="button" class="botao-secundario" id="botao-editar-endereco">
-                    <i data-lucide="pencil"></i>
-                    Alterar endereço
-                </button>
+            <button type="button" class="botao-secundario" id="botao-editar-endereco">
+                <i data-lucide="pencil"></i>
+                Alterar endereço
+            </button>
 
             </div>
 
@@ -313,39 +296,29 @@
 
             <div class="historico-lista">
 
-                <!-- Serviço de exemplo -->
-
+            
+                {% for servico in servicos %}
                 <div class="historico-item">
-
                     <div class="historico-icone">
                         <i data-lucide="smartphone"></i>
                     </div>
 
                     <div class="historico-info">
-
-                        <strong>
-                            Troca de tela
-                        </strong>
-
-                        <span>
-                            Smartphone
-                        </span>
-
+                        <strong>{{ servico['problema'] }}</strong>
+                        <span>{{ servico['aparelho'] }}</span>
                     </div>
 
                     <div class="historico-status">
-
-                        <span class="status status-andamento">
-                            Em andamento
+                        <span
+                            class="status {{ 'status-concluido' if servico['status'] == 'Entregue' else 'status-andamento' }}">
+                            {{ servico['status'] }}
                         </span>
-
-                        <small>
-                            OS-2026-0148
-                        </small>
-
+                        <small>OS-{{ '%04d'|format(servico['id']) }}</small>
                     </div>
-
                 </div>
+                {% else %}
+                <p>Você ainda não possui serviços cadastrados.</p>
+                {% endfor %}
 
 
                 <!-- Serviço de exemplo -->

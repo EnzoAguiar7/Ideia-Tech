@@ -13,6 +13,13 @@ CREATE TABLE if NOT EXISTS usuarios (
     email TEXT NOT NULL UNIQUE,
     telefone TEXT NOT NULL,
     senha_hash TEXT NOT NULL,
+    cep TEXT NOT NULL DEFAULT '',
+    logradouro TEXT NOT NULL DEFAULT '',
+    numero_endereco TEXT NOT NULL DEFAULT '',
+    complemento TEXT NOT NULL DEFAULT '',
+    bairro TEXT NOT NULL DEFAULT '',
+    cidade TEXT NOT NULL DEFAULT '',
+    uf TEXT NOT NULL DEFAULT '',
     versao_sessao INTEGER NOT NULL DEFAULT 0,
     tipo TEXT NOT NULL DEFAULT 'cliente'
     CHECK (tipo IN ('cliente', 'empresa')),
@@ -130,6 +137,11 @@ CREATE TABLE IF NOT EXISTS pedidos (
         )),
     total_centavos INTEGER NOT NULL
         CHECK (total_centavos >= 0),
+    modalidade_entrega TEXT NOT NULL DEFAULT 'retirada'
+        CHECK (modalidade_entrega IN ('retirada', 'entrega')),
+    endereco_entrega TEXT NOT NULL DEFAULT '',
+    frete_centavos INTEGER NOT NULL DEFAULT 0
+        CHECK (frete_centavos >= 0),
 
     criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,

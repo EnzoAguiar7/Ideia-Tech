@@ -110,7 +110,10 @@
     const campoCep = formularioFrete?.querySelector('[name="cep"]');
     const resultadoFrete = document.querySelector('[data-resultado-frete]');
     const botaoConsultarCep = formularioFrete?.querySelector('[data-consultar-cep]');
-
+    const camposEntrega = document.querySelector('[data-campos=entrega');
+    const modalidadesEntrega = formularioFrete?.querySelectorAll(
+        '[name="modalidade'
+    )
 
     if (formularioFrete && campoCep && resultadoFrete && botaoConsultarCep) {
         function formatarCep() {

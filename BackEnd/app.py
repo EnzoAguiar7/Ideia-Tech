@@ -906,7 +906,8 @@ def buscar_usuario_sessao():
     try:
         usuario = conexao.execute(
             """
-            SELECT id, nome, email, telefone, versao_sessao, tipo
+            SELECT id, nome, email, telefone, cep, logradouro, numero_endereco,
+            complemento, bairro, cidade, uf,versao_sessao, tipo
             FROM usuarios
             WHERE id = ?
             """,
@@ -1162,8 +1163,25 @@ def perfil():
     if usuario["tipo"] != "cliente":
         return redirect(pagina_inicial_usuario(usuario["tipo"]))
 
+
+        conexao = conectar_banco()
+        try:
+            sevicos = conexao.execute(
+                """
+                SELECT id, aparelho, problema, status
+                FROM ordens_servico
+                WHERE cliente_id = ?
+                ORDER BY id DESC
+                LIMIT 5
+                """,
+                (usuario["id"],),
+            ).fetchall()
+
+        finally:
+                conexao.close()
+
     resposta = app.make_response(
-        render_template("Perfil.html", usuario=usuario)
+        render_template("Perfil.html", usuario=usuario, servicos=servicos)
     )
     resposta.headers["Cache-Control"] = "no-store"
 
@@ -1247,7 +1265,7 @@ def editar_perfil():
         render_template(
             "editarPerfil.html",
             usuario=usuario,
-            erro=erro,
+            erro=erro
             csrf_token=session["csrf_token"]
         )
     )
