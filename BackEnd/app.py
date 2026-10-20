@@ -17,6 +17,7 @@ from urllib.parse import urlsplit
 from configuracao import carregar_configuracao
 from decimal import Decimal, InvalidOperation
 import banco
+from frete import calcular_frete, formatar_endereco
 
 carregar_configuracao()
 
@@ -861,6 +862,17 @@ def endereco_usuario():
     return jsonify({"mensagem": "Endereço salvo na conta.", **dados})
 
 
+@app.get("/api/frete")
+def consultar_frete():
+    valor, regiao = calcular_frete(request.args.get("cep", ""))
+    if valor is None:
+        return jsonify({"erro": "Informe um CEP válido com 8 números."}), 400
+
+    resposta = jsonify({"frete_centavos": valor, "regiao": regiao})
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
+
+
 @app.post("/logout")
 def sair ():
     session.clear()
@@ -1067,6 +1079,42 @@ def ordens_servico():
         csrf_token=session["csrf_token"],
         status_disponiveis=STATUS_ORDENS
     ), codigo_resposta
+
+
+@app.get("/Pages/Empresa/aparelhosCadastrados.html")
+def aparelhos_cadastrados():
+    usuario = buscar_usuario_sessao()  # before_request já exige empresa
+    conexao = conectar_banco()
+    try:
+        empresa = conexao.execute(
+            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
+            (usuario["id"],),
+        ).fetchone()
+
+        if empresa is None:
+            abort(404, description="Não há empresa vinculada a esta conta.")
+
+        aparelhos = conexao.execute(
+            """
+            SELECT o.id, o.aparelho, o.problema, o.status, o.previsao,
+                   u.nome AS cliente_nome
+            FROM ordens_servico AS o
+            JOIN usuarios AS u ON u.id = o.cliente_id
+            WHERE o.empresa_id = ?
+            ORDER BY o.id DESC
+            """,
+            (empresa["id"],),
+        ).fetchall()
+    finally:
+        conexao.close()
+
+    resposta = app.make_response(render_template(
+        "Empresa/aparelhosCadastrados.html",
+        empresa=empresa,
+        aparelhos=aparelhos,
+    ))
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
 
 
 @app.post("/Pages/Empresa/ordens/<int:ordem_id>/status")
@@ -1500,6 +1548,7 @@ def catalogo_produtos_banco():
 
     catalogo = {
         f"produto-{produto['id']}":{
+            "empresa_id": produto["empresa_id"],
             "nome":produto["nome"],
             "preco":produto["preco_centavos"],
             "estoque":produto["estoque"],
@@ -1594,6 +1643,11 @@ def criar_pedido():
         quantidades[produto_id] = quantidade
 
     marcadores = ",".join("?" for _ in quantidades)
+
+    endereco_entrega = formatar_endereco(usuario)
+    modalidade_entrega = "entrega" if endereco_entrega else "retirada"
+    frete_centavos = (calcular_frete(usuario["cep"])[0] or 0) if endereco_entrega else 0
+
     conexao = conectar_banco()
 
     try:
@@ -1641,24 +1695,27 @@ def criar_pedido():
         pedidos_criados = []
 
         for empresa_id, itens_empresa in produtos_por_empresa.items():
-            total_centavos = sum(
+            total_produtos = sum(
                 produto["preco_centavos"] * quantidade
                 for produto, quantidade in itens_empresa
             )
+            total_centavos = total_produtos + frete_centavos
 
             cursor = conexao.execute(
                 """
                 INSERT INTO pedidos (
-                empresa_id,
-                cliente_id,
-                total_centavos
+                    empresa_id, cliente_id, total_centavos,
+                    modalidade_entrega, endereco_entrega, frete_centavos
                 )
-                VALUES (?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
                     empresa_id,
                     usuario["id"],
-                    total_centavos
+                    total_centavos,
+                    modalidade_entrega,
+                    endereco_entrega or "",
+                    frete_centavos,
                 )
             )
 
@@ -1726,7 +1783,9 @@ def criar_pedido():
 
     return jsonify({
         "mensagem": "Pedido confirmado com sucesso.",
-        "pedidos": pedidos_criados
+        "pedidos": pedidos_criados,
+        "frete_centavos": frete_centavos,
+        "modalidade_entrega": modalidade_entrega
     }), 201
 
 
@@ -1745,7 +1804,8 @@ def meus_pedidos():
     try:
         pedidos = conexao.execute(
             """
-            SELECT p.id, p.status, p.total_centavos,
+            SELECT p.id, p.status, p.total_centavos, p.modalidade_entrega,
+                    p.endereco_entrega, p.frete_centavos,
                     e.nome AS empresa_nome
             FROM pedidos AS p
             JOIN empresas AS e ON e.id = p.empresa_id
@@ -1827,7 +1887,8 @@ def listar_pedidos_empresa():
 
         pedidos = conexao.execute(
                   """
-            SELECT p.id, p.status, p.total_centavos,
+            SELECT p.id, p.status, p.total_centavos, p.modalidade_entrega,
+                   p.endereco_entrega, p.frete_centavos,
                    u.nome AS cliente_nome
             FROM pedidos AS p
             JOIN usuarios AS u ON u.id = p.cliente_id

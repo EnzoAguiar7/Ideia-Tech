@@ -74,6 +74,26 @@
                     </dd>
                 </div>
                 {% endfor %}
+                <div>
+                    <dt>Entrega</dt>
+                    <dd>
+                        {% if pedido['modalidade_entrega'] == 'entrega' %}
+                        {{ pedido['endereco_entrega'] }}
+                        {% else %}
+                        Retirada na loja
+                        {% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt>Frete</dt>
+                    <dd>
+                        {% if pedido['frete_centavos'] %}
+                        R$ {{ ('%.2f' % (pedido['frete_centavos'] / 100)).replace('.', ',') }}
+                        {% else %}
+                        Grátis
+                        {% endif %}
+                    </dd>
+                </div>
             </dl>
 
             <p>

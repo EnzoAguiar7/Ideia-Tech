@@ -2,6 +2,9 @@
     const chave = 'ideiaTech.carrinho.v1';
     const chaveEnderecoEntrega = 'ideiaTech.enderecoEntrega.v1';
     const catalogo = window.CatalogoProdutos;
+    let fretePorEmpresa = null;
+    let enderecoNaConta = false;
+    let enderecoDaConta = false;
     let enviandoPedido = false;
     const moeda = valor => (valor / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     function ler() {
@@ -104,6 +107,22 @@
         document.querySelector('[data-total-carrinho]').textContent = moeda(total);
         document.querySelector('[data-quantidade-resumo]').textContent = quantidade + (quantidade === 1 ? ' produto' : ' produtos');
         document.querySelector('[data-pagar]').disabled = enviandoPedido || !itens.length || itens.some(item => catalogo[item.id].estoque < item.quantidade);
+        atualizarResumoFrete();
+    }
+
+    function atualizarResumoFrete() {
+        const campoFrete = document.querySelector('[data-valor-frete]');
+        const campoTotal = document.querySelector('[data-total-pedido]');
+        if (fretePorEmpresa === null || !campoFrete || !campoTotal) return;
+        const itens = ler();
+        if (!itens.length) return;
+        const empresas = new Set(itens.map(item => catalogo[item.id].empresa_id));
+        const frete = fretePorEmpresa * Math.max(empresas.size, 1);
+        const produtos = itens.reduce(
+            (soma, item) => soma + catalogo[item.id].preco * item.quantidade, 0
+        );
+        campoFrete.textContent = moeda(frete);
+        campoTotal.textContent = moeda(produtos + frete);
     }
 
     const formularioFrete = document.querySelector('[data-forma-frete]');
@@ -119,7 +138,6 @@
                 : numeros;
         }
 
-        let enderecoDaConta = false;
         fetch('/api/endereco', { credentials: 'same-origin' })
             .then(resposta => {
                 if (!resposta.ok) return null;
@@ -133,7 +151,11 @@
                         campo.value = endereco[campo.name];
                     }
                 });
+                enderecoNaConta = ['cep', 'logradouro', 'numero', 'bairro', 'cidade', 'uf']
+                    .every(campo => endereco[campo]);
                 formatarCep();
+                const cepConta = campoCep.value.replace(/\D/g, '');
+                if (/^\d{8}$/.test(cepConta)) consultarFrete(cepConta);
             })
             .catch(() => {});
 
@@ -157,6 +179,22 @@
 
         formatarCep();
         campoCep.addEventListener('input', formatarCep);
+        formularioFrete.addEventListener('input', () => { enderecoNaConta = false; });
+
+        async function consultarFrete(cep) {
+            try {
+                const resposta = await fetch(`/api/frete?cep=${cep}`, {
+                    credentials: 'same-origin'
+                });
+                const dados = await resposta.json();
+                if (!resposta.ok) throw new Error(dados.erro || 'Não foi possível calcular o frete.');
+                fretePorEmpresa = dados.frete_centavos;
+            } catch (erro) {
+                fretePorEmpresa = null;
+                resultadoFrete.textContent = erro.message || 'Falha ao calcular o frete.';
+            }
+            atualizarResumoFrete();
+        }
 
         async function consultarCep() {
             const cep = campoCep.value.replace(/\D/g, '');
@@ -212,6 +250,8 @@
                     }
                 });
 
+                await consultarFrete(cep);
+
                 resultadoFrete.textContent =
                     'Endereço localizado. Confira os dados e preencha o número.';
             } catch (erro) {
@@ -237,6 +277,8 @@
             }
 
             campoCep.removeAttribute('aria-invalid');
+
+            await consultarFrete(cep);
 
             const endereco = Object.fromEntries(
                 new FormData(formularioFrete).entries()
@@ -267,7 +309,8 @@
                     });
                     const resultado = await resposta.json();
                     if (!resposta.ok) throw new Error(resultado.erro || 'Não foi possível salvar na conta.');
-                    resultadoFrete.textContent = 'Endereço salvo na sua conta. O valor do frete depende do cadastro das faixas regionais.';
+                    enderecoNaConta = true;
+                    resultadoFrete.textContent = 'Endereço salvo na sua conta e frete calculado.';
                     return;
                 } catch (erro) {
                     resultadoFrete.textContent = erro.message || 'Endereço guardado apenas nesta sessão.';
@@ -276,8 +319,8 @@
             }
 
             resultadoFrete.textContent = enderecoGuardado
-                ? 'Endereço guardado nesta sessão. A consulta do valor depende do cadastro das faixas regionais de frete.'
-                : 'Endereço preenchido. A consulta do valor depende do cadastro das faixas regionais de frete.';
+                ? 'Endereço guardado nesta sessão. Entre na conta para salvar e calcular o frete.'
+                : 'Endereço preenchido. Entre na conta para salvar e calcular o frete.';
         });
     }
     document.querySelectorAll('.botao-carrinho[data-produto-id]').forEach(botao => {
@@ -301,6 +344,12 @@
         if (enviandoPedido) return;
         const itens = ler();
         if (!itens.length || itens.some(item => item.quantidade > catalogo[item.id].estoque)) { atualizar(); return; }
+        if (enderecoDaConta && (!enderecoNaConta || fretePorEmpresa === null)) {
+            avisar('Salve o endereço de entrega na sua conta antes de confirmar o pedido.');
+            document.querySelector('[data-forma-frete]')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
         enviandoPedido = true;
         botao.disabled = true;
         try {

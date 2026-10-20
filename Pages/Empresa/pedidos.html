@@ -132,6 +132,7 @@
                         <tr>
                             <th scope="col">Pedido</th>
                             <th scope="col">Cliente</th>
+                            <th scope="col">Entrega</th>
                             <th scope="col">Produtos</th>
                             <th scope="col">Total do pedido</th>
                             <th scope="col">Situação</th>
@@ -146,6 +147,16 @@
                             </th>
 
                             <td>{{ pedido['cliente_nome'] }}</td>
+
+                            <td>
+                                {% if pedido['modalidade_entrega'] == 'entrega' %}
+                                {{ pedido['endereco_entrega'] }}
+                                <br>
+                                Frete: R$ {{ ('%.2f' % (pedido['frete_centavos'] / 100)).replace('.', ',') }}
+                                {% else %}
+                                Retirada na loja
+                                {% endif %}
+                            </td>
 
                             <td>
                                 {% for item in itens_por_pedido.get(pedido['id'], []) %}
