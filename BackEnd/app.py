@@ -364,7 +364,10 @@ def validar_csrf():
     if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
         return
 
-    token_enviado = request.form.get("csrf_token", "")
+    token_enviado = (
+        request.form.get("csrf_token", "")
+        or request.headers.get("X-CSRF-Token", "")
+    )
     token_esperado = session.get("csrf_token", "")
 
     if not token_enviado or not token_esperado:
@@ -378,6 +381,72 @@ def validar_csrf():
 def inicio():
     return redirect("/Pages/index.html")
 
+@app.get("/Pages/Empresa/painelEmpresa.html")
+def painel_empresa():
+    usuario = buscar_usuario_sessao()
+    if usuario is None:
+        return redirect("/Pages/login.html")
+    if usuario["tipo"] != "empresa":
+        abort(403)
+
+    conexao = conectar_banco()
+    try:
+        empresa = conexao.execute(
+            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
+            (usuario["id"],)
+        ).fetchone()
+        if empresa is None:
+            abort(404, description="Empresa não encontrada.")
+
+        metricas = dict(conexao.execute(
+            """
+            SELECT
+                COUNT(*) FILTER (WHERE status != 'Entregue') AS servicos_ativos,
+                COUNT(*) FILTER (WHERE status = 'Pronto para retirada') AS prontos_retirada
+            FROM ordens_servico WHERE empresa_id = ?
+            """,
+            (empresa["id"],)
+        ).fetchone())
+        metricas["orcamentos_pendentes"] = conexao.execute(
+            """SELECT COUNT(*) FROM solicitacoes
+               WHERE empresa_id = ? AND orcamento_status = 'Aguardando aprovação'""",
+            (empresa["id"],),
+        ).fetchone()[0]
+        ordens_recentes = conexao.execute(
+            """SELECT id, aparelho, status, previsao FROM ordens_servico
+               WHERE empresa_id = ? ORDER BY id DESC LIMIT 5""",
+            (empresa["id"],),
+        ).fetchall()
+
+    finally:
+        conexao.close()
+
+    return render_template(
+        "Empresa/painelEmpresa.html",
+        empresa=empresa,
+        metricas=metricas,
+        ordens_recentes=ordens_recentes,
+    )
+
+
+@app.post("/api/orcamento/analisar")
+def analisar_orcamento():
+    dados = request.get_json(silent=True) or {}
+    descricao = dados.get("descricao_problema", "").strip()
+    if len(descricao) < 10:
+        return jsonify({"erro": "Descreva melhor o problema."}), 400
+
+    servicos = {
+        "tela": "Avaliação de tela e touch", "bateria": "Avaliação de bateria",
+        "carga": "Avaliação do conector de carga", "camera": "Avaliação de câmera",
+        "audio": "Avaliação de áudio ou microfone", "placa": "Avaliação de placa",
+    }
+    return jsonify({
+        "servico": servicos.get(dados.get("categoria_problema"), "Avaliação técnica do aparelho"),
+        "explicacao": "A análise é preliminar; o técnico confirmará após avaliar o aparelho.",
+        "orientacao": "Envie uma solicitação para receber o orçamento definitivo.",
+        "faixa_preco": None, "prazo_estimado": None, "perguntas": [],
+    })
 
 @app.get("/<pasta>/<path:arquivo>")
 def arquivos_publicos(pasta, arquivo):
@@ -2146,6 +2215,7 @@ def solicitar_atendimento():
             empresas=empresas,
             erro=erro,
             csrf_token=session["csrf_token"],
+            rascunho={},
         ),
         codigo_resposta,
     ))
@@ -2186,21 +2256,36 @@ def listar_solicitacoes_empresa():
         solicitacoes = conexao.execute(
             """
             SELECT
-                s.id,
-                s.aparelho,
-                s.problema,
-                s.status,
-                s.criado_em,
-                u.nome AS cliente_nome,
-                u.email AS cliente_email,
-                u.telefone AS cliente_telefone
+            s.id, s.aparelho, s.problema, s.status, s.criado_em,
+          s.modalidade_entrada, s.endereco_coleta,
+         s.valor_final_centavos, s.prazo_minimo_dias, s.prazo_maximo_dias,
+          s.resposta_cliente, s.modalidade_saida,
+          o.status AS status_orcamento,
+            o.valor_centavos AS valor_orcamento_centavos,
+           o.prazo_minimo_dias AS prazo_orcamento_minimo,
+           o.prazo_maximo_dias AS prazo_orcamento_maximo,
+           u.nome AS cliente_nome, u.email AS cliente_email,
+           u.telefone AS cliente_telefone
             FROM solicitacoes AS s
             JOIN usuarios AS u ON u.id = s.cliente_id
+            LEFT JOIN orcamentos AS o ON o.solicitacao_id = s.id
             WHERE s.empresa_id = ?
             ORDER BY s.id DESC
             """,
             (empresa["id"],),
         ).fetchall()
+        solicitacoes = [dict(item) for item in solicitacoes]
+        for solicitacao in solicitacoes:
+            try:
+                endereco = json.loads(solicitacao["endereco_coleta"] or "{}")
+            except (TypeError, ValueError):
+                endereco = {}
+            solicitacao["endereco_coleta_formatado"] = ", ".join(
+                endereco.get(campo, "").strip()
+                for campo in ("logradouro_coleta", "numero_coleta", "bairro_coleta",
+                              "cidade_coleta", "uf_coleta", "cep_coleta")
+                if endereco.get(campo)
+            )
 
     finally:
         conexao.close()

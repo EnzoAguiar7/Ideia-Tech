@@ -1,0 +1,17 @@
+.pagina-orcamentos-cliente {
+    width: min(1100px, 92%);
+    margin: 48px auto
+}
+
+.acoes-orcamento-cliente {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 16px
+}
+
+.aviso-orcamento {
+    color: #647277;
+    line-height: 1.6
+}
