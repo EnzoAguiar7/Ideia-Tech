@@ -136,10 +136,10 @@ colunas_pedidos = {
 colunas_novos_pedidos = {
     "modalidade_entrega": "TEXT NOT NULL DEFAULT 'retirada'",
     "endereco_entrega": "TEXT NOT NULL DEFAULT ''",
-    "frete_centavos": "TEXT NOT NULL DEFAULT 0",
+    "frete_centavos": "INTEGER NOT NULL DEFAULT 0",
 }
 
-for coluna, definicao in colunas_novas_pedidos.items():
+for coluna, definicao in colunas_novos_pedidos.items():
     if coluna not in colunas_pedidos:
         conexao.execute(f"ALTER TABLE pedidos ADD COLUMN {coluna} {definicao}")
 

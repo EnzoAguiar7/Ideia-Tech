@@ -246,30 +246,28 @@
             </div>
 
 
-            <!-- ENDEREÇO -->
-            {% if usuario['logradouro'] %}
-            <strong id="perfil-endereco">
-                {{ usuario['logradouro'] }}, {{ usuario['numero_endereco'] }}
-                {% if usuario['complemento'] %} · {{ usuario['complemento'] }}{% endif %}
-            </strong>
-
-            <p id="perfil-cidade">
-                {{ usuario['bairro'] }} · {{ usuario['cidade'] }} - {{ usuario['uf'] }}
-            </p>
-
-            <p id="perfil-cep">
-                CEP {{ usuario['cep'][:5] }}-{{ usuario['cep'][5:] }}
-            </p>
-            {% else %}
-            <strong id="perfil-endereco">Endereço não informado</strong>
-            <p id="perfil-cidade">Cadastre seu endereço para agilizar suas compras.</p>
-            {% endif %}
-
-            <button type="button" class="botao-secundario" id="botao-editar-endereco">
-                <i data-lucide="pencil"></i>
-                Alterar endereço
-            </button>
-
+            <div class="perfil-card endereco">
+                <h2>Endereço de entrega</h2>
+                {% if usuario['logradouro'] %}
+                <strong id="perfil-endereco">{{ usuario['logradouro'] }}, {{ usuario['numero_endereco'] }}{% if usuario['complemento'] %} · {{ usuario['complemento'] }}{% endif %}</strong>
+                <p id="perfil-cidade">{{ usuario['bairro'] }} · {{ usuario['cidade'] }} - {{ usuario['uf'] }}</p>
+                <p id="perfil-cep">CEP {{ usuario['cep'][:5] }}-{{ usuario['cep'][5:] }}</p>
+                {% else %}
+                <p>Cadastre seu endereço para agilizar suas compras.</p>
+                {% endif %}
+                <details>
+                    <summary class="botao-secundario">{{ 'Alterar endereço' if usuario['logradouro'] else 'Cadastrar endereço' }}</summary>
+                    <form action="/Pages/Perfil.html" method="POST" class="formulario-endereco">
+                        <label>CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" required value="{{ usuario['cep'] }}"></label>
+                        <label>Rua/avenida<input name="logradouro" autocomplete="address-line1" maxlength="120" required value="{{ usuario['logradouro'] }}"></label>
+                        <label>Número<input name="numero" maxlength="20" required value="{{ usuario['numero_endereco'] }}"></label>
+                        <label>Complemento<input name="complemento" maxlength="100" value="{{ usuario['complemento'] }}"></label>
+                        <label>Bairro<input name="bairro" maxlength="100" required value="{{ usuario['bairro'] }}"></label>
+                        <label>Cidade<input name="cidade" autocomplete="address-level2" maxlength="100" required value="{{ usuario['cidade'] }}"></label>
+                        <label>UF<input name="uf" maxlength="2" pattern="[A-Za-z]{2}" required value="{{ usuario['uf'] }}"></label>
+                        <button type="submit" class="botao-editar">Salvar endereço</button>
+                    </form>
+                </details>
             </div>
 
         </section>

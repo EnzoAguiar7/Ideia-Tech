@@ -363,6 +363,38 @@ html[data-responsive~="Perfil"] nav ul li:first-child a::after {
     color: #647277;
 }
 
+.formulario-endereco {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.formulario-endereco label {
+    display: grid;
+    gap: 5px;
+    color: #647277;
+}
+
+.formulario-endereco input {
+    width: 100%;
+    min-height: 40px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font: inherit;
+}
+
+.endereco summary {
+    display: inline-block;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+@media (max-width: 520px) {
+    .formulario-endereco { grid-template-columns: 1fr; }
+}
+
 
 /* =========================================
    HISTÓRICO

@@ -16,9 +16,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from urllib.parse import urlsplit
 from configuracao import carregar_configuracao
 from decimal import Decimal, InvalidOperation
-from groq import Groq
 import banco
-from ia_prompt import PERSONA_IDEATECH
 
 carregar_configuracao()
 
@@ -78,359 +76,6 @@ def obter_token_csrf():
     resposta = jsonify({"csrf_token": token})
     resposta.headers["Cache-Control"] = "no-store"
     return resposta
-
-
-@app.post("/Pages/Empresa/solicitacoes/<int:solicitacao_id>/orcamento")
-def enviar_orcamento_solicitacao(solicitacao_id):
-    usuario = buscar_usuario_sessao()
-    if usuario is None:
-        return redirect("/Pages/login.html?next=/Pages/Empresa/solicitacoes.html")
-    if usuario["tipo"] != "empresa":
-        abort(403)
-
-    def ler_valor(campo):
-        valor = Decimal(request.form.get(campo, "").strip().replace(",", "."))
-        centavos = (valor * 100).quantize(Decimal("1"))
-        if valor < 0 or centavos > 100_000_000:
-            raise InvalidOperation
-        return int(centavos)
-
-    try:
-        valor_final = ler_valor("valor_final")
-        taxa_devolucao = ler_valor("taxa_devolucao")
-        prazo_minimo = int(request.form.get("prazo_minimo_dias", ""))
-        prazo_maximo = int(request.form.get("prazo_maximo_dias", ""))
-    except (InvalidOperation, ValueError):
-        flash("Informe valores e prazos válidos para o orçamento.", "erro")
-        return redirect("/Pages/Empresa/solicitacoes.html")
-
-    mensagem = request.form.get("mensagem_orcamento", "").strip()
-    if (
-        valor_final <= 0 or len(mensagem) > 1000
-        or not 1 <= prazo_minimo <= prazo_maximo <= 60
-    ):
-        flash("Informe um orçamento positivo, uma faixa de 1 a 60 dias úteis e mensagem de até 1000 caracteres.", "erro")
-        return redirect("/Pages/Empresa/solicitacoes.html")
-
-    enviado = False
-    conexao = conectar_banco()
-    try:
-        conexao.execute("BEGIN IMMEDIATE")
-        solicitacao = conexao.execute(
-            """SELECT s.id, s.modalidade_entrada, s.orcamento_status
-               FROM solicitacoes s JOIN empresas e ON e.id = s.empresa_id
-               WHERE s.id = ? AND e.usuario_id = ?""",
-            (solicitacao_id, usuario["id"]),
-        ).fetchone()
-        if solicitacao is None:
-            abort(404)
-        if solicitacao["orcamento_status"] != "Aguardando análise":
-            flash("Esta solicitação não está mais aguardando o primeiro orçamento.", "erro")
-            return redirect("/Pages/Empresa/solicitacoes.html")
-        if solicitacao["modalidade_entrada"] != "coleta":
-            taxa_devolucao = 0
-        conexao.execute(
-            """UPDATE solicitacoes
-               SET valor_final_centavos = ?, taxa_devolucao_centavos = ?,
-                   prazo_minimo_dias = ?, prazo_maximo_dias = ?,
-                   mensagem_orcamento = ?, orcamento_status = 'Aguardando aprovação',
-                   atualizado_em = CURRENT_TIMESTAMP
-               WHERE id = ?""",
-            (valor_final, taxa_devolucao, prazo_minimo, prazo_maximo, mensagem, solicitacao_id),
-        )
-        conexao.commit()
-        enviado = True
-    except sqlite3.Error:
-        conexao.rollback()
-        app.logger.exception("Erro ao enviar orçamento da solicitação.")
-        flash("Não foi possível enviar o orçamento. Tente novamente.", "erro")
-    finally:
-        conexao.close()
-    if enviado:
-        flash("Orçamento enviado ao cliente.", "sucesso")
-    return redirect("/Pages/Empresa/solicitacoes.html")
-
-
-@app.post("/Pages/solicitacoes/<int:solicitacao_id>/responder")
-def responder_orcamento_solicitacao(solicitacao_id):
-    usuario = buscar_usuario_sessao()
-    if usuario is None:
-        return redirect("/Pages/login.html?next=/Pages/Acompanhar.html")
-    if usuario["tipo"] != "cliente":
-        abort(403)
-
-    resposta_cliente = request.form.get("resposta", "").strip()
-    modalidade_saida = request.form.get("modalidade_saida", "").strip()
-    if resposta_cliente not in {"aceitar", "recusar"}:
-        abort(400)
-
-    respondido = False
-    conexao = conectar_banco()
-    try:
-        conexao.execute("BEGIN IMMEDIATE")
-        solicitacao = conexao.execute(
-            """SELECT id, modalidade_entrada, taxa_devolucao_centavos,
-                      orcamento_status
-               FROM solicitacoes WHERE id = ? AND cliente_id = ?""",
-            (solicitacao_id, usuario["id"]),
-        ).fetchone()
-        if solicitacao is None:
-            abort(404)
-        if solicitacao["orcamento_status"] != "Aguardando aprovação":
-            flash("Este orçamento não está aguardando uma resposta.", "erro")
-            return redirect("/Pages/Acompanhar.html")
-
-        if resposta_cliente == "aceitar":
-            novo_status = "Aprovado"
-            modalidade_saida = ""
-        else:
-            opcoes_saida = {"retirada"}
-            if (
-                solicitacao["modalidade_entrada"] == "coleta"
-                and solicitacao["taxa_devolucao_centavos"] is not None
-            ):
-                opcoes_saida.add("devolucao")
-            if modalidade_saida not in opcoes_saida:
-                flash("Escolha buscar o aparelho ou receber a devolução informada.", "erro")
-                return redirect("/Pages/Acompanhar.html")
-            novo_status = "Recusado"
-
-        conexao.execute(
-            """UPDATE solicitacoes
-               SET orcamento_status = ?, resposta_cliente = ?,
-                   modalidade_saida = ?, respondido_em = CURRENT_TIMESTAMP,
-                   atualizado_em = CURRENT_TIMESTAMP
-               WHERE id = ?""",
-            (novo_status, resposta_cliente, modalidade_saida, solicitacao_id),
-        )
-        conexao.commit()
-        respondido = True
-    except sqlite3.Error:
-        conexao.rollback()
-        app.logger.exception("Erro ao registrar resposta ao orçamento.")
-        flash("Não foi possível registrar sua resposta. Tente novamente.", "erro")
-    finally:
-        conexao.close()
-
-    if respondido:
-        flash("Sua resposta foi enviada à assistência.", "sucesso")
-    return redirect("/Pages/Acompanhar.html")
-
-
-SERVICOS_ORCAMENTO = {
-    "tela": "Avaliação de tela e touch",
-    "bateria": "Diagnóstico de bateria",
-    "carga": "Diagnóstico de carregamento",
-    "camera": "Diagnóstico de câmera",
-    "audio": "Diagnóstico de áudio e microfone",
-    "placa": "Diagnóstico de placa e alimentação",
-    "diagnostico_geral": "Diagnóstico técnico",
-}
-
-CATEGORIAS_ORCAMENTO = {"", "tela", "bateria", "carga", "camera", "audio", "placa"}
-MARCAS_ORCAMENTO = {"Apple", "Samsung", "Motorola", "Xiaomi", "Outro"}
-
-# Faixas públicas de referência observadas em tabela de assistência brasileira
-# publicada em 2026. São referências amplas, não uma média estatística nacional
-# nem um orçamento para um modelo específico. Categorias sem dado publicado
-# permanecem sem preço para evitar inventar valores.
-REFERENCIAS_PRECO_ORCAMENTO = {
-    "bateria": (19000, 45000),
-    "carga": (12000, 12000),
-    "camera": (18000, 60000),
-    "placa": (40000, 60000),
-}
-FONTE_REFERENCIA_PRECO = "Tabela pública TNX, assistência técnica em São Paulo (2026). Faixas amplas, não uma média estatística nacional; o preço depende do modelo, peça e região."
-PRAZOS_REFERENCIA_DIAS_UTEIS = {
-    "tela": (1, 2),
-    "bateria": (1, 2),
-    "carga": (1, 3),
-    "camera": (1, 3),
-    "audio": (1, 3),
-    "placa": (1, 3),
-    "diagnostico_geral": (1, 3),
-}
-AVISO_PRAZO_REFERENCIA = (
-    "Estimativa preliminar em dias úteis. Estoque de peças, fila e diagnóstico "
-    "podem alterar o prazo; a assistência confirma a previsão após avaliar o aparelho."
-)
-
-
-def referencia_preco_orcamento(categoria, marca, modelo):
-    modelo_normalizado = modelo.casefold()
-    if categoria == "tela" and marca == "Apple":
-        # Valores divulgados para iPhone 11, 14 e 16 em assistência autorizada.
-        return (156900, 242900, "Referência de tela para iPhone 11, 14 e 16 publicada em 2026; outros modelos podem variar.")
-    if categoria == "tela" and marca == "Motorola" and "g30" in modelo_normalizado:
-        return (28000, 30000, "Referência publicada para Android comum, exemplo Moto G30 (TNX, 2026).")
-    valores = REFERENCIAS_PRECO_ORCAMENTO.get(categoria)
-    if valores:
-        return (*valores, FONTE_REFERENCIA_PRECO)
-    return None
-
-
-@app.post("/api/orcamento/analisar")
-def analisar_orcamento_com_ia():
-    if request.content_length and request.content_length > 8192:
-        return jsonify({"erro": "O relato enviado é muito grande."}), 413
-
-    if not request.is_json:
-        return jsonify({"erro": "Envie os dados do aparelho em formato JSON."}), 400
-
-    dados = request.get_json(silent=True)
-    if not isinstance(dados, dict):
-        return jsonify({"erro": "Não foi possível ler os dados do aparelho."}), 400
-
-    marca = str(dados.get("marca", "")).strip()
-    modelo = str(dados.get("modelo", "")).strip()
-    categoria = str(dados.get("categoria_problema", "")).strip()
-    descricao = str(dados.get("descricao_problema", "")).strip()
-    modalidade_entrada = str(dados.get("modalidade_entrada", "loja")).strip()
-    campos_endereco = (
-        "cep_coleta", "logradouro_coleta", "numero_coleta", "bairro_coleta",
-        "cidade_coleta", "uf_coleta",
-    )
-    endereco_coleta = {
-        campo: str(dados.get(campo, "")).strip()[:120]
-        for campo in campos_endereco
-    }
-
-    if marca not in MARCAS_ORCAMENTO:
-        return jsonify({"erro": "Selecione uma marca válida."}), 400
-    if not 1 <= len(modelo) <= 80:
-        return jsonify({"erro": "Informe um modelo com até 80 caracteres."}), 400
-    if categoria not in CATEGORIAS_ORCAMENTO:
-        return jsonify({"erro": "Selecione uma categoria válida."}), 400
-    if not 10 <= len(descricao) <= 500:
-        return jsonify({"erro": "Descreva o problema usando de 10 a 500 caracteres."}), 400
-    if modalidade_entrada not in {"coleta", "loja"}:
-        return jsonify({"erro": "Selecione como o aparelho será levado à assistência."}), 400
-    if modalidade_entrada == "coleta" and any(
-        not endereco_coleta[campo]
-        for campo in ("cep_coleta", "logradouro_coleta", "numero_coleta", "bairro_coleta", "cidade_coleta", "uf_coleta")
-    ):
-        return jsonify({"erro": "Preencha o endereço para a busca do aparelho."}), 400
-
-    chave_groq = os.environ.get("GROQ_API_KEY", "").strip()
-    if not chave_groq:
-        return jsonify({
-            "erro": "A análise com IA ainda não está configurada. Tente novamente mais tarde."
-        }), 503
-
-    modelo_groq = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b").strip()
-    esquema_resposta = {
-        "name": "analise_orcamento_ideiatech",
-        "strict": True,
-        "schema": {
-            "type": "object",
-            "properties": {
-                "categoria": {
-                    "type": "string",
-                    "enum": list(SERVICOS_ORCAMENTO),
-                },
-                "explicacao": {"type": "string"},
-                "orientacao": {"type": "string"},
-                "perguntas": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                },
-            },
-            "required": ["categoria", "explicacao", "orientacao", "perguntas"],
-            "additionalProperties": False,
-        },
-    }
-    contexto_cliente = {
-        "marca": marca,
-        "modelo": modelo,
-        "categoria_selecionada": categoria or "não sabe",
-        "relato_do_problema": descricao,
-    }
-
-    try:
-        cliente_groq = Groq(api_key=chave_groq, timeout=25.0, max_retries=1)
-        resposta = cliente_groq.chat.completions.create(
-            model=modelo_groq,
-            messages=[
-                {"role": "system", "content": PERSONA_IDEATECH},
-                {
-                    "role": "user",
-                    "content": (
-                        "Analise o relato abaixo como uma hipótese preliminar. "
-                        "Use somente as categorias permitidas no formato de resposta. "
-                "Não estime preço ou prazo. Dados do aparelho e relato: "
-                        + json.dumps(contexto_cliente, ensure_ascii=False)
-                    ),
-                },
-            ],
-            response_format={"type": "json_schema", "json_schema": esquema_resposta},
-            max_completion_tokens=500,
-        )
-        conteudo = resposta.choices[0].message.content
-        analise = json.loads(conteudo or "{}")
-    except Exception as erro:
-        app.logger.error(
-            "Falha na análise de orçamento pela Groq (%s, HTTP %s): %s",
-            type(erro).__name__,
-            getattr(erro, "status_code", "desconhecido"),
-            str(erro)[:800],
-        )
-        return jsonify({
-            "erro": "A análise não ficou disponível agora. Tente novamente em instantes."
-        }), 502
-
-    categoria_resultado = analise.get("categoria")
-    if (
-        not isinstance(categoria_resultado, str)
-        or categoria_resultado not in SERVICOS_ORCAMENTO
-    ):
-        categoria_resultado = "diagnostico_geral"
-
-    explicacao = str(analise.get("explicacao", "")).strip()[:600]
-    orientacao = str(analise.get("orientacao", "")).strip()[:300]
-    perguntas_brutas = analise.get("perguntas", [])
-    if not isinstance(perguntas_brutas, list):
-        perguntas_brutas = []
-    perguntas = [
-        str(pergunta).strip()[:180]
-        for pergunta in perguntas_brutas[:3]
-        if str(pergunta).strip()
-    ]
-
-    session["rascunho_orcamento"] = {
-        "aparelho": f"{marca} {modelo}".strip(),
-        "problema": descricao,
-        "marca": marca,
-        "modelo": modelo,
-        "categoria": categoria_resultado,
-        "servico": SERVICOS_ORCAMENTO[categoria_resultado],
-        "prazo_minimo_dias": PRAZOS_REFERENCIA_DIAS_UTEIS[categoria_resultado][0],
-        "prazo_maximo_dias": PRAZOS_REFERENCIA_DIAS_UTEIS[categoria_resultado][1],
-        "modalidade_entrada": modalidade_entrada,
-        "endereco_coleta": endereco_coleta if modalidade_entrada == "coleta" else {},
-    }
-
-    referencia = referencia_preco_orcamento(categoria_resultado, marca, modelo)
-
-    resposta_json = jsonify({
-        "servico": SERVICOS_ORCAMENTO[categoria_resultado],
-        "explicacao": explicacao or "Os sintomas precisam ser avaliados por um técnico.",
-        "orientacao": orientacao or "Solicite uma avaliação da assistência escolhida.",
-        "perguntas": perguntas,
-        "faixa_preco": ({
-            "minimo_centavos": referencia[0],
-            "maximo_centavos": referencia[1],
-            "medio_centavos": (referencia[0] + referencia[1]) // 2,
-            "fonte": referencia[2],
-        } if referencia else None),
-        "prazo_estimado": {
-            "minimo_dias_uteis": PRAZOS_REFERENCIA_DIAS_UTEIS[categoria_resultado][0],
-            "maximo_dias_uteis": PRAZOS_REFERENCIA_DIAS_UTEIS[categoria_resultado][1],
-            "medio_dias_uteis": sum(PRAZOS_REFERENCIA_DIAS_UTEIS[categoria_resultado]) / 2,
-            "aviso": AVISO_PRAZO_REFERENCIA,
-        },
-    })
-    resposta_json.headers["Cache-Control"] = "no-store"
-    return resposta_json
 
 
 def enviar_email_recuperacao(destinatario, link_redefinicao):
@@ -718,10 +363,7 @@ def validar_csrf():
     if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
         return
 
-    token_enviado = (
-        request.form.get("csrf_token", "")
-        or request.headers.get("X-CSRF-Token", "")
-    )
+    token_enviado = request.form.get("csrf_token", "")
     token_esperado = session.get("csrf_token", "")
 
     if not token_enviado or not token_esperado:
@@ -906,8 +548,9 @@ def buscar_usuario_sessao():
     try:
         usuario = conexao.execute(
             """
-            SELECT id, nome, email, telefone, cep, logradouro, numero_endereco,
-            complemento, bairro, cidade, uf,versao_sessao, tipo
+            SELECT id, nome, email, telefone, cep, logradouro,
+                   numero_endereco, complemento, bairro, cidade, uf,
+                   versao_sessao, tipo
             FROM usuarios
             WHERE id = ?
             """,
@@ -1137,10 +780,7 @@ def entrar():
     finally:
         conexao.close()
 
-    rascunho_orcamento = session.get("rascunho_orcamento")
     session.clear()
-    if isinstance(rascunho_orcamento, dict):
-        session["rascunho_orcamento"] = rascunho_orcamento
     session["usuario_id"] = usuario["id"]
     session["versao_sessao"] = usuario["versao_sessao"]
     session.permanent = True
@@ -1153,7 +793,7 @@ def entrar():
     )
 
 
-@app.get("/Pages/Perfil.html")
+@app.route("/Pages/Perfil.html", methods=["GET", "POST"])
 def perfil():
     usuario = buscar_usuario_sessao()
 
@@ -1163,29 +803,62 @@ def perfil():
     if usuario["tipo"] != "cliente":
         return redirect(pagina_inicial_usuario(usuario["tipo"]))
 
-
+    if request.method == "POST":
+        dados = {campo: request.form.get(campo, "").strip() for campo in ("cep", "logradouro", "numero", "complemento", "bairro", "cidade", "uf")}
+        dados["cep"] = "".join(char for char in dados["cep"] if char.isdigit())
+        dados["uf"] = dados["uf"].upper()
+        if len(dados["cep"]) != 8 or not all(dados[campo] for campo in ("logradouro", "numero", "bairro", "cidade")) or len(dados["uf"]) != 2:
+            flash("Preencha um endereço válido e completo.", "erro")
+            return redirect("/Pages/Perfil.html")
         conexao = conectar_banco()
         try:
-            sevicos = conexao.execute(
-                """
-                SELECT id, aparelho, problema, status
-                FROM ordens_servico
-                WHERE cliente_id = ?
-                ORDER BY id DESC
-                LIMIT 5
-                """,
-                (usuario["id"],),
-            ).fetchall()
-
+            conexao.execute(
+                """UPDATE usuarios SET cep=?, logradouro=?, numero_endereco=?,
+                   complemento=?, bairro=?, cidade=?, uf=? WHERE id=?""",
+                (dados["cep"], dados["logradouro"], dados["numero"], dados["complemento"], dados["bairro"], dados["cidade"], dados["uf"], usuario["id"]),
+            )
+            conexao.commit()
         finally:
-                conexao.close()
+            conexao.close()
+        flash("Endereço atualizado com sucesso.", "sucesso")
+        return redirect("/Pages/Perfil.html")
 
     resposta = app.make_response(
-        render_template("Perfil.html", usuario=usuario, servicos=servicos)
+        render_template("Perfil.html", usuario=usuario)
     )
     resposta.headers["Cache-Control"] = "no-store"
 
     return resposta
+
+
+@app.route("/api/endereco", methods=["GET", "POST"])
+def endereco_usuario():
+    usuario = buscar_usuario_sessao()
+    if usuario is None:
+        return jsonify({"erro": "Faça login para acessar seu endereço."}), 401
+    if usuario["tipo"] != "cliente":
+        abort(403)
+
+    campos = ("cep", "logradouro", "numero", "complemento", "bairro", "cidade", "uf")
+    if request.method == "GET":
+        return jsonify({campo: usuario["numero_endereco"] if campo == "numero" else usuario[campo] for campo in campos})
+    dados = {campo: request.form.get(campo, "").strip() for campo in campos}
+    dados["cep"] = "".join(char for char in dados["cep"] if char.isdigit())
+    dados["uf"] = dados["uf"].upper()
+    obrigatorios = ("logradouro", "numero", "bairro", "cidade")
+    if len(dados["cep"]) != 8 or not all(dados[campo] for campo in obrigatorios) or len(dados["uf"]) != 2:
+        return jsonify({"erro": "Preencha um endereço válido e completo."}), 400
+    conexao = conectar_banco()
+    try:
+        conexao.execute(
+            """UPDATE usuarios SET cep=?, logradouro=?, numero_endereco=?,
+               complemento=?, bairro=?, cidade=?, uf=? WHERE id=?""",
+            (dados["cep"], dados["logradouro"], dados["numero"], dados["complemento"], dados["bairro"], dados["cidade"], dados["uf"], usuario["id"]),
+        )
+        conexao.commit()
+    finally:
+        conexao.close()
+    return jsonify({"mensagem": "Endereço salvo na conta.", **dados})
 
 
 @app.post("/logout")
@@ -1265,7 +938,7 @@ def editar_perfil():
         render_template(
             "editarPerfil.html",
             usuario=usuario,
-            erro=erro
+            erro=erro,
             csrf_token=session["csrf_token"]
         )
     )
@@ -1301,21 +974,6 @@ def ordens_servico():
             "SELECT id, nome FROM empresas WHERE usuario_id = ?",
             (usuario["id"],)
         ).fetchone()
-
-        if empresa is None:
-            abort(404, description="Empresa não encontrada.")
-
-        aparelhos = conexao.execute(
-            """
-            SELECT o.id, o.aparelho, o.problema, o.previsao, o.status,
-                   u.nome AS cliente_nome
-            FROM ordens_servico AS o
-            JOIN usuarios AS u ON u.id = o.cliente_id
-            WHERE o.empresa_id = ?
-            ORDER BY o.id DESC
-            """,
-            (empresa["id"],)
-        ).fetchall()
 
         if empresa is None:
             abort(
@@ -1523,18 +1181,6 @@ def acompanhar_ordens():
             (usuario["id"],)
         ).fetchall()
 
-        solicitacoes = conexao.execute(
-            """SELECT s.id, s.aparelho, s.problema, s.status,
-                      s.modalidade_entrada, s.valor_final_centavos,
-                      s.taxa_devolucao_centavos, s.mensagem_orcamento,
-                      s.prazo_minimo_dias, s.prazo_maximo_dias,
-                      s.orcamento_status, s.resposta_cliente, s.modalidade_saida,
-                      e.nome AS empresa_nome
-               FROM solicitacoes s JOIN empresas e ON e.id = s.empresa_id
-               WHERE s.cliente_id = ? ORDER BY s.id DESC""",
-            (usuario["id"],),
-        ).fetchall()
-
     finally:
         conexao.close()
 
@@ -1549,9 +1195,7 @@ def acompanhar_ordens():
         render_template(
             "Acompanhar.html",
             ordens=ordens, 
-            historicos=historicos,
-            solicitacoes=solicitacoes,
-            csrf_token=session.setdefault("csrf_token", secrets.token_urlsafe(32)),
+            historicos=historicos
         )
     )
 
@@ -2370,71 +2014,61 @@ def solicitar_atendimento():
             aparelho = request.form.get("aparelho", "").strip()
 
             problema = request.form.get("problema", "").strip()
-            empresas_validas = {empresa["id"] for empresa in empresas}
-            modalidade_entrada = request.form.get("modalidade_entrada", "loja").strip()
-            endereco_coleta = {
-                campo: request.form.get(campo, "").strip()[:120]
-                for campo in (
-                    "cep_coleta", "logradouro_coleta", "numero_coleta",
-                    "bairro_coleta", "cidade_coleta", "uf_coleta",
-                    "complemento_coleta",
-                )
+
+            empresas_validas = {
+                empresa["id"] for empresa in empresas
             }
-            rascunho = session.get("rascunho_orcamento", {})
-            if (
-                not isinstance(rascunho, dict)
-                or rascunho.get("aparelho") != aparelho
-                or rascunho.get("problema") != problema
-            ):
-                rascunho = {}
 
             if empresa_id not in empresas_validas:
                 erro = "Selecione uma assistência válida."
             elif not 2 <= len(aparelho) <= 150:
-                erro = "Informe o aparelho usando entre 2 e 150 caracteres."
-            elif not 10 <= len(problema) <= 2000:
-                erro = "Descreva o problema usando entre 10 e 2000 caracteres."
-            elif modalidade_entrada not in {"coleta", "loja"}:
-                erro = "Escolha como o aparelho chegará à assistência."
-            elif modalidade_entrada == "coleta" and any(
-                not endereco_coleta[campo]
-                for campo in (
-                    "cep_coleta", "logradouro_coleta", "numero_coleta",
-                    "bairro_coleta", "cidade_coleta", "uf_coleta",
+                erro = (
+                    "Informe o aparelho usando entre"
+                    "2 e '50 caracteres."
                 )
-            ):
-                erro = "Preencha o endereço completo para a busca do aparelho."
+            elif not 10 <= len(problema) <= 2000:
+                erro =(
+                    "Descreva o problema usando entre "
+                    "10 e 2000 caracteres."
+                )
 
             if erro:
                 codigo_resposta = 400
             else:
                 conexao.execute(
-                    """
+                     """
                     INSERT INTO solicitacoes (
-                        empresa_id, cliente_id, aparelho, problema,
-                        modalidade_entrada, endereco_coleta,
-                        prazo_minimo_dias, prazo_maximo_dias
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        empresa_id,
+                        cliente_id,
+                        aparelho,
+                        problema
+                    )
+                    VALUES (?, ?, ?, ?)
                     """,
                     (
-                        empresa_id, usuario["id"], aparelho, problema,
-                        modalidade_entrada,
-                        json.dumps(endereco_coleta, ensure_ascii=False)
-                        if modalidade_entrada == "coleta" else "",
-                        rascunho.get("prazo_minimo_dias"),
-                        rascunho.get("prazo_maximo_dias"),
+                        empresa_id,
+                        usuario["id"],
+                        aparelho,
+                        problema,
                     ),
                 )
                 conexao.commit()
-                flash("Solicitação enviada à assistência com sucesso.", "sucesso")
-                session.pop("rascunho_orcamento", None)
-                return redirect("/Pages/solicitarAtendimento.html")
+
+                flash(
+                    "Solicitação enviada à assistência com sucesso.",
+                    "sucesso",
+                )
+                return redirect(
+                    "/Pages/solicitarAtendimento.html"
+                )
+
+
     except sqlite3.Error:
         conexao.rollback()
         app.logger.exception("Erro ao registrar solicitação.")
         erro = (
-            "Não foi possível processar a solicitação. "
-            "Tente novamente."
+            "Não foi possível processar a solicitação."
+            " Tente novamente."
         )
         codigo_resposta = 500
         empresas = []
@@ -2451,7 +2085,6 @@ def solicitar_atendimento():
             empresas=empresas,
             erro=erro,
             csrf_token=session["csrf_token"],
-            rascunho=session.get("rascunho_orcamento", {}),
         ),
         codigo_resposta,
     ))
@@ -2491,23 +2124,17 @@ def listar_solicitacoes_empresa():
 
         solicitacoes = conexao.execute(
             """
-            SELECT s.id, s.aparelho, s.problema, s.status, s.criado_em,
-                   s.modalidade_entrada, s.endereco_coleta,
-                   s.orcamento_status, s.valor_final_centavos,
-                   s.prazo_minimo_dias, s.prazo_maximo_dias,
-                   s.taxa_devolucao_centavos, s.resposta_cliente,
-                   s.modalidade_saida,
-                   o.status AS status_orcamento,
-                   o.valor_centavos AS valor_orcamento_centavos,
-                   o.prazo_minimo_dias AS prazo_orcamento_minimo,
-                   o.prazo_maximo_dias AS prazo_orcamento_maximo,
-                   o.taxa_devolucao_centavos AS taxa_orcamento_centavos,
-                   o.modalidade_saida AS saida_orcamento,
-                   u.nome AS cliente_nome, u.email AS cliente_email,
-                   u.telefone AS cliente_telefone
+            SELECT
+                s.id,
+                s.aparelho,
+                s.problema,
+                s.status,
+                s.criado_em,
+                u.nome AS cliente_nome,
+                u.email AS cliente_email,
+                u.telefone AS cliente_telefone
             FROM solicitacoes AS s
             JOIN usuarios AS u ON u.id = s.cliente_id
-            LEFT JOIN orcamentos AS o ON o.solicitacao_id = s.id
             WHERE s.empresa_id = ?
             ORDER BY s.id DESC
             """,
@@ -2516,126 +2143,22 @@ def listar_solicitacoes_empresa():
 
     finally:
         conexao.close()
-    resposta = app.make_response(render_template(
-        "Empresa/solicitacoes.html", empresa=empresa, solicitacoes=solicitacoes,
-    ))
+
+    resposta = app.make_response(
+        render_template(
+            "Empresa/solicitacoes.html",
+            empresa=empresa,
+            solicitacoes=solicitacoes,
+        )
+    )
     resposta.headers["Cache-Control"] = "no-store"
     return resposta
-
-
-
-@app.route("/Pages/Empresa/aparelhosCadastrados.html")
-def aparelhos_cadastrados():
-    usuario = buscar_usuario_sessao()
-
-    if usuario is None:
-        return redirect("/Pages/login.html")
-
-    if usuario["tipo"] != "empresa":
-        abort(403)
-
-    conexao = conectar_banco()
-
-    try:
-        empresa = conexao.execute(
-            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
-            (usuario["id"],)
-        ).fetchone()
-
-    finally:
-        conexao.close()
-
-    return render_template(
-        "Empresa/aparelhosCadastrados.html",
-        empresa=empresa,
-        aparelhos=aparelhos
-    )
-
-@app.get("/Pages/Empresa/painelEmpresa.html")
-def painel_empresa():
-    usuario = buscar_usuario_sessao()
-
-    if usuario is None:
-        return redirect("/Pages/login.html")
-
-    if usuario["tipo"] != "empresa":
-        abort(403)
-
-    conexao = conectar_banco()
-
-    try:
-        empresa = conexao.execute(
-            "SELECT id, nome FROM empresas WHERE usuario_id = ?",
-            (usuario["id"],)
-        ).fetchone()
-
-        if empresa is None:
-            abort(404, description="Empresa não encontrada.")
-
-        metricas = conexao.execute(
-            """
-            SELECT
-                SUM(
-                    CASE
-                        WHEN status IN (
-                        'Recebido',
-                        'Em diagnóstico',
-                        'Aguardando aprovação',
-                        'Em reparo'
-                        ) THEN 1
-                        ELSE 0
-                    END
-                ) AS servicos_ativos,
-
-                SUM(
-                 CASE
-                    WHEN status = 'Aguardando aprovação'
-                    THEN 1
-                    ELSE 0
-                 END
-                ) AS orcamentos_pendentes,
-
-                SUM(
-                    CASE
-                        WHEN status = 'Pronto para retirada'
-                        THEN 1
-                        ELSE 0
-                    END
-                ) AS prontos_retirada
-
-            FROM ordens_servico
-            WHERE empresa_id = ?
-            """,
-            (empresa["id"],)
-        ).fetchone()
-
-        ordens_recentes = conexao.execute(
-            """
-            SELECT id, aparelho, status, previsao
-            FROM ordens_servico
-            WHERE empresa_id = ?
-            ORDER BY id DESC
-            LIMIT 5
-            """,
-            (empresa["id"],)
-        ).fetchall()
-
-    finally:
-        conexao.close()
-
-    return render_template(
-        "Empresa/painelEmpresa.html",
-        empresa=empresa,
-        metricas=metricas,
-        ordens_recentes=ordens_recentes
-    )
 
 from orcamentos import registrar_rotas_orcamentos
 
 registrar_rotas_orcamentos(
     app, conectar_banco, buscar_usuario_sessao
 )
-
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)

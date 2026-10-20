@@ -110,11 +110,6 @@
     const campoCep = formularioFrete?.querySelector('[name="cep"]');
     const resultadoFrete = document.querySelector('[data-resultado-frete]');
     const botaoConsultarCep = formularioFrete?.querySelector('[data-consultar-cep]');
-    const camposEntrega = document.querySelector('[data-campos=entrega');
-    const modalidadesEntrega = formularioFrete?.querySelectorAll(
-        '[name="modalidade'
-    )
-
     if (formularioFrete && campoCep && resultadoFrete && botaoConsultarCep) {
         function formatarCep() {
             const numeros = campoCep.value.replace(/\D/g, '').slice(0, 8);
@@ -123,6 +118,24 @@
                 ? numeros.slice(0, 5) + '-' + numeros.slice(5)
                 : numeros;
         }
+
+        let enderecoDaConta = false;
+        fetch('/api/endereco', { credentials: 'same-origin' })
+            .then(resposta => {
+                if (!resposta.ok) return null;
+                enderecoDaConta = true;
+                return resposta.json();
+            })
+            .then(endereco => {
+                if (!endereco) return;
+                formularioFrete.querySelectorAll('[name]').forEach(campo => {
+                    if (typeof endereco[campo.name] === 'string' && endereco[campo.name]) {
+                        campo.value = endereco[campo.name];
+                    }
+                });
+                formatarCep();
+            })
+            .catch(() => {});
 
         try {
             const enderecoSalvo = JSON.parse(
@@ -211,7 +224,7 @@
 
         botaoConsultarCep.addEventListener('click', consultarCep);
 
-        formularioFrete.addEventListener('submit', event => {
+        formularioFrete.addEventListener('submit', async event => {
             event.preventDefault();
 
             const cep = campoCep.value.replace(/\D/g, '');
@@ -241,6 +254,26 @@
                 );
                 enderecoGuardado = true;
             } catch { }
+
+            if (enderecoDaConta) {
+                try {
+                    const csrfResposta = await fetch('/csrf-token', { credentials: 'same-origin' });
+                    const csrf = await csrfResposta.json();
+                    const dados = new URLSearchParams({ ...endereco, csrf_token: csrf.csrf_token });
+                    const resposta = await fetch('/api/endereco', {
+                        method: 'POST', credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: dados
+                    });
+                    const resultado = await resposta.json();
+                    if (!resposta.ok) throw new Error(resultado.erro || 'Não foi possível salvar na conta.');
+                    resultadoFrete.textContent = 'Endereço salvo na sua conta. O valor do frete depende do cadastro das faixas regionais.';
+                    return;
+                } catch (erro) {
+                    resultadoFrete.textContent = erro.message || 'Endereço guardado apenas nesta sessão.';
+                    return;
+                }
+            }
 
             resultadoFrete.textContent = enderecoGuardado
                 ? 'Endereço guardado nesta sessão. A consulta do valor depende do cadastro das faixas regionais de frete.'
