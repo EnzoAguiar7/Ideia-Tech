@@ -309,3 +309,117 @@ legend>span {
     outline: 2px solid var(--verde);
     outline-offset: 2px;
 }
+
+.form-status-os .confirmacao-recebimento {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 82px;
+    margin: 7px 0 12px;
+    padding: 16px 18px;
+    border: 1px solid #d9e5e1;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #fbfdfb 0%, #f3f8f5 100%);
+    cursor: pointer;
+    transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.form-status-os .confirmacao-recebimento:hover {
+    border-color: #9ac8bb;
+    box-shadow: 0 8px 22px rgba(16, 61, 57, .08);
+    transform: translateY(-1px);
+}
+
+.confirmacao-recebimento input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+.controle-confirmacao {
+    display: grid;
+    width: 25px;
+    height: 25px;
+    flex: 0 0 25px;
+    place-items: center;
+    border: 1.5px solid #b8c9c3;
+    border-radius: 7px;
+    background: #fff;
+    color: transparent;
+    transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+    text-align: center;
+
+
+}
+
+.controle-confirmacao svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 3;
+}
+
+.confirmacao-recebimento input:checked + .controle-confirmacao {
+    border-color: var(--verde);
+    background: var(--verde);
+    color: #fff;
+}
+
+.confirmacao-recebimento input:focus-visible + .controle-confirmacao {
+    outline: 3px solid rgba(0, 139, 124, .25);
+    outline-offset: 3px;
+}
+
+.form-status-os .confirmacao-recebimento:has(input:checked) {
+    border-color: #8bc8b8;
+    background: linear-gradient(135deg, #f4fbf8 0%, #e8f6f1 100%);
+}
+
+.texto-confirmacao {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 3px;
+    min-width: 0;
+   
+}
+
+.form-status-os .texto-confirmacao strong {
+    color: #183c39;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.form-status-os .texto-confirmacao small {
+    color: #70817c;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.selo-confirmacao {
+    flex: 0 0 auto;
+    padding: 5px 9px;
+    border: 1px solid #d8e8e2;
+    border-radius: 20px;
+    background: #fff;
+    color: #55736b;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+
+@media (max-width: 560px) {
+    .form-status-os .confirmacao-recebimento {
+        align-items: flex-start;
+        gap: 11px;
+        padding: 14px;
+    }
+
+    .selo-confirmacao {
+        display: none;
+    }
+}
