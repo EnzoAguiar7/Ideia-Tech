@@ -123,6 +123,14 @@
             }
 
             document.querySelector('#servicoIdentificado').textContent = analise.servico;
+            sessionStorage.setItem('ideiatech_orcamento', JSON.stringify({
+                aparelho: `${dados.marca} ${dados.modelo}`.trim(),
+                problema: dados.descricao_problema,
+                servico: analise.servico,
+                categoria: dados.categoria_problema,
+                modalidade_entrada: dados.modalidade_entrada,
+                endereco: Object.fromEntries(['cep','logradouro','numero','bairro','cidade','uf'].map(c => [`${c}_coleta`, dados[`${c}_coleta`] || '']))
+            }));
             document.querySelector('#explicacaoDiagnostico').textContent = analise.explicacao;
             document.querySelector('#orientacaoDiagnostico').textContent = analise.orientacao;
             const faixa = analise.faixa_preco;
@@ -130,11 +138,11 @@
                 style: 'currency', currency: 'BRL'
             });
             document.querySelector('#precoEstimado').textContent = faixa
-                ? `${formatarReais(faixa.minimo_centavos)} a ${formatarReais(faixa.maximo_centavos)}`
+                ? `${formatarReais(faixa.minimo_centavos)} a ${formatarReais(faixa.maximo_centavos)} (média ${formatarReais(faixa.medio_centavos)})`
                 : 'Sem referência confiável para esta categoria';
             const avisoPreco = document.querySelector('#fontePrecoEstimado');
             avisoPreco.textContent = faixa
-                ? `Faixa de referência de mercado (valor médio do intervalo: ${formatarReais(faixa.medio_centavos)}). ${faixa.fonte} O valor final será definido pela assistência após analisar o aparelho.`
+                ? `${faixa.fonte} É apenas uma perspectiva de mercado; o preço final será definido pela assistência após a análise técnica do aparelho.`
                 : 'Ainda não há dados de mercado suficientes para estimar esta categoria. O valor final será informado após análise técnica.';
             const prazo = analise.prazo_estimado;
             const formatarDias = (dias) => String(dias).replace('.', ',');

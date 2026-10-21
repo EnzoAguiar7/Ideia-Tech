@@ -78,6 +78,9 @@
                 required
             >{{ request.form.get('problema', rascunho.get('problema', '')) }}</textarea>
 
+            <label for="servico-sugerido">Serviço solicitado ou sugerido pela IA</label>
+            <input id="servico-sugerido" name="servico_sugerido" maxlength="200" placeholder="Selecione ou descreva o serviço desejado">
+
             <fieldset class="atendimento-logistica">
                 <legend>Como o aparelho chegará à assistência?</legend>
                 <label>
@@ -111,5 +114,21 @@
         <p>Nenhuma assistência está disponível no momento.</p>
         {% endif %}
     </main>
+
+<script>
+(() => {
+ const form = document.querySelector(".atendimento-form");
+ try {
+  const dado = JSON.parse(sessionStorage.getItem("ideiatech_orcamento") || "null");
+  if (!dado || !form) return;
+  form.querySelector("[name=aparelho]").value = dado.aparelho || "";
+  form.querySelector("[name=problema]").value = dado.problema || "";
+  form.querySelector("[name=servico_sugerido]").value = dado.servico || "";
+  const chegada = form.querySelector(`[name=modalidade_entrada][value="${dado.modalidade_entrada}"]`);
+  if (chegada) chegada.checked = true;
+  Object.entries(dado.endereco || {}).forEach(([nome, valor]) => { const campo = form.querySelector(`[name="${nome}"]`); if (campo && valor) campo.value = valor; });
+ } catch (_) {}
+})();
+</script>
 </body>
 </html>

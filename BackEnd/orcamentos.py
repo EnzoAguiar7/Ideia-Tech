@@ -65,10 +65,12 @@ def registrar_rotas_orcamentos(app, conectar_banco, buscar_usuario_sessao):
                 SELECT o.id, o.status, o.diagnostico, o.servico,
                        o.valor_centavos, o.prazo_dias, o.prazo_minimo_dias,
                        o.prazo_maximo_dias, o.taxa_devolucao_centavos,
-                       s.modalidade_entrada, s.id AS solicitacao_id,
-                       s.empresa_id, s.cliente_id, s.aparelho
+                       s.modalidade_entrada, s.endereco_coleta, s.id AS solicitacao_id,
+                       s.empresa_id, s.cliente_id, s.aparelho,
+                       u.cep, u.logradouro, u.numero_endereco, u.bairro, u.cidade, u.uf
                 FROM orcamentos AS o
                 JOIN solicitacoes AS s ON s.id = o.solicitacao_id
+                JOIN usuarios AS u ON u.id = s.cliente_id
                 WHERE o.id = ? AND s.cliente_id = ?
                 """,
                 (orcamento_id, usuario["id"]),
@@ -77,19 +79,25 @@ def registrar_rotas_orcamentos(app, conectar_banco, buscar_usuario_sessao):
                 abort(404)
             if orcamento["status"] != "Aguardando aprovação":
                 flash("Este orçamento já recebeu uma decisão.", "erro")
-                return redirect("/Pages/MeusOrcamentos.html")
+                return redirect("/Pages/Acompanhar.html")
 
             modalidade_saida = request.form.get("modalidade_saida", "").strip()
             if decisao == "Recusado":
                 opcoes_saida = {"retirada"}
-                if (
-                    orcamento["modalidade_entrada"] == "coleta"
-                    and orcamento["taxa_devolucao_centavos"] is not None
-                ):
+                try:
+                    endereco_salvo = json.loads(orcamento["endereco_coleta"] or "{}")
+                except (TypeError, ValueError):
+                    endereco_salvo = {}
+                tem_endereco = bool(
+                    endereco_salvo.get("logradouro_coleta")
+                    or all(orcamento[campo] for campo in (
+                        "cep", "logradouro", "numero_endereco", "bairro", "cidade", "uf"))
+                )
+                if tem_endereco:
                     opcoes_saida.add("devolucao")
                 if modalidade_saida not in opcoes_saida:
                     flash("Escolha receber o aparelho de volta ou buscá-lo na assistência.", "erro")
-                    return redirect("/Pages/MeusOrcamentos.html")
+                    return redirect("/Pages/Acompanhar.html")
             else:
                 modalidade_saida = ""
 
@@ -144,7 +152,7 @@ def registrar_rotas_orcamentos(app, conectar_banco, buscar_usuario_sessao):
         finally:
             conexao.close()
         flash(mensagem, "sucesso")
-        return redirect("/Pages/MeusOrcamentos.html")
+        return redirect("/Pages/Acompanhar.html")
 
     @app.route("/Pages/Empresa/orcamentos.html", methods=["GET", "POST"])
     def orcamentos_empresa():
@@ -171,6 +179,7 @@ def registrar_rotas_orcamentos(app, conectar_banco, buscar_usuario_sessao):
                 servico = request.form.get("servico", "").strip()
                 prazo_minimo = request.form.get("prazo_minimo_dias", type=int)
                 prazo_maximo = request.form.get("prazo_maximo_dias", type=int)
+                aparelho_recebido = request.form.get("confirmar_aparelho_recebido") == "on"
                 valor_texto = request.form.get("valor", "").strip().replace(",", ".")
                 taxa_texto = request.form.get("taxa_devolucao", "0").strip().replace(",", ".")
                 try:
@@ -195,7 +204,9 @@ def registrar_rotas_orcamentos(app, conectar_banco, buscar_usuario_sessao):
                             "com até duas casas decimais, sem milhar.")
 
                 if not erro:
-                    if not 5 <= len(diagnostico) <= 2000:
+                    if not aparelho_recebido:
+                        erro = "Confirme que o aparelho está em mãos antes de enviar o orçamento final."
+                    elif not 5 <= len(diagnostico) <= 2000:
                         erro = "O diagnóstico deve ter entre 5 e 2000 caracteres."
                     elif not 3 <= len(servico) <= 1000:
                         erro = "O serviço deve ter entre 3 e 1000 caracteres."
@@ -207,7 +218,7 @@ def registrar_rotas_orcamentos(app, conectar_banco, buscar_usuario_sessao):
                     conexao.execute("BEGIN IMMEDIATE")
                     solicitacao = conexao.execute(
                         """
-                        SELECT s.id, s.modalidade_entrada FROM solicitacoes AS s
+                        SELECT s.id, s.modalidade_entrada, s.dispositivo_recebido FROM solicitacoes AS s
                         WHERE s.id = ? AND s.empresa_id = ?
                           AND s.status IN ('Nova solicitação', 'Em análise')
                           AND NOT EXISTS (
@@ -222,6 +233,10 @@ def registrar_rotas_orcamentos(app, conectar_banco, buscar_usuario_sessao):
                         erro = ("Solicitação indisponível, encerrada "
                                 "ou já possui orçamento.")
                     else:
+                        conexao.execute(
+                            "UPDATE solicitacoes SET dispositivo_recebido = 1 WHERE id = ?",
+                            (solicitacao_id,),
+                        )
                         if solicitacao["modalidade_entrada"] != "coleta":
                             taxa_devolucao_centavos = 0
                         conexao.execute(
@@ -252,7 +267,7 @@ def registrar_rotas_orcamentos(app, conectar_banco, buscar_usuario_sessao):
 
             solicitacoes = conexao.execute(
                 """
-                SELECT s.id, s.aparelho, u.nome AS cliente_nome,
+                SELECT s.id, s.aparelho, s.servico_sugerido, u.nome AS cliente_nome,
                        s.modalidade_entrada, s.prazo_minimo_dias,
                        s.prazo_maximo_dias, s.endereco_coleta
                 FROM solicitacoes AS s

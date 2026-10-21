@@ -32,31 +32,113 @@
     <main class="pagina-acompanhar">
         <section class="acompanhar-topo" aria-labelledby="titulo-acompanhar">
             <div>
-                <span class="texto-destaque">
-                    MEUS ATENDIMENTOS
-                </span>
+                <span class="texto-destaque"><i data-lucide="activity" aria-hidden="true"></i> PAINEL DO CLIENTE</span>
 
                 <h1 id="titulo-acompanhar">
-                    Como está <span>seu aparelho?</span>
+                    Acompanhe cada <span>etapa do reparo.</span>
                 </h1>
 
                 <p>
-                    Confira o andamento e os recados da assistência.
-                    Atualize a página para consultar novas informações.
+                    Orçamentos, atualizações da assistência e próximos passos reunidos em um só lugar.
                 </p>
+            </div>
+            <div class="acoes-topo-acompanhar">
+                <button class="botao-atualizar" type="button" id="atualizarAcompanhamento">
+                    <i data-lucide="refresh-cw" aria-hidden="true"></i> Atualizar
+                </button>
+                <a class="botao-novo-orcamento" href="/Pages/Orçamento.html">
+                    <i data-lucide="plus" aria-hidden="true"></i> Novo orçamento
+                </a>
             </div>
         </section>
 
         {% include "_mensagens.html" %}
 
-        <section class="ordem-servico" aria-labelledby="titulo-orcamentos-cliente">
-            <h2 id="titulo-orcamentos-cliente">Orçamentos das assistências</h2>
-            <p>Consulte os valores definidos pela assistência, autorize o serviço e escolha como receber o aparelho na página de orçamentos.</p>
-            <a class="atendimento-submit" href="/Pages/MeusOrcamentos.html">Ver meus orçamentos</a>
+        {% set resumo = namespace(aguardando=solicitacoes_pendentes|length + orcamentos_pendentes|length, ativos=0, prontos=0) %}
+        {% for ordem in ordens %}
+            {% if ordem['status'] == 'Pronto para retirada' %}
+                {% set resumo.prontos = resumo.prontos + 1 %}
+            {% elif ordem['status'] != 'Entregue' %}
+                {% set resumo.ativos = resumo.ativos + 1 %}
+            {% endif %}
+        {% endfor %}
+
+        <section class="resumo-acompanhamento" aria-label="Resumo dos atendimentos">
+            <article class="indicador-acompanhamento indicador-pendente">
+                <span class="indicador-icone"><i data-lucide="bell-ring" aria-hidden="true"></i></span>
+                <div><span>Precisam de você</span><strong>{{ resumo.aguardando }}</strong><small>orçamentos e respostas</small></div>
+            </article>
+            <article class="indicador-acompanhamento">
+                <span class="indicador-icone"><i data-lucide="wrench" aria-hidden="true"></i></span>
+                <div><span>Em andamento</span><strong>{{ resumo.ativos }}</strong><small>serviços ativos</small></div>
+            </article>
+            <article class="indicador-acompanhamento">
+                <span class="indicador-icone"><i data-lucide="package-check" aria-hidden="true"></i></span>
+                <div><span>Prontos</span><strong>{{ resumo.prontos }}</strong><small>aguardando sua retirada</small></div>
+            </article>
         </section>
 
+        <nav class="filtros-acompanhamento" aria-label="Filtrar atendimentos">
+            <div class="filtros-botoes" role="group" aria-label="Exibir atendimentos">
+                <button type="button" class="filtro-atendimento ativo" data-filtro="todos" aria-pressed="true">Tudo</button>
+                <button type="button" class="filtro-atendimento" data-filtro="orcamento" aria-pressed="false">Orçamentos <span>{{ resumo.aguardando }}</span></button>
+                <button type="button" class="filtro-atendimento" data-filtro="servico" aria-pressed="false">Serviços <span>{{ ordens|length }}</span></button>
+                <button type="button" class="filtro-atendimento" data-filtro="pronto" aria-pressed="false">Prontos <span>{{ resumo.prontos }}</span></button>
+            </div>
+            <p id="resultadoFiltro" aria-live="polite">Exibindo todos os seus atendimentos</p>
+        </nav>
+
+        {% if solicitacoes_pendentes %}
+        <section class="ordem-servico" data-categoria="orcamento" aria-labelledby="titulo-solicitacoes-pendentes">
+            <h2 id="titulo-solicitacoes-pendentes">Solicitações aguardando orçamento</h2>
+            {% for solicitacao in solicitacoes_pendentes %}
+            <article class="solicitacao-pendente">
+                <div class="ordem-cabecalho">
+                    <div>
+                        <span class="texto-destaque">{{ solicitacao['empresa_nome'] }} · Solicitação #{{ solicitacao['id'] }}</span>
+                        <h3>{{ solicitacao['aparelho'] }}</h3>
+                    </div>
+                    <span class="status-atual">Aguardando orçamento</span>
+                </div>
+                <p><strong>Serviço desejado:</strong> {{ solicitacao['servico_sugerido'] }}</p>
+                <p><strong>Problema informado:</strong> {{ solicitacao['problema'] }}</p>
+                <p role="status">Sua solicitação foi enviada. A empresa analisará o aparelho e enviará o preço e o prazo finais para você decidir se aceita o serviço.</p>
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if orcamentos_pendentes %}
+        <section class="ordem-servico" data-categoria="orcamento" aria-labelledby="titulo-orcamentos-pendentes">
+            <h2 id="titulo-orcamentos-pendentes">Orçamento final aguardando sua decisão</h2>
+            {% for orcamento in orcamentos_pendentes %}
+            <article class="orcamento-pendente">
+                <h3>{{ orcamento['empresa_nome'] }} · {{ orcamento['aparelho'] }}</h3>
+                <p><strong>Diagnóstico:</strong> {{ orcamento['diagnostico'] }}</p>
+                <p><strong>Serviço:</strong> {{ orcamento['servico'] }}</p>
+                <p><strong>Preço final:</strong> R$ {{ ('%.2f' % (orcamento['valor_centavos'] / 100)).replace('.', ',') }}</p>
+                <p><strong>Prazo final:</strong> {{ orcamento['prazo_minimo_dias'] }} a {{ orcamento['prazo_maximo_dias'] }} dias úteis</p>
+                <form action="/Pages/MeusOrcamentos/{{ orcamento['id'] }}/decisao" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button class="atendimento-submit" type="submit" name="decisao" value="Aprovado">Aceitar serviço</button>
+                </form>
+                <form action="/Pages/MeusOrcamentos/{{ orcamento['id'] }}/decisao" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="decisao" value="Recusado">
+                    <label for="saida-recusa-{{ orcamento['id'] }}">Se recusar, como receberá o aparelho?</label>
+                    <select id="saida-recusa-{{ orcamento['id'] }}" name="modalidade_saida" required>
+                        {% if orcamento['modalidade_entrada'] == 'coleta' or orcamento['endereco_coleta'] not in ['', '{}'] or (orcamento['cep'] and orcamento['logradouro'] and orcamento['numero_endereco'] and orcamento['bairro'] and orcamento['cidade'] and orcamento['uf']) %}<option value="devolucao">Receber novamente no endereço</option>{% endif %}
+                        <option value="retirada">Buscar na loja</option>
+                    </select>
+                    <button class="atendimento-submit" type="submit">Recusar serviço</button>
+                </form>
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+
         {% for ordem in ordens %}
-        <section class="ordem-servico" aria-labelledby="titulo-os-{{ ordem['id'] }}">
+        <section class="ordem-servico" data-categoria="{{ 'pronto' if ordem['status'] == 'Pronto para retirada' else 'servico' }}" aria-labelledby="titulo-os-{{ ordem['id'] }}">
             <div class="ordem-cabecalho">
                 <div>
                     <span class="texto-destaque">
@@ -73,11 +155,25 @@
                 </span>
             </div>
 
-            <dl class="resumo-ordem">
+            <dl class="resumo-ordem resumo-ordem-detalhes">
                 <div>
                     <dt>Problema relatado</dt>
                     <dd>{{ ordem['problema'] }}</dd>
                 </div>
+
+                {% if ordem['servico_orcamento'] %}
+                <div>
+                    <dt>Serviço aprovado</dt>
+                    <dd>{{ ordem['servico_orcamento'] }}</dd>
+                </div>
+                {% endif %}
+
+                {% if ordem['valor_orcamento_centavos'] %}
+                <div>
+                    <dt>Valor aprovado</dt>
+                    <dd>R$ {{ ('%.2f' % (ordem['valor_orcamento_centavos'] / 100)).replace('.', ',') }}</dd>
+                </div>
+                {% endif %}
 
                 <div>
                     <dt>Previsão de entrega</dt>
@@ -91,7 +187,47 @@
                 </div>
             </dl>
 
-            <h3>Atualizações da assistência</h3>
+            {% set etapas_servico = ['Recebido', 'Em diagnóstico', 'Em reparo', 'Pronto para retirada', 'Entregue'] %}
+            {% set etapa_atual = 0 %}
+            {% if ordem['status'] == 'Em diagnóstico' %}{% set etapa_atual = 1 %}
+            {% elif ordem['status'] == 'Em reparo' %}{% set etapa_atual = 2 %}
+            {% elif ordem['status'] == 'Pronto para retirada' %}{% set etapa_atual = 3 %}
+            {% elif ordem['status'] == 'Entregue' %}{% set etapa_atual = 4 %}{% endif %}
+            <ol class="linha-etapas" aria-label="Etapas do serviço">
+                {% for etapa in etapas_servico %}
+                <li class="{% if loop.index0 < etapa_atual %}concluida{% elif loop.index0 == etapa_atual %}etapa-atual{% endif %}">
+                    <span class="etapa-marcador">{% if loop.index0 < etapa_atual %}<i data-lucide="check" aria-hidden="true"></i>{% else %}{{ loop.index }}{% endif %}</span>
+                    <span>{{ etapa }}</span>
+                </li>
+                {% endfor %}
+            </ol>
+
+            <div class="titulo-historico"><i data-lucide="history" aria-hidden="true"></i><h3>Atualizações da assistência</h3></div>
+
+            {% if ordem['orcamento_id'] and ordem['status'] == 'Pronto para retirada' %}
+            <section class="preferencias-entrega" aria-labelledby="titulo-entrega-{{ ordem['id'] }}">
+                <h3 id="titulo-entrega-{{ ordem['id'] }}">Seu aparelho está pronto</h3>
+                {% if ordem['modalidade_saida_pronto'] and ordem['pagamento_modalidade'] %}
+                <p>Você escolheu {{ 'receber no endereço' if ordem['modalidade_saida_pronto'] == 'devolucao' else 'buscar na loja' }} e pretende pagar {{ 'pelo site' if ordem['pagamento_modalidade'] == 'site' else 'pessoalmente' }}.</p>
+                {% else %}
+                <p>Escolha como receber o aparelho e como pretende pagar. O pagamento ainda não será processado pelo site.</p>
+                <form action="/Pages/Acompanhar/ordem/{{ ordem['id'] }}/preferencias-entrega" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <label for="saida-pronto-{{ ordem['id'] }}">Como pegará o aparelho?</label>
+                    <select id="saida-pronto-{{ ordem['id'] }}" name="modalidade_saida" required>
+                        <option value="retirada">Vou buscar na loja</option>
+                        <option value="devolucao">Quero receber no meu endereço</option>
+                    </select>
+                    <label for="pagamento-{{ ordem['id'] }}">Como pretende pagar?</label>
+                    <select id="pagamento-{{ ordem['id'] }}" name="pagamento_modalidade" required>
+                        <option value="site">Pelo site</option>
+                        <option value="presencial">Pessoalmente na loja</option>
+                    </select>
+                    <button class="atendimento-submit" type="submit">Salvar minhas escolhas</button>
+                </form>
+                {% endif %}
+            </section>
+            {% endif %}
 
             {% set atualizacoes = historicos.get(ordem['id'], []) %}
 
@@ -121,14 +257,14 @@
             {% endif %}
         </section>
         {% else %}
-        <section class="ordem-servico">
-            <h2>Nenhum atendimento encontrado.</h2>
-
-            <p>
-                Quando a assistência cadastrar uma ordem vinculada
-                ao e-mail da sua conta, ela aparecerá aqui.
-            </p>
-        </section>
+            {% if not solicitacoes_pendentes and not orcamentos_pendentes %}
+            <section class="estado-vazio-acompanhar">
+                <span class="estado-vazio-icone"><i data-lucide="smartphone" aria-hidden="true"></i></span>
+                <h2>Seu próximo reparo começa aqui</h2>
+                <p>Quando você solicitar um orçamento, as respostas da assistência e o andamento do serviço aparecerão neste painel.</p>
+                <a class="botao-novo-orcamento" href="/Pages/Orçamento.html"><i data-lucide="plus" aria-hidden="true"></i> Solicitar orçamento</a>
+            </section>
+            {% endif %}
         {% endfor %}
     </main>
 
@@ -136,6 +272,33 @@
     <footer>
         <p>Ideia Tech · Projeto desenvolvido no Senac DF · 2026</p>
     </footer>
+    <script>
+        (() => {
+            const filtros = [...document.querySelectorAll('.filtro-atendimento')];
+            const cartoes = [...document.querySelectorAll('[data-categoria]')];
+            const status = document.querySelector('#resultadoFiltro');
+            const atualizar = document.querySelector('#atualizarAcompanhamento');
+            const nomes = { todos: 'todos os seus atendimentos', orcamento: 'orçamentos e solicitações', servico: 'serviços em andamento', pronto: 'serviços prontos' };
+
+            filtros.forEach((botao) => botao.addEventListener('click', () => {
+                const filtro = botao.dataset.filtro;
+                let visiveis = 0;
+                cartoes.forEach((cartao) => {
+                    const mostrar = filtro === 'todos' || cartao.dataset.categoria === filtro;
+                    cartao.hidden = !mostrar;
+                    if (mostrar) visiveis += 1;
+                });
+                filtros.forEach((item) => {
+                    const ativo = item === botao;
+                    item.classList.toggle('ativo', ativo);
+                    item.setAttribute('aria-pressed', String(ativo));
+                });
+                status.textContent = `Exibindo ${visiveis} item(ns): ${nomes[filtro]}`;
+            }));
+
+            atualizar?.addEventListener('click', () => window.location.reload());
+        })();
+    </script>
 </body>
 
 </html>

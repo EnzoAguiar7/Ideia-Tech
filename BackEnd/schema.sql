@@ -185,6 +185,7 @@ CREATE TABLE IF NOT EXISTS solicitacoes (
     cliente_id INTEGER NOT NULL,
     aparelho TEXT NOT NULL,
     problema TEXT NOT NULL,
+    servico_sugerido TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL DEFAULT 'Nova solicitação'
         CHECK (status IN(
             'Nova solicitação',
@@ -195,6 +196,7 @@ CREATE TABLE IF NOT EXISTS solicitacoes (
     criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modalidade_entrada TEXT NOT NULL DEFAULT 'loja'
         CHECK (modalidade_entrada IN ('coleta', 'loja')),
+    dispositivo_recebido INTEGER NOT NULL DEFAULT 0 CHECK (dispositivo_recebido IN (0, 1)),
     endereco_coleta TEXT NOT NULL DEFAULT '',
     prazo_minimo_dias INTEGER CHECK (prazo_minimo_dias >= 0),
     prazo_maximo_dias INTEGER CHECK (prazo_maximo_dias >= 0),
@@ -232,6 +234,9 @@ CREATE TABLE IF NOT EXISTS orcamentos (
     prazo_maximo_dias INTEGER NOT NULL DEFAULT 3 CHECK (prazo_maximo_dias BETWEEN prazo_minimo_dias AND 365),
     taxa_devolucao_centavos INTEGER NOT NULL DEFAULT 0 CHECK (taxa_devolucao_centavos >= 0),
     modalidade_saida TEXT NOT NULL DEFAULT '' CHECK (modalidade_saida IN ('', 'devolucao', 'retirada')),
+    modalidade_saida_pronto TEXT NOT NULL DEFAULT '' CHECK (modalidade_saida_pronto IN ('', 'devolucao', 'retirada')),
+    pagamento_modalidade TEXT NOT NULL DEFAULT '' CHECK (pagamento_modalidade IN ('', 'site', 'presencial')),
+    chegada_confirmada INTEGER NOT NULL DEFAULT 0 CHECK (chegada_confirmada IN (0, 1)),
     status TEXT NOT NULL DEFAULT 'Aguardando aprovação'
         CHECK (status IN ('Aguardando aprovação', 'Aprovado', 'Recusado')),
     criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,

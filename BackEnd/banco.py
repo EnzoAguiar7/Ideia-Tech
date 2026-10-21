@@ -53,6 +53,9 @@ colunas_novas_orcamentos = {
     "taxa_devolucao_centavos": "INTEGER NOT NULL DEFAULT 0",
     "modalidade_saida": "TEXT NOT NULL DEFAULT ''",
     "respondido_em": "TEXT",
+    "modalidade_saida_pronto": "TEXT NOT NULL DEFAULT ''",
+    "pagamento_modalidade": "TEXT NOT NULL DEFAULT ''",
+    "chegada_confirmada": "INTEGER NOT NULL DEFAULT 0",
 }
 colunas_novas_orcamentos["prazo_dias"] = "INTEGER NOT NULL DEFAULT 3"
 for coluna, definicao in colunas_novas_orcamentos.items():
@@ -72,6 +75,8 @@ colunas_solicitacoes = {
     linha[1] for linha in conexao.execute("PRAGMA table_info(solicitacoes)")
 }
 colunas_novas_solicitacoes = {
+    "servico_sugerido": "TEXT NOT NULL DEFAULT ''",
+    "dispositivo_recebido": "INTEGER NOT NULL DEFAULT 0",
     "modalidade_entrada": "TEXT NOT NULL DEFAULT 'loja'",
     "endereco_coleta": "TEXT NOT NULL DEFAULT ''",
     "prazo_minimo_dias": "INTEGER",

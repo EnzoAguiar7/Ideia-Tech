@@ -100,102 +100,11 @@
         </p>
         {% endif %}
 
-        <div class="order-layout">
-            <section class="card order-card" id="nova-ordem">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">NOVO ATENDIMENTO</p>
-                        <h2>Prepare a ordem de serviço</h2>
-                    </div>
-                    <span class="section-icon">
-                        <i data-lucide="clipboard-list" aria-hidden="true"></i>
-                    </span>
-                </div>
-                <p class="form-intro">Preencha os dados do cliente e do aparelho. Os campos com * são obrigatórios.</p>
-
-
-
-                <form id="formOrdemServico" action="/Pages/Empresa/ordensServico.html" method="POST">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <fieldset>
-                        <legend>
-                            <span>01</span>Cliente e aparelho
-                        </legend>
-                        <div class="field">
-                            <label for="clienteEmail">E-mail do cliente *</label>
-                            <input id="clienteEmail" name="cliente_email" type="email" maxlength="254"
-                                autocomplete="email" placeholder="cliente@email.com"
-                                value="{{ request.form.get('cliente_email', '') }}" required>
-                            <small>Use o e-mail da conta do cliente para vincular o atendimento.</small>
-                        </div>
-                        <div class="field">
-                            <label for="aparelho">Aparelho e modelo *</label>
-                            <input id="aparelho" name="aparelho" minlength="2" maxlength="120"
-                                placeholder="Ex.: Samsung Galaxy S23" value="{{ request.form.get('aparelho', '') }}"
-                                required>
-                        </div>
-                    </fieldset>
-                    <fieldset>
-                        <legend>
-                            <span>02</span>Detalhes do atendimento
-                        </legend>
-                        <div class="field">
-                            <label for="problema">Problema relatado *</label>
-                            <textarea id="problema" name="problema" minlength="5" maxlength="1000" rows="5"
-                                placeholder="Descreva os sintomas relatados pelo cliente."
-                                required>{{ request.form.get('problema', '') }}</textarea>
-                            <small>Inclua as informações que ajudam na avaliação técnica.</small>
-                        </div>
-                        <div class="field">
-                            <label for="previsao">Previsão de entrega <span class="optional">Opcional</span>
-                            </label>
-                            <input id="previsao" name="previsao" type="date"
-                                value="{{ request.form.get('previsao', '') }}">
-                            <small>A estimativa poderá ser ajustada após o diagnóstico.</small>
-                        </div>
-                    </fieldset>
-
-                    <div class="form-bottom">
-                        <p>
-                            <i data-lucide="info" aria-hidden="true"></i>
-                            A ordem ficará vinculada à conta do cliente informado.
-                        </p>
-
-                        <button class="button primary" type="submit">
-                            <i data-lucide="plus" aria-hidden="true"></i>
-                            Salvar ordem
-                        </button>
-                    </div>
-
-                </form>
-            </section>
-            <aside class="order-aside">
-                <section class="card tip-card">
-                    <span class="tip-icon">
-                        <i data-lucide="user-round" aria-hidden="true"></i>
-                    </span>
-                    <h2>Informação que faz diferença.</h2>
-                    <p>Uma descrição cuidadosa evita dúvidas e ajuda o cliente a entender o atendimento.</p>
-                    <ul>
-                        <li>Confirme o modelo do aparelho.</li>
-                        <li>Anote danos e sintomas relatados.</li>
-                        <li>Combine a previsão com o cliente.</li>
-                    </ul>
-                </section>
-                <section class="status-guide">
-                    <p class="eyebrow">PRÓXIMAS ETAPAS</p>
-                    <h2>Um caminho fácil de acompanhar</h2>
-                    <div class="status-list">
-                        <span class="status active">Recebido</span>
-                        <span class="status">Diagnóstico</span>
-                        <span class="status">Aguardando aprovação</span>
-                        <span class="status">Em reparo</span>
-                        <span class="status">Pronto para retirada</span>
-                    </div>
-                    <p>Esses status vão orientar as atualizações do atendimento.</p>
-                </section>
-            </aside>
-        </div>
+        <section class="card order-card" aria-labelledby="titulo-origem-ordens">
+            <h2 id="titulo-origem-ordens">Ordens vinculadas a orçamentos aprovados</h2>
+            <p>Uma ordem aparece aqui automaticamente quando o cliente aceita o orçamento final. Os status desta página atualizam o acompanhamento do cliente.</p>
+            <a class="button secondary" href="/Pages/Empresa/orcamentos.html">Ver orçamentos e solicitações</a>
+        </section>
 
         <section class="card lista-ordens">
             <div class="section-heading">

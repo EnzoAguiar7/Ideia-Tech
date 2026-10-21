@@ -115,11 +115,17 @@
                         request.form.get('solicitacao_id')==solicitacao['id']|string %} selected {% endif %}>
                         #{{ solicitacao['id'] }} —
                         {{ solicitacao['cliente_nome'] }} —
-                        {{ solicitacao['aparelho'] }}
+                        {{ solicitacao['aparelho'] }} —
+                        {{ solicitacao['servico_sugerido'] }}
                     </option>
                     {% endfor %}
                 </select>
                 <small id="logisticaSolicitacao" aria-live="polite"></small>
+
+                <label class="confirmacao-recebimento">
+                    <input type="checkbox" name="confirmar_aparelho_recebido" required>
+                    Confirmo que o aparelho está em mãos e foi analisado tecnicamente.
+                </label>
 
                 <label for="diagnostico">Diagnóstico técnico</label>
                 <textarea id="diagnostico" name="diagnostico" minlength="5" maxlength="2000" rows="4"
