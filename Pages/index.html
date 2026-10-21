@@ -61,7 +61,10 @@
             </div>
 
             <div class="diagrama-iphone">
-                <img src="../Assets/img/Diagrama Iphone.png" alt="Diagrama de iphone">
+                <video class="video-montagem" autoplay muted loop playsinline preload="auto" aria-label="Vídeo da montagem de um celular">
+                    <source src="../Assets/video/montagem.mp4" type="video/mp4">
+                    Seu navegador não consegue reproduzir este vídeo.
+                </video>
             </div>
 
         </section>
@@ -279,6 +282,22 @@
 </body>
 
 <script src="../Script/Script.js"></script>
+
+<script>
+    const videoMontagem = document.querySelector('.video-montagem');
+
+    if (videoMontagem) {
+        const observadorVideo = new IntersectionObserver(([entrada]) => {
+            if (entrada.isIntersecting) {
+                videoMontagem.play().catch(() => {});
+            } else {
+                videoMontagem.pause();
+            }
+        }, { threshold: 0.25 });
+
+        observadorVideo.observe(videoMontagem);
+    }
+</script>
 
 
 </html>

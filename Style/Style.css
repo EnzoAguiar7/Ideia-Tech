@@ -307,11 +307,14 @@ main {
     align-items: center;
 }
 
-.diagrama-iphone img {
+.diagrama-iphone img,
+.diagrama-iphone video {
     width: 100%;
     max-width: 550px;
     height: 520px;
     display: block;
+    object-fit: cover;
+    border-radius: 12px;
 }
 
 .nota {
