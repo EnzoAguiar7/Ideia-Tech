@@ -1685,6 +1685,7 @@ def buscar_produtos_publicos():
             """
             SELECT
                 p.id,
+                p.empresa_id,
                 p.nome,
                 p.descricao,
                 p.categoria,

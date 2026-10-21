@@ -66,6 +66,22 @@ class PedidosTest(unittest.TestCase):
         self.assertEqual(self.consultar("SELECT estoque FROM produtos ORDER BY id"),
                          [(10,), (8,), (5,), (4,)])
 
+    def test_catalogo_publico_corresponde_aos_produtos_da_vitrine(self):
+        resposta = self.cliente.get("/Script/catalogoProdutos.js")
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.mimetype, "application/javascript")
+        script = resposta.get_data(as_text=True)
+        dados = json.loads(script.split("Object.freeze(", 1)[1].removesuffix(");"))
+
+        self.assertEqual(set(dados), {"produto-1", "produto-2", "produto-3"})
+        self.assertEqual(dados["produto-1"]["empresa_id"], 1)
+        self.assertEqual(dados["produto-1"]["preco"], 1500)
+        self.assertEqual(dados["produto-1"]["estoque"], 10)
+
+        vitrine = self.cliente.get("/Pages/vitrine.html")
+        self.assertEqual(vitrine.status_code, 200)
+        self.assertIn('data-produto-id="produto-1"', vitrine.get_data(as_text=True))
+
     def test_agrupa_por_empresa_sem_duplicar_pedidos_ou_baixas(self):
         resposta = self.enviar([
             {"id": "produto-1", "quantidade": 2},
