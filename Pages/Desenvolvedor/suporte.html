@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Caixa de suporte | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/Empresa/suporte.css">
+    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer src="/Script/suporte.js"></script>
+</head>
+<body data-conversa-id="{{ selecionada or '' }}" data-csrf-token="{{ csrf_token }}" data-papel="desenvolvedor" data-nome="{{ usuario['nome'] }}">
+    <main class="support-shell developer-shell">
+        <aside class="support-sidebar developer-list">
+            <a class="support-brand" href="/">‹ <span>IdeiaTech</span></a>
+            <div class="support-user"><span class="avatar">{{ usuario['nome'][:1]|upper }}</span><div><strong>{{ usuario['nome'] }}</strong><small>Desenvolvedor</small></div></div>
+            <div class="inbox-heading"><div><small>ATENDIMENTO</small><h1>Caixa de suporte</h1></div><span class="conversation-count">{{ conversas|length }}</span></div>
+            <div class="conversation-filter"><span>Conversas</span><span>Recentes</span></div>
+            <nav class="conversation-list" aria-label="Conversas de suporte">
+                {% for item in conversas %}
+                <a class="conversation-item {% if item['id'] == selecionada %}selected{% endif %}" href="/Pages/Desenvolvedor/suporte.html?conversa={{ item['id'] }}">
+                    <span class="avatar company-avatar">{{ item['empresa_nome'][:1]|upper }}</span>
+                    <span class="conversation-summary"><strong>{{ item['empresa_nome'] }}</strong><small>{{ item['ultima_mensagem'] or 'Iniciou uma conversa' }}</small><small class="last-time">{{ item['atualizada_em'] }}</small></span>
+                    <span class="status-pill {{ 'closed' if item['status'] == 'encerrada' else '' }}">{{ 'Encerrada' if item['status'] == 'encerrada' else 'Aberta' }}</span>
+                </a>
+                {% else %}
+                <div class="empty-inbox"><span>✉</span><strong>Nenhuma conversa ainda</strong><p>Quando uma empresa enviar uma mensagem, ela aparecerá aqui.</p></div>
+                {% endfor %}
+            </nav>
+            <form class="logout-form" action="/logout" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit">Sair da conta</button></form>
+        </aside>
+        <section class="chat-panel">
+            {% set selecionada_info = namespace(conversa=None) %}
+            {% for item in conversas %}{% if item['id'] == selecionada %}{% set selecionada_info.conversa = item %}{% endif %}{% endfor %}
+            {% if selecionada_info.conversa %}
+            <header class="chat-header"><div class="thread-avatar large company-avatar">{{ selecionada_info.conversa['empresa_nome'][:1]|upper }}</div><div class="chat-contact"><h1>{{ selecionada_info.conversa['empresa_nome'] }}</h1><p>{{ selecionada_info.conversa['responsavel_nome'] }} · Responsável da empresa</p></div><button type="button" class="close-conversation" id="closeConversation" {% if selecionada_info.conversa['status'] == 'encerrada' %}hidden{% endif %}>Encerrar conversa</button><span class="status-pill closed" id="closedBadge" {% if selecionada_info.conversa['status'] != 'encerrada' %}hidden{% endif %}>Encerrada</span></header>
+            <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+            <form class="chat-composer" id="chatForm"><label class="sr-only" for="messageInput">Mensagem</label><textarea id="messageInput" rows="1" maxlength="4000" placeholder="Responder à empresa…" required></textarea><button type="submit" aria-label="Enviar mensagem">➤</button><div class="composer-hint">Enter para enviar · Shift+Enter para nova linha</div></form>
+            {% else %}<div class="no-conversation"><div class="thread-avatar large">IT</div><h2>Seu suporte começa aqui</h2><p>Selecione uma conversa na lista para atender a empresa.</p></div>{% endif %}
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Suporte técnico | IdeiaTech</title>
+    <link rel="stylesheet" href="/Style/Empresa/suporte.css">
+    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer src="/Script/suporte.js"></script>
+</head>
+<body data-conversa-id="{{ conversa['id'] }}" data-csrf-token="{{ csrf_token }}" data-papel="empresa" data-nome="{{ empresa['nome'] }}">
+    <main class="support-shell">
+        <aside class="support-sidebar">
+            <a class="support-brand" href="/Pages/Empresa/painelEmpresa.html">‹ <span>IdeiaTech</span></a>
+            <div class="support-user"><span class="avatar">{{ empresa['nome'][:1]|upper }}</span><div><strong>{{ empresa['nome'] }}</strong><small>Área empresarial</small></div></div>
+            <a class="back-link" href="/Pages/Empresa/painelEmpresa.html">Voltar ao painel</a>
+            <div class="support-sidebar-label">MENSAGENS</div>
+            <div class="support-thread active"><span class="thread-avatar">IT</span><span><strong>Suporte IdeiaTech</strong><small>Equipe de desenvolvimento</small></span><i class="online-dot"></i></div>
+            <div class="sidebar-help">Converse com a equipe responsável pelo sistema. O histórico fica salvo nesta página.</div>
+        </aside>
+        <section class="chat-panel">
+            <header class="chat-header"><div class="thread-avatar large">IT</div><div class="chat-contact"><h1>Suporte IdeiaTech</h1><p><i class="online-dot"></i> Equipe de desenvolvimento</p></div><span class="secure-label">Canal de suporte</span></header>
+            <div class="chat-notice">Olá! Envie sua dúvida ou relate o que precisa de ajuda. A equipe responderá por aqui.</div>
+            <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+            <form class="chat-composer" id="chatForm"><label class="sr-only" for="messageInput">Mensagem</label><textarea id="messageInput" rows="1" maxlength="4000" placeholder="Escreva uma mensagem…" required></textarea><button type="submit" aria-label="Enviar mensagem">➤</button><div class="composer-hint">Enter para enviar · Shift+Enter para nova linha</div></form>
+        </section>
+    </main>
+</body>
+</html>
+
+

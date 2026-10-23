@@ -12,6 +12,7 @@ from email.message import EmailMessage
 from pathlib import Path
 from urllib.parse import quote, unquote, urlsplit, urlunsplit
 from flask import Flask, abort, flash, redirect, send_from_directory, request, session, render_template, jsonify
+from flask_socketio import SocketIO
 from werkzeug.security import generate_password_hash, check_password_hash
 from urllib.parse import urlsplit
 from configuracao import carregar_configuracao
@@ -40,6 +41,7 @@ app.config["SESSION_COOKIE_SECURE"] = os.environ.get("APP_ENV") == "production"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=12)
 app.config["SESSION_REFRESH_EACH_REQUEST"] = False
 app.config["RECUPERACAO_LOCAL"] = os.environ.get("RECUPERACAO_LOCAL") == "1"
+socketio = SocketIO(app, cors_allowed_origins=[])
 
 if app.config["RECUPERACAO_LOCAL"] and os.environ.get("APP_ENV") == "production":
     raise RuntimeError("RECUPERACAO_LOCAL não pode ser habilitado em produção.")
@@ -677,6 +679,8 @@ def buscar_usuario_sessao():
 def pagina_inicial_usuario(tipo):
     if tipo == "empresa":
         return "/Pages/Empresa/painelEmpresa.html"
+    if tipo == "desenvolvedor":
+        return "/Pages/Desenvolvedor/suporte.html"
     
     return "/Pages/Perfil.html"
 
@@ -686,7 +690,10 @@ def destino_permitido_para_usuario(destino, tipo):
 
     caminho = urlsplit(destino).path
 
-    if caminho.startswith ("/Pages/Empresa/") and tipo != "empresa":
+    if caminho.startswith("/Pages/Empresa/") and tipo not in {"empresa", "desenvolvedor"}:
+        return None
+
+    if caminho.startswith("/Pages/Desenvolvedor/") and tipo != "desenvolvedor":
         return None
     
     paginas_cliente = {
@@ -711,7 +718,7 @@ def proteger_area_empresarial():
         destino = quote(request.full_path.rstrip("?"), safe="/?=&")
         return redirect (f"/Pages/login.html?next={destino}")
 
-    if usuario["tipo"] != "empresa":
+    if usuario["tipo"] not in {"empresa", "desenvolvedor"}:
         abort(403)
 
 @app.route("/Pages/Empresa/dadosEmpresa.html", methods=["GET", "POST"])
@@ -2425,10 +2432,13 @@ def listar_solicitacoes_empresa():
     return resposta
 
 from orcamentos import registrar_rotas_orcamentos
+from suporte import registrar_suporte
 
 registrar_rotas_orcamentos(
     app, conectar_banco, buscar_usuario_sessao
 )
 
+registrar_suporte(app, socketio, conectar_banco, buscar_usuario_sessao)
+
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000)
+    socketio.run(app, host="127.0.0.1", port=5000)

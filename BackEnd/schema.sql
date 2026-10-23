@@ -22,7 +22,7 @@ CREATE TABLE if NOT EXISTS usuarios (
     uf TEXT NOT NULL DEFAULT '',
     versao_sessao INTEGER NOT NULL DEFAULT 0,
     tipo TEXT NOT NULL DEFAULT 'cliente'
-    CHECK (tipo IN ('cliente', 'empresa')),
+    CHECK (tipo IN ('cliente', 'empresa', 'desenvolvedor')),
     criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
