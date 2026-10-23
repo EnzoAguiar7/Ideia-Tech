@@ -32,12 +32,93 @@ html {
     background: var(--fundo-pagina);
 }
 
+/* Transição entre documentos: aprimoramento progressivo, sem interceptar links. */
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-old(root) {
+    animation: transicao-pagina-saida 140ms ease both;
+}
+
+::view-transition-new(root) {
+    animation: transicao-pagina-entrada 200ms ease both;
+}
+
+@keyframes transicao-pagina-saida {
+    to { opacity: 0; }
+}
+
+@keyframes transicao-pagina-entrada {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation: none;
+    }
+}
+
 body {
     background: var(--cor-fundo);
     color: var(--cor-texto);
     font-family: "Inter", sans-serif;
     font-family: "Sora", sans-serif;
     line-height: 1.5;
+}
+
+/* Revelação suave de conteúdo conforme o usuário percorre as páginas. */
+.scroll-reveal {
+    opacity: 0;
+    filter: blur(7px);
+    transform: translate3d(0, 28px, 0) scale(0.985);
+    transition: opacity 650ms cubic-bezier(0.2, 0.7, 0.2, 1),
+        filter 650ms cubic-bezier(0.2, 0.7, 0.2, 1),
+        transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--scroll-reveal-delay, 0ms);
+    will-change: opacity, transform;
+}
+
+.scroll-reveal.is-visible {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+    will-change: auto;
+}
+
+.scroll-progress {
+    position: fixed;
+    inset: 0 auto auto 0;
+    z-index: 1100;
+    width: 100%;
+    height: 3px;
+    pointer-events: none;
+    transform: scaleX(var(--scroll-progress, 0));
+    transform-origin: left center;
+    background: linear-gradient(90deg, #11c5ad, #7ee8d9 60%, #c5fff5);
+    box-shadow: 0 0 12px rgb(17 197 173 / 35%);
+    transition: transform 100ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-reveal,
+    .scroll-reveal.is-visible {
+        opacity: 1;
+        filter: none;
+        transform: none;
+        transition: none;
+        will-change: auto;
+    }
+
+    .hero .video-montagem {
+        animation: none;
+    }
+
+    .scroll-progress {
+        display: none;
+    }
 }
 
 a {
@@ -313,6 +394,21 @@ main {
     display: block;
     object-fit: cover;
     border-radius: 12px;
+}
+
+.hero .video-montagem {
+    animation: video-entrada-lateral 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes video-entrada-lateral {
+    from {
+        opacity: 0;
+        transform: translate3d(-100vw, 0, 0) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
 }
 
 .nota {

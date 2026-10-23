@@ -79,6 +79,17 @@ def obter_token_csrf():
     return resposta
 
 
+@app.get("/sessao-atual")
+def obter_sessao_atual():
+    usuario = buscar_usuario_sessao()
+    resposta = jsonify({
+        "autenticado": usuario is not None,
+        "tipo": usuario["tipo"] if usuario is not None else None,
+    })
+    resposta.headers["Cache-Control"] = "no-store"
+    return resposta
+
+
 def enviar_email_recuperacao(destinatario, link_redefinicao):
     if app.config["RECUPERACAO_LOCAL"]:
         app.logger.warning("Link local de redefinição de senha: %s", link_redefinicao)

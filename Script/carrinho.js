@@ -68,7 +68,10 @@
         const quantidade = itens.reduce((soma, item) => soma + item.quantidade, 0);
         document.querySelectorAll('[data-contador-carrinho]').forEach(el => el.textContent = quantidade);
         const limpar = document.querySelector('[data-limpar-carrinho]');
-        if (limpar) limpar.disabled = itens.length === 0;
+        if (limpar) {
+            limpar.disabled = itens.length === 0;
+            limpar.hidden = itens.length === 0;
+        }
         const lista = document.querySelector('[data-itens-carrinho]');
         if (!lista) return;
         lista.replaceChildren();
