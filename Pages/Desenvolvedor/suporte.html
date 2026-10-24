@@ -4,7 +4,7 @@
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Caixa de suporte | IdeiaTech</title>
     <link rel="stylesheet" href="/Style/Empresa/suporte.css">
-    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer src="https://cdn.socket.io/4.8.4/socket.io.min.js" crossorigin="anonymous"></script>
     <script defer src="/Script/suporte.js"></script>
 </head>
 <body data-conversa-id="{{ selecionada or '' }}" data-csrf-token="{{ csrf_token }}" data-papel="desenvolvedor" data-nome="{{ usuario['nome'] }}">
