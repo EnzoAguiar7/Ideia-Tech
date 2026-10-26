@@ -3,10 +3,19 @@
     const id = Number(root.dataset.conversaId);
     const form = document.getElementById("chatForm");
     const list = document.getElementById("chatMessages");
-    if (!id || !form || !list || typeof window.io !== "function") return;
+    if (!id || !form || !list) return;
 
     const input = document.getElementById("messageInput");
     const button = form.querySelector("button[type='submit']");
+    if (typeof window.io !== "function") {
+        const error = document.createElement("p");
+        error.className = "connection-notice";
+        error.textContent = "Não foi possível carregar o cliente de mensagens. Verifique sua conexão e recarregue a página.";
+        list.prepend(error);
+        input.disabled = true;
+        button.disabled = true;
+        return;
+    }
     const socket = window.io("/suporte", { auth: { csrf_token: root.dataset.csrfToken } });
     const seen = new Set();
 
