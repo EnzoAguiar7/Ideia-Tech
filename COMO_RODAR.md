@@ -57,6 +57,23 @@ A página carrega o cadastro da conta autenticada e permite atualizar o
 nome da empresa, CNPJ opcional, telefone e nome do responsável. O e-mail
 de acesso permanece somente para consulta.
 
+## Suporte técnico em tempo real
+
+Instale as dependências atualizadas com `.\.venv\Scripts\python.exe -m pip install -r requirements.txt`.
+Na primeira execução, `BackEnd/banco.py` cria as tabelas de suporte e atualiza
+o tipo de conta para incluir `desenvolvedor`, preservando as contas existentes.
+Para criar uma conta interna de desenvolvedor, execute depois da migração:
+
+```powershell
+.\.venv\Scripts\python.exe BackEnd/criar_desenvolvedor.py
+```
+
+O comando solicita nome, e-mail, telefone e senha no terminal. O cadastro não
+fica disponível publicamente. Desenvolvedores entram pela página de login e
+são direcionados à caixa de suporte. Empresas acessam **Suporte técnico** no
+menu da área empresarial. A conversa é armazenada no banco local e pode ser
+encerrada e reaberta pela empresa ao voltar à tela de suporte.
+
 ## Erros comuns
 
 - `No module named flask`: execute a instalação das dependências e use

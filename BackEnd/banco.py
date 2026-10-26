@@ -174,6 +174,71 @@ conexao.execute(
     ON usuarios(email)
     """
 )
+
+# Atualiza o CHECK de tipo em bancos locais criados antes do perfil dev.
+sql_usuarios = conexao.execute(
+    "SELECT sql FROM sqlite_master WHERE type='table' AND name='usuarios'"
+).fetchone()[0]
+if "desenvolvedor" not in sql_usuarios:
+    conexao.commit()
+    conexao.execute("PRAGMA foreign_keys = OFF")
+    conexao.execute("BEGIN IMMEDIATE")
+    conexao.execute("""
+        CREATE TABLE usuarios_novo (
+            id INTEGER PRIMARY KEY,
+            nome TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            telefone TEXT NOT NULL,
+            senha_hash TEXT NOT NULL,
+            cep TEXT NOT NULL DEFAULT '',
+            logradouro TEXT NOT NULL DEFAULT '',
+            numero_endereco TEXT NOT NULL DEFAULT '',
+            complemento TEXT NOT NULL DEFAULT '',
+            bairro TEXT NOT NULL DEFAULT '',
+            cidade TEXT NOT NULL DEFAULT '',
+            uf TEXT NOT NULL DEFAULT '',
+            versao_sessao INTEGER NOT NULL DEFAULT 0,
+            tipo TEXT NOT NULL DEFAULT 'cliente'
+                CHECK (tipo IN ('cliente', 'empresa', 'desenvolvedor')),
+            criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conexao.execute("""
+        INSERT INTO usuarios_novo
+            (id,nome,email,telefone,senha_hash,cep,logradouro,numero_endereco,
+             complemento,bairro,cidade,uf,versao_sessao,tipo,criado_em)
+        SELECT id,nome,email,telefone,senha_hash,cep,logradouro,numero_endereco,
+               complemento,bairro,cidade,uf,versao_sessao,tipo,criado_em
+        FROM usuarios
+    """)
+    conexao.execute("DROP TABLE usuarios")
+    conexao.execute("ALTER TABLE usuarios_novo RENAME TO usuarios")
+    conexao.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email)"
+    )
+    conexao.commit()
+    conexao.execute("PRAGMA foreign_keys = ON")
+
+conexao.executescript("""
+CREATE TABLE IF NOT EXISTS conversas_suporte (
+    id INTEGER PRIMARY KEY,
+    empresa_id INTEGER NOT NULL UNIQUE REFERENCES empresas(id) ON DELETE CASCADE,
+    status TEXT NOT NULL DEFAULT 'aberta' CHECK (status IN ('aberta','encerrada')),
+    criada_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizada_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS mensagens_suporte (
+    id INTEGER PRIMARY KEY,
+    conversa_id INTEGER NOT NULL REFERENCES conversas_suporte(id) ON DELETE CASCADE,
+    usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
+    texto TEXT NOT NULL CHECK (length(texto) BETWEEN 1 AND 4000),
+    criada_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_mensagens_suporte_conversa
+    ON mensagens_suporte(conversa_id, id);
+CREATE INDEX IF NOT EXISTS idx_conversas_suporte_atualizada
+    ON conversas_suporte(atualizada_em DESC);
+""")
  
 colunas_historico = {
     linha[1] for linha in conexao.execute("PRAGMA table_info(historico_ordens)")
