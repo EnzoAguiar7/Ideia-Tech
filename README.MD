@@ -65,7 +65,7 @@ O projeto foi desenvolvido como uma aplicação web, utilizando:
 
 | Página inicial | Solicitação de atendimento |
 | --- | --- |
-| ![Página inicial do IdeiaTech](Assets/screenshots/MenuInicial.jpeg) | ![Tela de solicitação de atendimento](Assets/screenshots/OrçamentoIA.jpeg) |
+| ![Página inicial do IdeiaTech](Assets/screenshots/menuInicial.jpeg) | ![Tela de solicitação de atendimento](Assets/screenshots/OrçamentoIA.jpeg) |
 
 | Painel da empresa | Vitrine de produtos |
 | --- | --- |
