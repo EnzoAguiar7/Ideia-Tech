@@ -62,15 +62,14 @@ O projeto foi desenvolvido como uma aplicação web, utilizando:
 
 ## Imagens do projeto
 
-> Insira abaixo capturas de tela do sistema. Salve as imagens na pasta `Assets/screenshots/` e mantenha os nomes indicados, ou ajuste os caminhos conforme necessário.
 
 | Página inicial | Solicitação de atendimento |
 | --- | --- |
-| ![Página inicial do IdeiaTech](Assets/screenshots/pagina-inicial.png) | ![Tela de solicitação de atendimento](Assets/screenshots/solicitar-atendimento.png) |
+| ![Página inicial do IdeiaTech](Assets/screenshots/MenuInicial.jpeg) | ![Tela de solicitação de atendimento](Assets/screenshots/OrçamentoIA.jpeg) |
 
 | Painel da empresa | Vitrine de produtos |
 | --- | --- |
-| ![Painel empresarial do IdeiaTech](Assets/screenshots/painel-empresa.png) | ![Vitrine de produtos do IdeiaTech](Assets/screenshots/vitrine.png) |
+| ![Painel empresarial do IdeiaTech](Assets/screenshots/MenuEmpresa.jpeg) | ![Vitrine de produtos do IdeiaTech](Assets/screenshots/DadosEmpresa.jpeg) |
 
 ---
 
